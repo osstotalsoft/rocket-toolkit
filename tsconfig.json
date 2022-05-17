@@ -1,23 +1,4 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "lib": ["ESNext", "ES2015"],
-    "outDir": "./dist",
-    "strict": true,
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "noEmitOnError": true,
-    "forceConsistentCasingInFileNames": true,
-    "declaration": true,
-    "declarationMap": true,
-    // "sourceMap": true,
-    "strictNullChecks": true,
-    "useUnknownInCatchVariables": false,
-    "resolveJsonModule": true
-  },
-  "include": ["**/src/**/*"],
-  "exclude": ["**/dist", ".vscode", "packages/**/dist/**"],
   "references": [
     {
       "path": "./packages/apollo-logger"
