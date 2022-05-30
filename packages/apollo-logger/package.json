@@ -23,14 +23,18 @@
     "build": "run clean && tsc --project tsconfig.build.json",
     "lint": "eslint src/*.ts",
     "clean": "rimraf dist",
-    "test": "jest --collectCoverage --passWithNoTests --verbose --silent=false"
+    "test": "jest --collectCoverage --passWithNoTests --verbose --silent=false --runInBand"
   },
   "devDependencies": {
+    "@jest/types": "^28.1.0",
+    "@types/jest": "^27.5.1",
     "@types/node": "^17.0.32",
     "@types/ramda": "0.28.0",
     "@types/rimraf": "^3",
     "@types/uuid": "^8.3.4",
+    "jest": "^28.1.0",
     "rimraf": "^3.0.2",
+    "ts-jest": "^28.0.3",
     "typescript": "^4.7.2"
   },
   "dependencies": {
@@ -42,6 +46,11 @@
     "graphql": "^16.4.0",
     "ramda": "^0.28.0",
     "uuid": "^8.3.2"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "verbose": true
   },
   "license": "MIT"
 }

@@ -1,6 +1,6 @@
 import { ApolloError } from 'apollo-server'
 import { v4 } from 'uuid'
-import { append, map } from 'ramda'
+import { append } from 'ramda'
 import { ApolloContextExtension, LoggingLevel } from './types'
 import '@colors/colors'
 
@@ -37,26 +37,6 @@ export const initializeDbLogging = (
       ? new Promise(() => error)
       : logDbError(context, message, code || '', LoggingLevel.ERROR, error, persistLogsFn)
 })
-
-// export const saveLogs = async (context: ApolloContextExtension) => {
-//   const { dbInstance, logs, requestId } = context
-//   if (logs && dbInstance) {
-//     const insertLogs = map(
-//       ({ uid, code, message, timeStamp, loggingLevel, error }) => ({
-//         Uid: uid,
-//         RequestId: requestId || v4(),
-//         Code: code,
-//         Message: message,
-//         Details: error ? `${error?.message} ${error?.stack} ${JSON.stringify(error?.extensions)}` : '',
-//         TimeStamp: timeStamp,
-//         LoggingLevel: loggingLevel
-//       }),
-//       logs
-//     )
-//     await dbInstance('EventLog').insert(insertLogs)
-//   }
-//   context.logs = undefined
-// }
 
 export const logEvent = async (
   context: ApolloContextExtension,
@@ -96,8 +76,8 @@ export const logEvent = async (
         '[GraphQL_Error]'
       )
     await persistLogsFn(context)
+    context.logs = []
   }
-  context.logs = []
 }
 
 export const logDbError = async (

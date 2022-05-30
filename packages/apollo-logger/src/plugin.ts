@@ -67,6 +67,7 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
       }: GraphQLRequestContextWillSendResponse<ApolloContextExtension>) => {
         logDebug(`A response for the operation <${operationName}> was sent!`, '[GraphQL_Response]')
         await this.persistLogsFn(context)
+        context.logs = []
       }
     }
   }

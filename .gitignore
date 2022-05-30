@@ -11,3 +11,4 @@
 .yarn/cache
 .pnp.*
 **/dist
+**/coverage

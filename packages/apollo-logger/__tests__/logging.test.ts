@@ -1,6 +1,6 @@
 import { shouldSkipLogging, logEvent, logDbError } from '../src/utils'
 import { ApolloError } from 'apollo-server'
-import { ApolloContextExtension, LoggingLevel } from '../src/types'
+import { ApolloContextExtension, Log, LoggingLevel } from '../src/types'
 
 describe('logging plugin tests:', () => {
   it('should skip logging for introspection:', async () => {
@@ -66,16 +66,15 @@ describe('logging plugin tests:', () => {
 
   it('logEvent should append the new log to the context:', async () => {
     //arrange
-    const context = { requestId: 'requestId', logs: [] } as ApolloContextExtension
+    const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
     const message = 'Log message'
     const code = 'Message_Code'
 
-    jest.mock('../loggingUtils')
     global.console = { ...global.console, log: jest.fn() }
 
     //act
-    logEvent(context, message, code, LoggingLevel.INFO)
-    logEvent(context, message, code, LoggingLevel.DEBUG)
+    await logEvent(context, message, code, LoggingLevel.INFO)
+    await logEvent(context, message, code, LoggingLevel.DEBUG)
 
     //assert
     expect(context.logs[0].message).toBe(message)
@@ -92,9 +91,7 @@ describe('logging plugin tests:', () => {
     const code = 'Error_Message_Code'
     const errorMessage = 'ErrorMessage'
 
-    const { elastic } = require('../../../elasticSearch')
-    jest.mock('../../../elasticSearch')
-    const context = { requestId: 'requestId', logs: [] } as ApolloContextExtension
+    const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
 
     global.console = { ...global.console, error: jest.fn(), log: jest.fn() }
 
@@ -102,8 +99,7 @@ describe('logging plugin tests:', () => {
     const res = await logDbError(context, message, code, LoggingLevel.ERROR, new Error(errorMessage), jest.fn())
 
     //assert
-    expect(context.logs).toBe(null)
-    expect(elastic.seed).toBeCalled()
+    expect(context.logs).toStrictEqual([] as Log[])
     expect(console.error).toBeCalled()
     expect(res).toBeInstanceOf(ApolloError)
   })
