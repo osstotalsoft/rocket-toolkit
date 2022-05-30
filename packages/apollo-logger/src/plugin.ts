@@ -9,10 +9,16 @@ import {
 } from 'apollo-server-types'
 import { GraphQLRequestListener } from 'apollo-server-plugin-base/src/index'
 import { v4 } from 'uuid'
-import { ApolloContextExtension } from './types'
-import { initializeDbLogging, saveLogs } from './utils'
+import { ApolloContextExtension, ApolloLoggingOptions } from './types'
+import { initializeDbLogging } from './utils'
 
-export const ApolloLoggerPlugin: ApolloServerPlugin<ApolloContextExtension> = {
+export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExtension> {
+  private persistLogsFn: (context: ApolloContextExtension) => void | Promise<void>
+
+  constructor(options: ApolloLoggingOptions) {
+    this.persistLogsFn = options.persistLogsFn
+  }
+
   async requestDidStart(
     requestContext: GraphQLRequestContext<ApolloContextExtension>
   ): Promise<GraphQLRequestListener<ApolloContextExtension>> {
@@ -60,7 +66,7 @@ export const ApolloLoggerPlugin: ApolloServerPlugin<ApolloContextExtension> = {
         context
       }: GraphQLRequestContextWillSendResponse<ApolloContextExtension>) => {
         logDebug(`A response for the operation <${operationName}> was sent!`, '[GraphQL_Response]')
-        await saveLogs(context)
+        await this.persistLogsFn(context)
       }
     }
   }

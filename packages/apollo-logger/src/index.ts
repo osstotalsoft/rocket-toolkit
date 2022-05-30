@@ -1,4 +1,2 @@
-import { ApolloLoggerPlugin } from './plugin'
-import * as types from './types'
-
-export default { ApolloLoggerPlugin, ...types }
+export * from './plugin'
+export * from './types'

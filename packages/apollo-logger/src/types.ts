@@ -1,6 +1,6 @@
 import { BaseContext } from 'apollo-server-types'
 
-interface Log {
+export interface Log {
   uid: string
   code: string
   message: string
@@ -8,9 +8,16 @@ interface Log {
   loggingLevel: LoggingLevel
   error?: any
 }
+
 export interface ApolloContextExtension extends BaseContext {
   requestId: string
-  logs?: Log[]
+  logs: Log[]
+}
+
+export interface ApolloLoggingOptions {
+  persistLogs: boolean
+  // Custom implementation that allows the user to persist the logs in a file, in a database or using some other technologies.
+  persistLogsFn: (context: ApolloContextExtension) => void | Promise<void>
 }
 
 export enum LoggingLevel {

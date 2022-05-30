@@ -19,47 +19,52 @@ export const shouldSkipLogging = (operationName: string, logLevel: LoggingLevel)
   }
 }
 
-export const initializeDbLogging = (context: ApolloContextExtension, operationName: string) => ({
-  logInfo: (message: string, code: string, autoSave = false): Promise<void> =>
+export const initializeDbLogging = (
+  context: ApolloContextExtension,
+  operationName: string,
+  persistLogsFn?: (context: ApolloContextExtension) => void | Promise<void>
+) => ({
+  logInfo: (message: string, code: string, persistLogs = false): Promise<void> =>
     shouldSkipLogging(operationName, LoggingLevel.INFO)
       ? new Promise(() => {})
-      : logEvent(context, message, code, LoggingLevel.INFO, autoSave),
-  logDebug: (message: string, code: string, autoSave = false): Promise<void> =>
+      : logEvent(context, message, code, LoggingLevel.INFO, persistLogs, persistLogsFn),
+  logDebug: (message: string, code: string, persistLogs = false): Promise<void> =>
     shouldSkipLogging(operationName, LoggingLevel.DEBUG)
       ? new Promise(() => {})
-      : logEvent(context, message, code, LoggingLevel.DEBUG, autoSave),
+      : logEvent(context, message, code, LoggingLevel.DEBUG, persistLogs, persistLogsFn),
   logError: (message: string, code?: string, error?: any): Promise<any> =>
     shouldSkipLogging(operationName, LoggingLevel.ERROR)
       ? new Promise(() => error)
-      : logDbError(context, message, code || '', LoggingLevel.ERROR, error)
+      : logDbError(context, message, code || '', LoggingLevel.ERROR, error, persistLogsFn)
 })
 
-export const saveLogs = async (context: ApolloContextExtension) => {
-  const { dbInstance, logs, requestId } = context
-  if (logs && dbInstance) {
-    const insertLogs = map(
-      ({ uid, code, message, timeStamp, loggingLevel, error }) => ({
-        Uid: uid,
-        RequestId: requestId || v4(),
-        Code: code,
-        Message: message,
-        Details: error ? `${error?.message} ${error?.stack} ${JSON.stringify(error?.extensions)}` : '',
-        TimeStamp: timeStamp,
-        LoggingLevel: loggingLevel
-      }),
-      logs
-    )
-    await dbInstance('EventLog').insert(insertLogs)
-  }
-  context.logs = undefined
-}
+// export const saveLogs = async (context: ApolloContextExtension) => {
+//   const { dbInstance, logs, requestId } = context
+//   if (logs && dbInstance) {
+//     const insertLogs = map(
+//       ({ uid, code, message, timeStamp, loggingLevel, error }) => ({
+//         Uid: uid,
+//         RequestId: requestId || v4(),
+//         Code: code,
+//         Message: message,
+//         Details: error ? `${error?.message} ${error?.stack} ${JSON.stringify(error?.extensions)}` : '',
+//         TimeStamp: timeStamp,
+//         LoggingLevel: loggingLevel
+//       }),
+//       logs
+//     )
+//     await dbInstance('EventLog').insert(insertLogs)
+//   }
+//   context.logs = undefined
+// }
 
 export const logEvent = async (
   context: ApolloContextExtension,
   message: string,
   code: string,
   level: LoggingLevel,
-  autoSave: boolean
+  persistLogs = false,
+  persistLogsFn?: (context: ApolloContextExtension) => void | Promise<void>
 ) => {
   const logId = v4()
   context.logs = append(
@@ -70,7 +75,7 @@ export const logEvent = async (
       timeStamp: new Date(),
       loggingLevel: level
     },
-    context.logs ?? []
+    context.logs
   )
 
   switch (level) {
@@ -84,9 +89,15 @@ export const logEvent = async (
     }
   }
 
-  if (autoSave) {
-    await saveLogs(context)
+  if (persistLogs) {
+    if (!persistLogsFn)
+      throw new ApolloError(
+        '"persistLogs" variable was set to `True`, to persist the logs, it is mandatory to also provide the "persistLogsFn"!',
+        '[GraphQL_Error]'
+      )
+    await persistLogsFn(context)
   }
+  context.logs = []
 }
 
 export const logDbError = async (
@@ -94,7 +105,8 @@ export const logDbError = async (
   message: string,
   code: string,
   level: LoggingLevel,
-  error?: any
+  error?: any,
+  persistLogsFn?: (context: ApolloContextExtension) => void | Promise<void>
 ) => {
   console.error(`${code} ${message} ${error?.message} ${error?.stack} ${JSON.stringify(error?.extensions)}`.red)
 
@@ -110,9 +122,11 @@ export const logDbError = async (
       loggingLevel: level,
       error
     },
-    context.logs ?? []
+    context.logs
   )
-  await saveLogs(context)
+  if (persistLogsFn) await persistLogsFn(context)
+
+  context.logs = []
 
   return new ApolloError(messageWithLogId, code)
 }
