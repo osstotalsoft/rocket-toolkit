@@ -24,9 +24,9 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
   ): Promise<GraphQLRequestListener<ApolloContextExtension>> {
     const { logInfo, logDebug, logError } = initializeDbLogging(
       requestContext?.context,
-      requestContext?.operationName || 'unidentifiedOperation'
+      requestContext?.operationName ?? 'unidentifiedOperation'
     )
-    requestContext.context.requestId = requestContext.context.requestId || v4()
+    requestContext.context.requestId = requestContext.context.requestId ?? v4()
 
     logInfo(`Request for operation name <${requestContext.operationName}> started!`, '[REQUEST_STARTED]')
     return {

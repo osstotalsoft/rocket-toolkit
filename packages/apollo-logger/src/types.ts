@@ -20,6 +20,12 @@ export interface ApolloLoggingOptions {
   persistLogsFn: (context: ApolloContextExtension) => void | Promise<void>
 }
 
+export interface Logger {
+  logInfo: (message: string, code: string, persistLogs?: boolean) => Promise<void>
+  logDebug: (message: string, code: string, persistLogs?: boolean) => Promise<void>
+  logError: (message: string, code?: string, error?: any) => Promise<any>
+}
+
 export enum LoggingLevel {
   INFO = 'INFO',
   ERROR = 'ERROR',

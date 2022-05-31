@@ -1,15 +1,95 @@
-import { shouldSkipLogging, logEvent, logDbError } from '../src/utils'
+import { shouldSkipLogging, logEvent, logDbError, initializeDbLogging } from '../src/utils'
 import { ApolloError } from 'apollo-server'
 import { ApolloContextExtension, Log, LoggingLevel } from '../src/types'
 
 describe('logging plugin tests:', () => {
-  it('should skip logging for introspection:', async () => {
-    const res = shouldSkipLogging('IntrospectionQuery', LoggingLevel.DEBUG)
+  const OLD_ENV = process.env
 
-    expect(res).toBe(false)
+  beforeEach(() => {
+    jest.resetModules()
+    process.env = { ...OLD_ENV }
   })
 
-  it('should not skip logging for info logging level:', async () => {
+  afterAll(() => {
+    process.env = OLD_ENV
+  })
+
+  it('initializedDbLogging returns 3 functions', () => {
+    //arrange
+    const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
+
+    //act
+    const result = initializeDbLogging(context, 'operationName')
+
+    //assert
+    expect(result?.logDebug).toBeDefined()
+    expect(result?.logError).toBeDefined()
+    expect(result?.logInfo).toBeDefined()
+  })
+
+  it('logDebug with no persist shows message at the console', () => {
+    //arrange
+    const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
+    global.console = { ...global.console, log: jest.fn() }
+
+    //act
+    const { logDebug } = initializeDbLogging(context, 'operationName')
+    logDebug('Test message', 'code', false)
+
+    //assert
+    expect(global.console.log).toBeCalledTimes(1)
+    expect(context.logs.length).toStrictEqual(1)
+  })
+
+  it('logInfo with no persist shows message at the console', () => {
+    //arrange
+    const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
+    global.console = { ...global.console, log: jest.fn() }
+
+    //act
+    const { logInfo } = initializeDbLogging(context, 'operationName')
+    logInfo('Test message', 'code', false)
+
+    //assert
+    expect(global.console.log).toBeCalledTimes(1)
+    expect(context.logs.length).toStrictEqual(1)
+  })
+
+  it('logError shows message at the console and return wrapped error', async () => {
+    //arrange
+    const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
+    global.console = { ...global.console, error: jest.fn() }
+
+    //act
+    const { logError } = initializeDbLogging(context, 'operationName')
+    const result = await logError('Test message', 'code', new Error('Error message'))
+
+    //assert
+    expect(global.console.error).toBeCalledTimes(1)
+    expect(context.logs.length).toStrictEqual(0)
+    expect(result).toBeInstanceOf(ApolloError)
+  })
+
+  it('should skip logging for introspection:', () => {
+    const res = shouldSkipLogging('IntrospectionQuery', LoggingLevel.DEBUG)
+
+    expect(res).toBe(true)
+  })
+
+  it('should skip logError for introspection:', () => {
+    //arrange
+    const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
+
+    //act
+    const { logError } = initializeDbLogging(context, 'IntrospectionQuery')
+    const error = new Error('Error message')
+    const result = logError('Test message', 'code', error)
+
+    //assert
+    expect(result).resolves.toStrictEqual(error)
+  })
+
+  it('should not skip logging for info logging level:', () => {
     //Arrange
     process.env = { APOLLO_LOGGING_LEVEL: 'INFO' }
 
@@ -20,7 +100,7 @@ describe('logging plugin tests:', () => {
     expect(res).toBe(false)
   })
 
-  it('should not skip logging for info when logging level is set to DEBUG:', async () => {
+  it('should not skip logging for info when logging level is set to DEBUG:', () => {
     //Arrange
     process.env = { APOLLO_LOGGING_LEVEL: 'DEBUG' }
 
@@ -31,7 +111,7 @@ describe('logging plugin tests:', () => {
     expect(res).toBe(false)
   })
 
-  it('should not skip logging for debug logging level:', async () => {
+  it('should not skip logging for debug logging level:', () => {
     //Arrange
     process.env = { APOLLO_LOGGING_LEVEL: 'DEBUG' }
 
@@ -42,7 +122,7 @@ describe('logging plugin tests:', () => {
     expect(res).toBe(false)
   })
 
-  it('should not skip logging for ERROR logging level:', async () => {
+  it('should not skip logging for ERROR logging level:', () => {
     //Arrange
     process.env = { APOLLO_LOGGING_LEVEL: 'ERROR' }
 
@@ -53,7 +133,7 @@ describe('logging plugin tests:', () => {
     expect(res).toBe(false)
   })
 
-  it('should not skip logging for ERROR when logging level is set to DEBUG:', async () => {
+  it('should not skip logging for ERROR when logging level is set to DEBUG:', () => {
     //Arrange
     process.env = { APOLLO_LOGGING_LEVEL: 'DEBUG' }
 
@@ -83,6 +163,36 @@ describe('logging plugin tests:', () => {
     expect(context.logs[1].message).toBe(message)
     expect(context.logs[1].code).toBe(code)
     expect(context.logs[1].loggingLevel).toBe(LoggingLevel.DEBUG)
+  })
+
+  it('logEvent throws an error if persistLogsFn was not sent:', async () => {
+    //arrange
+    const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
+    const message = 'Log message'
+    const code = 'Message_Code'
+
+    global.console = { ...global.console, log: jest.fn() }
+    const persistLogsFn = jest.fn((_ctx: ApolloContextExtension) => {})
+
+    //act
+    await logEvent(context, message, code, LoggingLevel.INFO, true, persistLogsFn)
+
+    //assert
+    expect(persistLogsFn).toBeCalledTimes(1)
+    expect(context.logs).toStrictEqual([])
+  })
+
+  it('persistLogsFn gets called and logs are cleared:', async () => {
+    const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
+    const message = 'Log message'
+    const code = 'Message_Code'
+
+    global.console = { ...global.console, log: jest.fn() }
+
+    const testLogEvent = async () => await logEvent(context, message, code, LoggingLevel.INFO, true)
+    expect(testLogEvent).rejects.toThrowError(
+      '"persistLogs" variable was set to `True`, to persist the logs, it is mandatory to also provide the "persistLogsFn"!'
+    )
   })
 
   it('logDbError should clears logs from context, call insert logs and return new ApolloError:', async () => {

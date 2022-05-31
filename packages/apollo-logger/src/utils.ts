@@ -1,14 +1,13 @@
 import { ApolloError } from 'apollo-server'
 import { v4 } from 'uuid'
 import { append } from 'ramda'
-import { ApolloContextExtension, LoggingLevel } from './types'
+import { ApolloContextExtension, LoggingLevel, Logger } from './types'
 import '@colors/colors'
 
-const { APOLLO_LOGGING_LEVEL } = process.env
-
 export const shouldSkipLogging = (operationName: string, logLevel: LoggingLevel) => {
-  if (operationName === 'IntrospectionQuery') return false
+  if (operationName === 'IntrospectionQuery') return true
 
+  const { APOLLO_LOGGING_LEVEL } = process.env
   switch (logLevel) {
     case LoggingLevel.INFO:
       return APOLLO_LOGGING_LEVEL === LoggingLevel.ERROR
@@ -23,7 +22,7 @@ export const initializeDbLogging = (
   context: ApolloContextExtension,
   operationName: string,
   persistLogsFn?: (context: ApolloContextExtension) => void | Promise<void>
-) => ({
+): Logger => ({
   logInfo: (message: string, code: string, persistLogs = false): Promise<void> =>
     shouldSkipLogging(operationName, LoggingLevel.INFO)
       ? new Promise(() => {})
