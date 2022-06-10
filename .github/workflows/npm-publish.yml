@@ -5,13 +5,14 @@ name: npm-publish
 
 on: workflow_dispatch
 
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
         with:
-          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
@@ -22,23 +23,18 @@ jobs:
         run: yarn
       - name: Run tests
         run: yarn test
-
   release:
-    name: Release
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
         uses: actions/checkout@master
-
+        with:
+          fetch-depth: 0
       - name: Set Node.js 16.x
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
-
-      - name: Install Dependencies
-        run: yarn install
-      - run: yarn add @changesets/cli
-
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
