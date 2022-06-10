@@ -1,0 +1,42 @@
+# This workflow will run tests using node and then publish a package to NPM when a release is created
+# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+
+name: npm-publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      with:
+          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+          fetch-depth: 0
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: Install Yarn
+        run: npm install --global yarn
+      - name: Install Dependencies
+        run: yarn
+      - name: Build project
+        run: yarn build
+      - name: Run tests
+        run: yarn test
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release and Publish to npm
+        uses: changesets/action@v1
+        with:
+          publish: yarn release
+          commit: 'chore(release): update monorepo packages versions'
+          title: 'Upcoming Release Changes'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
