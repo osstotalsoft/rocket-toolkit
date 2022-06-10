@@ -41,7 +41,7 @@ jobs:
 
       - name: Install Dependencies
         run: yarn install
-        run: yarn add @changesets/cli
+      - run: yarn add @changesets/cli
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
