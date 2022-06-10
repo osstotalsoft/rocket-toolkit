@@ -11,9 +11,10 @@
   "scripts": {
     "build": "yarn workspaces foreach run build",
     "test": "yarn workspaces foreach run test",
-    "release": "run build && changeset version && changeset publish"
+    "release": "run build && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.22.0",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
     "eslint": "7.32.0",
@@ -21,8 +22,5 @@
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.6.2",
     "typescript": "^4.6.3"
-  },
-  "dependencies": {
-    "@changesets/cli": "^2.22.0"
   }
 }
