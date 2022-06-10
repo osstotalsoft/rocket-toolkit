@@ -3,10 +3,7 @@
 
 name: npm-publish
 
-on:
-  push:
-    branches:
-      - master
+on: workflow_dispatch
 
 jobs:
   build:
@@ -32,6 +29,9 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Create Release and Publish to npm
         uses: changesets/action@v1
         with:
