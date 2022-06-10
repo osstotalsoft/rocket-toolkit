@@ -9,7 +9,6 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release:
-    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
