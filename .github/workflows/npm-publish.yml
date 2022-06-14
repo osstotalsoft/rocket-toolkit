@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@master
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT }}
       - name: Set Node.js 16.x
         uses: actions/setup-node@v3
         with:
