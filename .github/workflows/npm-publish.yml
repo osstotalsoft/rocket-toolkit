@@ -5,7 +5,8 @@ name: npm-publish
 
 on: workflow_dispatch
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+concurrency:
+  group: build-test-publish
 
 jobs:
   release:
@@ -15,6 +16,7 @@ jobs:
         uses: actions/checkout@master
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Set Node.js 16.x
         uses: actions/setup-node@v3
         with:
@@ -25,12 +27,13 @@ jobs:
         run: yarn install
       - name: Run tests
         run: yarn test
-      - name: Create Release Pull Request or Publish to npm
-        id: changesets
-        uses: changesets/action@v1
+      - name: Upgrade version based on Changeset
+        run: yarn changeset version
+      - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          version: yarn changeset version
-          publish: yarn release
+         commit_message: Increase packages version
+      - name: Publish to npm
+        run: yarn release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
