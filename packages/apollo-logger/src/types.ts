@@ -15,6 +15,9 @@ export interface ApolloContextExtension extends BaseContext {
 }
 
 export interface ApolloLoggingOptions {
+  // If 'true', errors thrown inside Apollo Server are wrapped in a 'user friendly message'. Default is 'true'.
+  securedMessages?: boolean
+  // If tue, all logs created inside the plugin will be persisted. 
   persistLogs: boolean
   // Custom implementation that allows the user to persist the logs in a file, in a database or using some other technologies.
   persistLogsFn: (context: ApolloContextExtension) => void | Promise<void>

@@ -18,9 +18,10 @@ export const shouldSkipLogging = (operationName: string, logLevel: LoggingLevel)
   }
 }
 
-export const initializeDbLogging = (
-  context: ApolloContextExtension,
+export const initializeLogger = (
+  context: ApolloContextExtension | any,
   operationName: string,
+  securedMessages?: boolean,
   persistLogsFn?: (context: ApolloContextExtension) => void | Promise<void>
 ): Logger => ({
   logInfo: (message: string, code: string, persistLogs = false): Promise<void> =>
@@ -31,10 +32,18 @@ export const initializeDbLogging = (
     shouldSkipLogging(operationName, LoggingLevel.DEBUG)
       ? new Promise(() => {})
       : logEvent(context, message, code, LoggingLevel.DEBUG, persistLogs, persistLogsFn),
-  logError: (message: string, code?: string, error?: any): Promise<any> =>
+  logError: (message: string, code?: string, error?: any, secureMessage?: boolean): Promise<any> =>
     shouldSkipLogging(operationName, LoggingLevel.ERROR)
       ? new Promise(() => error)
-      : logDbError(context, message, code || '', LoggingLevel.ERROR, error, persistLogsFn)
+      : logDbError(
+          context,
+          message,
+          code,
+          LoggingLevel.ERROR,
+          error,
+          secureMessage === undefined ? securedMessages : secureMessage,
+          persistLogsFn
+        )
 })
 
 export const logEvent = async (
@@ -82,15 +91,19 @@ export const logEvent = async (
 export const logDbError = async (
   context: ApolloContextExtension,
   message: string,
-  code: string,
+  code: string | undefined = '',
   level: LoggingLevel,
   error?: any,
+  securedMessage: boolean | undefined = true,
   persistLogsFn?: (context: ApolloContextExtension) => void | Promise<void>
 ) => {
-  console.error(`${code} ${message} ${error?.message} ${error?.stack} ${JSON.stringify(error?.extensions)}`.red)
+  const fullErrorMessage = `${code} ${message} ${error?.message} ${error?.stack} ${JSON.stringify(error?.extensions)}`
+  console.error(fullErrorMessage.red)
 
   const logId = v4()
-  const messageWithLogId = `${message} For more details check Log Id: < ${logId} > Request Id: < ${context.requestId} >`
+  let messageWithLogId = `${fullErrorMessage} - Log Id: < ${logId} > Request Id: < ${context.requestId} >`
+  if (securedMessage)
+    messageWithLogId = `${message} For more details check Log Id: < ${logId} > Request Id: < ${context.requestId} >`
 
   context.logs = append(
     {

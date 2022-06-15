@@ -10,21 +10,25 @@ import {
 import { GraphQLRequestListener } from 'apollo-server-plugin-base/src/index'
 import { v4 } from 'uuid'
 import { ApolloContextExtension, ApolloLoggingOptions } from './types'
-import { initializeDbLogging } from './utils'
+import { initializeLogger } from './utils'
 
 export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExtension> {
+  private securedMessages: boolean
   private persistLogsFn: (context: ApolloContextExtension) => void | Promise<void>
 
   constructor(options: ApolloLoggingOptions) {
+    this.securedMessages = options.securedMessages === undefined ? true : options.securedMessages
     this.persistLogsFn = options.persistLogsFn
   }
 
   async requestDidStart(
     requestContext: GraphQLRequestContext<ApolloContextExtension>
   ): Promise<GraphQLRequestListener<ApolloContextExtension>> {
-    const { logInfo, logDebug, logError } = initializeDbLogging(
+    const { logInfo, logDebug, logError } = initializeLogger(
       requestContext?.context,
-      requestContext?.operationName ?? 'unidentifiedOperation'
+      requestContext?.operationName ?? 'unidentifiedOperation',
+      this.securedMessages,
+      this.persistLogsFn
     )
     requestContext.context.requestId = requestContext.context.requestId ?? v4()
 
