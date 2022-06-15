@@ -1,5 +1,11 @@
 # @totalsoft/apollo-logger
 
+## 1.0.2
+
+### Patch Changes
+
+- e3f75f4: Updated Readme, added information about changeset creation
+
 ## 1.0.1
 
 ### Patch Changes
