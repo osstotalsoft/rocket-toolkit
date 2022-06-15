@@ -21,6 +21,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
+          registry-url: 'https://registry.npmjs.org'
       - name: Install Yarn
         run: npm install --global yarn
       - name: Install Dependencies
