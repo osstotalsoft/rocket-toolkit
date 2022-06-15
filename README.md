@@ -24,7 +24,7 @@ This command will ask you a series of questions, first about what packages you w
 Once confirmed, the changeset will write a Markdown file that contains the summary and YAML front matter which stores the packages that will be released and the semver bump types for them.
 
 ## License
-rocket-toolkit is licensed under the [MIT](LICENSE) license.
+rocket-toolkit is licensed under the [MIT](LICENSE) license. @TotalSoft
 
 ## Contributing
 When using Visual Studio Code please follow these steps: [Editor Setup for VSCode](https://yarnpkg.com/getting-started/editor-sdks#vscode) (allows VSCode to read .zip yarn cache files and supports features like go-to-definition).
