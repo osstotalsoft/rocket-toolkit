@@ -1,4 +1,4 @@
-import { shouldSkipLogging, logEvent, logDbError, initializeDbLogging } from '../src/utils'
+import { shouldSkipLogging, logEvent, logDbError, initializeLogger } from '../src/utils'
 import { ApolloError } from 'apollo-server'
 import { ApolloContextExtension, Log, LoggingLevel } from '../src/types'
 
@@ -19,7 +19,7 @@ describe('logging plugin tests:', () => {
     const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
 
     //act
-    const result = initializeDbLogging(context, 'operationName')
+    const result = initializeLogger(context, 'operationName')
 
     //assert
     expect(result?.logDebug).toBeDefined()
@@ -33,7 +33,7 @@ describe('logging plugin tests:', () => {
     global.console = { ...global.console, log: jest.fn() }
 
     //act
-    const { logDebug } = initializeDbLogging(context, 'operationName')
+    const { logDebug } = initializeLogger(context, 'operationName')
     logDebug('Test message', 'code', false)
 
     //assert
@@ -47,7 +47,7 @@ describe('logging plugin tests:', () => {
     global.console = { ...global.console, log: jest.fn() }
 
     //act
-    const { logInfo } = initializeDbLogging(context, 'operationName')
+    const { logInfo } = initializeLogger(context, 'operationName')
     logInfo('Test message', 'code', false)
 
     //assert
@@ -55,19 +55,36 @@ describe('logging plugin tests:', () => {
     expect(context.logs.length).toStrictEqual(1)
   })
 
-  it('logError shows message at the console and return wrapped error', async () => {
+  it('logError shows message at the console and return wrapped error message', async () => {
     //arrange
     const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
     global.console = { ...global.console, error: jest.fn() }
 
     //act
-    const { logError } = initializeDbLogging(context, 'operationName')
+    const { logError } = initializeLogger(context, 'operationName', true)
     const result = await logError('Test message', 'code', new Error('Error message'))
 
     //assert
     expect(global.console.error).toBeCalledTimes(1)
     expect(context.logs.length).toStrictEqual(0)
     expect(result).toBeInstanceOf(ApolloError)
+    expect(result.message.includes('Error message')).toBeFalsy()
+  })
+
+  it('logError shows message at the console and return raw error message', async () => {
+    //arrange
+    const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
+    global.console = { ...global.console, error: jest.fn() }
+
+    //act
+    const { logError } = initializeLogger(context, 'operationName', false)
+    const result = await logError('Test message', 'code', new Error('Error message'))
+
+    //assert
+    expect(global.console.error).toBeCalledTimes(1)
+    expect(context.logs.length).toStrictEqual(0)
+    expect(result).toBeInstanceOf(ApolloError)
+    expect(result.message).toContain('Error message')
   })
 
   it('should skip logging for introspection:', () => {
@@ -81,7 +98,7 @@ describe('logging plugin tests:', () => {
     const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
 
     //act
-    const { logError } = initializeDbLogging(context, 'IntrospectionQuery')
+    const { logError } = initializeLogger(context, 'IntrospectionQuery')
     const error = new Error('Error message')
     const result = logError('Test message', 'code', error)
 
@@ -195,7 +212,7 @@ describe('logging plugin tests:', () => {
     )
   })
 
-  it('logDbError should clears logs from context, call insert logs and return new ApolloError:', async () => {
+  it('logDbError should clear logs from context, call insert logs and return new ApolloError:', async () => {
     //arrange
     const message = 'Error log message'
     const code = 'Error_Message_Code'
@@ -206,11 +223,33 @@ describe('logging plugin tests:', () => {
     global.console = { ...global.console, error: jest.fn(), log: jest.fn() }
 
     //act
-    const res = await logDbError(context, message, code, LoggingLevel.ERROR, new Error(errorMessage), jest.fn())
+    const res = await logDbError(context, message, code, LoggingLevel.ERROR, new Error(errorMessage), false, jest.fn())
 
     //assert
     expect(context.logs).toStrictEqual([] as Log[])
     expect(console.error).toBeCalled()
     expect(res).toBeInstanceOf(ApolloError)
+  })
+
+  it('logError should return new ApolloError with wrapped error message:', async () => {
+    //arrange
+    const message = 'Error log message'
+    const code = 'Error_Message_Code'
+    const errorMessage = 'ErrorMessage'
+
+    const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
+
+    global.console = { ...global.console, error: jest.fn(), log: jest.fn() }
+    const persistFn = jest.fn()
+    //act
+    const { logError } = initializeLogger(context, 'operationName', true, persistFn)
+    const res = await logError(message, code, new Error(errorMessage))
+
+    //assert
+    expect(console.error).toBeCalled()
+    expect(persistFn).toBeCalled()
+    expect(res).toBeInstanceOf(ApolloError)
+    expect(res.message).toContain('For more details check Log Id:')
+    expect(res.message.includes('Error message')).toBeFalsy()
   })
 })
