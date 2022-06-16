@@ -1,5 +1,11 @@
 # @totalsoft/apollo-logger
 
+## 1.0.4
+
+### Patch Changes
+
+- b46f31c: Made wrapping error messages optional, Added documentation for apollo-logger, renamed initializeDbLogger to initializeLogger
+
 ## 1.0.3
 
 ### Patch Changes
