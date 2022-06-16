@@ -6,6 +6,9 @@ name: run-tests
 on:
   pull_request:
     branches: [main]
+  push:
+    branches:
+      - main  
 
 concurrency:
   group: run-tests
