@@ -1,5 +1,11 @@
 # @totalsoft/apollo-logger
 
+## 1.0.5
+
+### Patch Changes
+
+- 798e62c: Changed initializeLogger args order, added .npmignore file, added 'requestId' field on Log type, handled operationName edge cases
+
 ## 1.0.4
 
 ### Patch Changes
