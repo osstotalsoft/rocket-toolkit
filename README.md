@@ -1,6 +1,6 @@
 # rocket-toolkit 👩‍🔧 
 
-<img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/osstotalsoft/rocket-toolkit/npm-publish">
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/osstotalsoft/rocket-toolkit/npm-publish) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/osstotalsoft/rocket-toolkit/tests?label=tests)
 
 A collection of plugins and other GraphQL utilities.
 
