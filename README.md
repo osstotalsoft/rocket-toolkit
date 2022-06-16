@@ -1,11 +1,11 @@
 # rocket-toolkit 👩‍🔧 
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/osstotalsoft/rocket-toolkit/npm-publish) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/osstotalsoft/rocket-toolkit/tests?label=tests)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/osstotalsoft/rocket-toolkit/npm-publish)
 
 A collection of plugins and other GraphQL utilities.
 
 ## Packages
-  - [apollo-logger](./packages/zion#readme) -> ![npm (scoped)](https://img.shields.io/npm/v/@totalsoft/apollo-logger?style=social)
+  - [apollo-logger](./packages/apollo-logger#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fapollo-logger.svg)](https://badge.fury.io/js/@totalsoft%2Fapollo-logger)
   - and other to come... 
 
 ## Contributing guide
