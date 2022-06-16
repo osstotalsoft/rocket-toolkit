@@ -21,8 +21,8 @@ export const shouldSkipLogging = (operationName: string, logLevel: LoggingLevel)
 export const initializeLogger = (
   context: ApolloContextExtension | any,
   operationName: string,
-  securedMessages?: boolean,
-  persistLogsFn?: (context: ApolloContextExtension) => void | Promise<void>
+  persistLogsFn?: (context: ApolloContextExtension) => void | Promise<void>,
+  securedMessages?: boolean
 ): Logger => ({
   logInfo: (message: string, code: string, persistLogs = false): Promise<void> =>
     shouldSkipLogging(operationName, LoggingLevel.INFO)
@@ -58,6 +58,7 @@ export const logEvent = async (
   context.logs = append(
     {
       uid: logId,
+      requestId: context.requestId,
       code,
       message,
       timeStamp: new Date(),
@@ -108,6 +109,7 @@ export const logDbError = async (
   context.logs = append(
     {
       uid: logId,
+      requestId: context.requestId,
       code,
       message,
       timeStamp: new Date(),

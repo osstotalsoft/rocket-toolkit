@@ -7,7 +7,10 @@
     "source.fixAll.eslint": true
   },
   "files.eol": "\n",
-  "eslint.validate": ["typescript", "javascript"],
+  "eslint.validate": [
+    "typescript",
+    "javascript"
+  ],
   "typescript.validate.enable": true,
   "prettier.prettierPath": ".yarn/sdks/prettier/index.js",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -19,5 +22,7 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "eslint.packageManager": "yarn",
   "npm.packageManager": "yarn",
-  "cSpell.words": ["uuidv"]
+  "cSpell.words": [
+    "uuidv"
+  ]
 }
