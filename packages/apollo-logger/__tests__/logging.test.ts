@@ -61,7 +61,7 @@ describe('logging plugin tests:', () => {
     global.console = { ...global.console, error: jest.fn() }
 
     //act
-    const { logError } = initializeLogger(context, 'operationName', true)
+    const { logError } = initializeLogger(context, 'operationName', jest.fn(), true)
     const result = await logError('Test message', 'code', new Error('Error message'))
 
     //assert
@@ -77,7 +77,7 @@ describe('logging plugin tests:', () => {
     global.console = { ...global.console, error: jest.fn() }
 
     //act
-    const { logError } = initializeLogger(context, 'operationName', false)
+    const { logError } = initializeLogger(context, 'operationName', jest.fn(), false)
     const result = await logError('Test message', 'code', new Error('Error message'))
 
     //assert
@@ -242,12 +242,12 @@ describe('logging plugin tests:', () => {
     global.console = { ...global.console, error: jest.fn(), log: jest.fn() }
     const persistFn = jest.fn()
     //act
-    const { logError } = initializeLogger(context, 'operationName', true, persistFn)
+    const { logError } = initializeLogger(context, 'operationName', persistFn, true)
     const res = await logError(message, code, new Error(errorMessage))
 
     //assert
     expect(console.error).toBeCalled()
-    expect(persistFn).toBeCalled()
+    expect(persistFn).toBeCalledTimes(1)
     expect(res).toBeInstanceOf(ApolloError)
     expect(res.message).toContain('For more details check Log Id:')
     expect(res.message.includes('Error message')).toBeFalsy()

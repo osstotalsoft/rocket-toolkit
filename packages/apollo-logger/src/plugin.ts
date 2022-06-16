@@ -21,23 +21,26 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
     this.persistLogsFn = options.persistLogsFn
   }
 
-  async requestDidStart(
-    requestContext: GraphQLRequestContext<ApolloContextExtension>
-  ): Promise<GraphQLRequestListener<ApolloContextExtension>> {
+  async requestDidStart({
+    context,
+    request,
+    operationName
+  }: GraphQLRequestContext<ApolloContextExtension>): Promise<GraphQLRequestListener<ApolloContextExtension>> {
     const { logInfo, logDebug, logError } = initializeLogger(
-      requestContext?.context,
-      requestContext?.operationName ?? 'unidentifiedOperation',
-      this.securedMessages,
-      this.persistLogsFn
+      context,
+      request.operationName ?? operationName ?? 'unidentifiedOperation',
+      this.persistLogsFn,
+      this.securedMessages
     )
-    requestContext.context.requestId = requestContext.context.requestId ?? v4()
+    context.requestId = context.requestId ?? v4()
 
-    logInfo(`Request for operation name <${requestContext.operationName}> started!`, '[REQUEST_STARTED]')
+    logInfo(`Request for operation name <${request.operationName ?? operationName}> started!`, '[REQUEST_STARTED]')
     return {
       async parsingDidStart({
+        request,
         operationName
       }: GraphQLRequestContextParsingDidStart<ApolloContextExtension>): Promise<GraphQLRequestListenerParsingDidEnd> {
-        logDebug(`The parsing of operation <${operationName}> started!`, '[GraphQL_Parsing]')
+        logDebug(`The parsing of operation <${request?.operationName ?? operationName}> started!`, '[GraphQL_Parsing]')
         return async (err: Error | undefined) => {
           if (err) {
             await logError(`[GraphQL_Parsing][Error] ${err}`)
@@ -45,20 +48,24 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
         }
       },
       async validationDidStart({
+        request,
         operationName
       }: GraphQLRequestContextValidationDidStart<ApolloContextExtension>): Promise<void> {
-        logDebug(`The validation of operation <${operationName}> started!`, '[GraphQL_Validation]')
+        logDebug(`The validation of operation <${request?.operationName ?? operationName}> started!`, '[GraphQL_Validation]')
       },
-      async executionDidStart({ operationName }: GraphQLRequestContextExecutionDidStart<ApolloContextExtension>) {
-        logDebug(`The execution of operation <${operationName}> started!`, '[GraphQL_Execution]')
+      async executionDidStart({ request, operationName }: GraphQLRequestContextExecutionDidStart<ApolloContextExtension>) {
+        logDebug(`The execution of operation <${request?.operationName ?? operationName}> started!`, '[GraphQL_Execution]')
       },
       didEncounterErrors: async ({
+        request,
         operationName,
         errors
       }: GraphQLRequestContextDidEncounterErrors<ApolloContextExtension>) => {
         for (const error of errors) {
           const templateError = await logError(
-            `The server encounters errors while parsing, validating, or executing the operation < ${operationName} > \r\n`,
+            `The server encounters errors while parsing, validating, or executing the operation < ${
+              request?.operationName ?? operationName
+            } > \r\n`,
             '[GraphQL_Execution][Error]',
             error
           )
