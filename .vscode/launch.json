@@ -5,8 +5,20 @@
       "name": "vscode-jest-tests",
       "request": "launch",
       "runtimeExecutable": "yarn",
-      "runtimeArgs": ["run", "--inspect-brk", "jest", "--runInBand"],
-      "cwd": "${workspaceFolder}/packages/apollo-logger",
+      "runtimeArgs": ["run", "test"],
+      "args": [ "--runInBand"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "name": "Jest current file",
+      "request": "launch",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["run", "test"],
+      "args": [ "--runInBand", "${fileBasenameNoExtension}"],
+      "cwd": "${fileDirname}",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     }
