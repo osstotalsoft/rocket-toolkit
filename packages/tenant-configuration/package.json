@@ -1,7 +1,7 @@
 {
   "name": "@totalsoft/tenant-configuration",
   "description": "Key per file configuration provider",
-  "version": "1.0.6",
+  "version": "0.0.1",
   "author": "TotalSoft",
   "packageManager": "yarn@3.2.0",
   "type": "commonjs",
