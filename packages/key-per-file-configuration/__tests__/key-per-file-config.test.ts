@@ -1,3 +1,6 @@
+// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 import { load } from '../src'
 import { vol } from 'memfs'
 
