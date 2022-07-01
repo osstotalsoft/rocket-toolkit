@@ -6,7 +6,8 @@ A collection of plugins and other GraphQL utilities.
 
 ## Packages
   - [apollo-logger](./packages/apollo-logger#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fapollo-logger.svg)](https://badge.fury.io/js/@totalsoft%2Fapollo-logger)
-  - and other to come... 
+  - [key-per-file-configuration](./packages/key-per-file-configuration#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fkey-per-file-configuration.svg)](https://badge.fury.io/js/@totalsoft%2Fkey-per-file-configuration)
+  - [tenant-configuration](./packages/tenant-configuration#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Ftenant-configuration.svg)](https://badge.fury.io/js/@totalsoft%2Ftenant-configuration)
 
 ## Contributing guide
 When using Visual Studio Code please follow these steps: [Editor Setup for VSCode](https://yarnpkg.com/getting-started/editor-sdks#vscode) (allows VSCode to read .zip yarn cache files and supports features like go-to-definition).
