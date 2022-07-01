@@ -23,7 +23,9 @@ yarn add @totalsoft/key-per-file-configuration
 
 ```javascript
 const keyPerFileConfig = require('@totalsoft/key-per-file-configuration')
-keyPerFileConfig.load({configPath: 'runtime'})
+const configWatcher = keyPerFileConfig.load({configPath: 'runtime'})
+...
+await configWatcher.close()
 ```
 
 

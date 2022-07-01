@@ -11,7 +11,7 @@ export async function getTenantFromId(tenantId: string): Promise<Tenant | null> 
 
   const configTenant = tenantConfiguration.getValue(tenantId)
 
-  if (configTenant.enabled == "false") {
+  if (configTenant.enabled == 'false') {
     throw new Error(`Tenant '${configTenant.code}' is disabled`)
   }
 

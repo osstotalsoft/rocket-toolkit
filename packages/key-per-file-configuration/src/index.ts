@@ -13,7 +13,11 @@ export interface Options {
   configPath?: string
 }
 
-export function load(options: Options) {
+export interface ConfigWatcher{
+  close: () => Promise<void>
+}
+
+export function load(options?: Options) : ConfigWatcher {
   const cleanConfigPath = _cleanConfigPath(options?.configPath)
 
   console.info(`Loading "Key per File" configuration at: ${cleanConfigPath}`)
@@ -23,11 +27,13 @@ export function load(options: Options) {
   filePaths.forEach(_loadValue)
 
   // Watch for file changes
-  chokidar
+  const watcher = chokidar
     .watch(cleanConfigPath, { awaitWriteFinish: true /*, usePolling: true*/ })
     .on('unlink', _removeValue)
     .on('add', _loadValue)
     .on('change', _loadValue)
+
+  return { close: () => watcher.close()}
 }
 
 function _cleanConfigPath(configPath = KEY_PER_FILE_CONFIG_PATH || defaultConfigPath): string {
@@ -40,7 +46,7 @@ function _cleanConfigPath(configPath = KEY_PER_FILE_CONFIG_PATH || defaultConfig
   }
 
   // glob only works with forward slashes
-  cleanConfigPath.replace(/\\/g, '/')
+  cleanConfigPath = cleanConfigPath.replace(/\\/g, '/')
 
   return cleanConfigPath
 }
