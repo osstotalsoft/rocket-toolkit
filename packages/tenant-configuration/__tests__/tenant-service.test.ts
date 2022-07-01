@@ -62,4 +62,21 @@ describe('tenant service tests:', () => {
     ///Assert
     await expect(action).rejects.toThrowError('Configuration not found')
   })
+
+  it('should throw when tenant is disabled:', async () => {
+    //Arrange
+    const tenantId = '3c841325-eccc-4670-a577-09546df7b1fc'
+    process.env = {
+      IS_MULTITENANT: 'true',
+      MultiTenancy__Tenants__Tenant1__TenantId: tenantId,
+      MultiTenancy__Tenants__Tenant1__Enabled: 'false'
+    }
+    const { tenantService } = require('../src')
+
+    //Act
+    const action = async () => await tenantService.getTenantFromId(tenantId)
+
+    ///Assert
+    await expect(action).rejects.toThrowError('disabled')
+  })
 })
