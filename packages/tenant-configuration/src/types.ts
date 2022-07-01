@@ -15,3 +15,16 @@ export interface ConnectionInfo {
   password: string
   otherParams?: string
 }
+
+export interface TenantMapById {
+  [tid: string]: TenantSection
+}
+
+export interface TenantMapByCode {
+  [code: string]: TenantSection
+}
+
+export interface TenantSection {
+  tenantId: string
+  code: string
+}

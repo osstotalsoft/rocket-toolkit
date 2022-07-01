@@ -5,6 +5,7 @@ import objectPath from 'object-path'
 import humps from 'humps'
 import debounce from 'debounce'
 import deepmerge from 'deepmerge'
+import { TenantMapByCode, TenantMapById } from './types'
 const { IS_MULTITENANT } = process.env
 const isMultiTenant = JSON.parse(IS_MULTITENANT || 'false')
 const debounceTimeoutMs = 5000
@@ -40,19 +41,6 @@ function _getDefaults(): TenantMapByCode {
 
 function _isObject(value: any): boolean {
   return Object.prototype.toString.call(value) === '[object Object]'
-}
-
-interface TenantSection {
-  tenantId: string
-  code: string
-}
-
-interface TenantMapById {
-  [tid: string]: TenantSection
-}
-
-interface TenantMapByCode {
-  [code: string]: TenantSection
 }
 
 function _getTenants(): TenantMapById {

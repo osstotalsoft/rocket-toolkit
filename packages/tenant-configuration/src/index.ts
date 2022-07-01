@@ -1,7 +1,7 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-export * from './types'
+export { Tenant, ConnectionInfo } from './types'
 export * as tenantService from './tenantService'
 import * as tenantConfiguration from './tenantConfiguration'
 import * as tenantConfigurationExtensions from './tenantConfigurationExtensions'
