@@ -1,7 +1,7 @@
 {
   "name": "@totalsoft/tenant-configuration",
   "description": "Tenant configuration provider",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": "TotalSoft",
   "packageManager": "yarn@3.2.0",
   "type": "commonjs",
@@ -17,7 +17,8 @@
     "directory": "packages/tenant-configuration"
   },
   "keywords": [
-    "tenant", "configuration"
+    "tenant",
+    "configuration"
   ],
   "scripts": {
     "build": "run clean && tsc --project tsconfig.build.json",
