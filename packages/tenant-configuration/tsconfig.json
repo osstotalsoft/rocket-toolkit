@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
+  "compilerOptions": {    
     "outDir": "./dist" /* Redirect output structure to the directory. */,
   },
   "exclude": ["dist/**", "coverage/**"]
