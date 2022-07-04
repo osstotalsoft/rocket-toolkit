@@ -20,6 +20,24 @@ yarn build
 ```javascript
 yarn test
 ```
+
+### - Testing local packages
+To test your package locally without publishing to a npm repository, you can create a link in your testing project. For example:
+```shell
+npm link <YOUR_PATH>\rocket-toolkit\packages\key-per-file-configuration
+```
+
+If the package reference does not already exist in your testing project, you can add it without specifying the version:
+```json
+{
+  "dependencies": {
+    ...
+    "@totalsoft/key-per-file-configuration": "",
+  }
+}
+```
+For additional options see the [official documentation](https://docs.npmjs.com/cli/v8/commands/npm-link)
+
 ### - Pull Request
 Every change/feature/fix must result in a Pull Request. Before creating the PR make sure that all the tests are passing.
 
