@@ -5,6 +5,6 @@ export interface Options {
   configPath?: string
 }
 
-export interface ConfigWatcher{
+export interface ConfigWatcher {
   close: () => Promise<void>
 }
