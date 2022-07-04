@@ -1,3 +1,6 @@
+// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 import { ApolloServerPlugin, GraphQLRequestListenerParsingDidEnd } from 'apollo-server-plugin-base'
 import {
   GraphQLRequestContext,

@@ -1,3 +1,6 @@
+// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 import { ApolloError } from 'apollo-server'
 import { v4 } from 'uuid'
 import { append } from 'ramda'
