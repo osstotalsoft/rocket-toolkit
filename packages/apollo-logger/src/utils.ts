@@ -4,10 +4,10 @@
 import { ApolloError } from 'apollo-server'
 import { v4 } from 'uuid'
 import { append } from 'ramda'
-import { ApolloContextExtension, LoggingLevel, Logger } from './types'
+import { ApolloContextExtension, LoggingLevel, Logger, LoggingOptions } from './types'
 import '@colors/colors'
 
-export const shouldSkipLogging = (operationName: string, logLevel: LoggingLevel) => {
+export const shouldSkipLogging = (logLevel: LoggingLevel, operationName?: string) => {
   if (operationName === 'IntrospectionQuery') return true
 
   const { APOLLO_LOGGING_LEVEL } = process.env
@@ -21,22 +21,17 @@ export const shouldSkipLogging = (operationName: string, logLevel: LoggingLevel)
   }
 }
 
-export const initializeLogger = (
-  context: ApolloContextExtension | any,
-  operationName: string,
-  persistLogsFn?: (context: ApolloContextExtension) => void | Promise<void>,
-  securedMessages?: boolean
-): Logger => ({
-  logInfo: (message: string, code: string, persistLogs = false): Promise<void> =>
-    shouldSkipLogging(operationName, LoggingLevel.INFO)
+export const initializeLogger = ({ context, operationName, persistLogsFn, securedMessages }: LoggingOptions): Logger => ({
+  logInfo: (message: string, code: string): Promise<void> =>
+    shouldSkipLogging(LoggingLevel.INFO, operationName)
       ? new Promise(() => {})
-      : logEvent(context, message, code, LoggingLevel.INFO, persistLogs, persistLogsFn),
-  logDebug: (message: string, code: string, persistLogs = false): Promise<void> =>
-    shouldSkipLogging(operationName, LoggingLevel.DEBUG)
+      : logEvent(context, message, code, LoggingLevel.INFO, persistLogsFn),
+  logDebug: (message: string, code: string): Promise<void> =>
+    shouldSkipLogging(LoggingLevel.DEBUG, operationName)
       ? new Promise(() => {})
-      : logEvent(context, message, code, LoggingLevel.DEBUG, persistLogs, persistLogsFn),
+      : logEvent(context, message, code, LoggingLevel.DEBUG, persistLogsFn),
   logError: (message: string, code?: string, error?: any, secureMessage?: boolean): Promise<any> =>
-    shouldSkipLogging(operationName, LoggingLevel.ERROR)
+    shouldSkipLogging(LoggingLevel.ERROR, operationName)
       ? new Promise(() => error)
       : logDbError(
           context,
@@ -54,7 +49,6 @@ export const logEvent = async (
   message: string,
   code: string,
   level: LoggingLevel,
-  persistLogs = false,
   persistLogsFn?: (context: ApolloContextExtension) => void | Promise<void>
 ) => {
   const logId = v4()
@@ -81,12 +75,7 @@ export const logEvent = async (
     }
   }
 
-  if (persistLogs) {
-    if (!persistLogsFn)
-      throw new ApolloError(
-        '"persistLogs" variable was set to `True`, to persist the logs, it is mandatory to also provide the "persistLogsFn"!',
-        '[GraphQL_Error]'
-      )
+  if (persistLogsFn) {
     await persistLogsFn(context)
     context.logs = []
   }
