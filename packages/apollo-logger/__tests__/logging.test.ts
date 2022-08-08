@@ -19,7 +19,7 @@ describe('logging plugin tests:', () => {
     const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
 
     //act
-    const result = initializeLogger(context, 'operationName')
+    const result = initializeLogger({ context, operationName: 'operationName' })
 
     //assert
     expect(result?.logDebug).toBeDefined()
@@ -33,8 +33,8 @@ describe('logging plugin tests:', () => {
     global.console = { ...global.console, log: jest.fn() }
 
     //act
-    const { logDebug } = initializeLogger(context, 'operationName')
-    logDebug('Test message', 'code', false)
+    const { logDebug } = initializeLogger({ context, operationName: 'operationName' })
+    logDebug('Test message', 'code')
 
     //assert
     expect(global.console.log).toBeCalledTimes(1)
@@ -47,8 +47,8 @@ describe('logging plugin tests:', () => {
     global.console = { ...global.console, log: jest.fn() }
 
     //act
-    const { logInfo } = initializeLogger(context, 'operationName')
-    logInfo('Test message', 'code', false)
+    const { logInfo } = initializeLogger({ context, operationName: 'operationName' })
+    logInfo('Test message', 'code')
 
     //assert
     expect(global.console.log).toBeCalledTimes(1)
@@ -61,7 +61,12 @@ describe('logging plugin tests:', () => {
     global.console = { ...global.console, error: jest.fn() }
 
     //act
-    const { logError } = initializeLogger(context, 'operationName', jest.fn(), true)
+    const { logError } = initializeLogger({
+      context,
+      operationName: 'operationName',
+      persistLogsFn: jest.fn(),
+      securedMessages: true
+    })
     const result = await logError('Test message', 'code', new Error('Error message'))
 
     //assert
@@ -77,7 +82,12 @@ describe('logging plugin tests:', () => {
     global.console = { ...global.console, error: jest.fn() }
 
     //act
-    const { logError } = initializeLogger(context, 'operationName', jest.fn(), false)
+    const { logError } = initializeLogger({
+      context,
+      operationName: 'operationName',
+      persistLogsFn: jest.fn(),
+      securedMessages: false
+    })
     const result = await logError('Test message', 'code', new Error('Error message'))
 
     //assert
@@ -88,7 +98,7 @@ describe('logging plugin tests:', () => {
   })
 
   it('should skip logging for introspection:', () => {
-    const res = shouldSkipLogging('IntrospectionQuery', LoggingLevel.DEBUG)
+    const res = shouldSkipLogging(LoggingLevel.DEBUG, 'IntrospectionQuery')
 
     expect(res).toBe(true)
   })
@@ -98,7 +108,7 @@ describe('logging plugin tests:', () => {
     const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
 
     //act
-    const { logError } = initializeLogger(context, 'IntrospectionQuery')
+    const { logError } = initializeLogger({ context, operationName: 'IntrospectionQuery' })
     const error = new Error('Error message')
     const result = logError('Test message', 'code', error)
 
@@ -111,7 +121,7 @@ describe('logging plugin tests:', () => {
     process.env = { APOLLO_LOGGING_LEVEL: 'INFO' }
 
     //Act
-    const res = shouldSkipLogging('OperationName', LoggingLevel.INFO)
+    const res = shouldSkipLogging(LoggingLevel.INFO, 'OperationName')
 
     ///Assert
     expect(res).toBe(false)
@@ -122,7 +132,7 @@ describe('logging plugin tests:', () => {
     process.env = { APOLLO_LOGGING_LEVEL: 'DEBUG' }
 
     //Act
-    const res = shouldSkipLogging('OperationName', LoggingLevel.INFO)
+    const res = shouldSkipLogging(LoggingLevel.INFO, 'OperationName')
 
     ///Assert
     expect(res).toBe(false)
@@ -133,7 +143,7 @@ describe('logging plugin tests:', () => {
     process.env = { APOLLO_LOGGING_LEVEL: 'DEBUG' }
 
     //Act
-    const res = shouldSkipLogging('OperationName', LoggingLevel.DEBUG)
+    const res = shouldSkipLogging(LoggingLevel.DEBUG, 'OperationName')
 
     ///Assert
     expect(res).toBe(false)
@@ -144,7 +154,7 @@ describe('logging plugin tests:', () => {
     process.env = { APOLLO_LOGGING_LEVEL: 'ERROR' }
 
     //Act
-    const res = shouldSkipLogging('OperationName', LoggingLevel.ERROR)
+    const res = shouldSkipLogging(LoggingLevel.ERROR, 'OperationName')
 
     ///Assert
     expect(res).toBe(false)
@@ -155,7 +165,7 @@ describe('logging plugin tests:', () => {
     process.env = { APOLLO_LOGGING_LEVEL: 'DEBUG' }
 
     //Act
-    const res = shouldSkipLogging('OperationName', LoggingLevel.ERROR)
+    const res = shouldSkipLogging(LoggingLevel.ERROR, 'OperationName')
 
     ///Assert
     expect(res).toBe(false)
@@ -182,7 +192,7 @@ describe('logging plugin tests:', () => {
     expect(context.logs[1].loggingLevel).toBe(LoggingLevel.DEBUG)
   })
 
-  it('logEvent throws an error if persistLogsFn was not sent:', async () => {
+  it('persistLogsFn gets called and logs are cleared:', async () => {
     //arrange
     const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
     const message = 'Log message'
@@ -192,24 +202,11 @@ describe('logging plugin tests:', () => {
     const persistLogsFn = jest.fn((_ctx: ApolloContextExtension) => {})
 
     //act
-    await logEvent(context, message, code, LoggingLevel.INFO, true, persistLogsFn)
+    await logEvent(context, message, code, LoggingLevel.INFO, persistLogsFn)
 
     //assert
     expect(persistLogsFn).toBeCalledTimes(1)
     expect(context.logs).toStrictEqual([])
-  })
-
-  it('persistLogsFn gets called and logs are cleared:', async () => {
-    const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
-    const message = 'Log message'
-    const code = 'Message_Code'
-
-    global.console = { ...global.console, log: jest.fn() }
-
-    const testLogEvent = async () => await logEvent(context, message, code, LoggingLevel.INFO, true)
-    expect(testLogEvent).rejects.toThrowError(
-      '"persistLogs" variable was set to `True`, to persist the logs, it is mandatory to also provide the "persistLogsFn"!'
-    )
   })
 
   it('logDbError should clear logs from context, call insert logs and return new ApolloError:', async () => {
@@ -240,14 +237,14 @@ describe('logging plugin tests:', () => {
     const context: ApolloContextExtension = { requestId: 'requestId', logs: [] }
 
     global.console = { ...global.console, error: jest.fn(), log: jest.fn() }
-    const persistFn = jest.fn()
+    const persistLogsFn = jest.fn()
     //act
-    const { logError } = initializeLogger(context, 'operationName', persistFn, true)
+    const { logError } = initializeLogger({ context, operationName: 'operationName', persistLogsFn, securedMessages: true })
     const res = await logError(message, code, new Error(errorMessage))
 
     //assert
     expect(console.error).toBeCalled()
-    expect(persistFn).toBeCalledTimes(1)
+    expect(persistLogsFn).toBeCalledTimes(1)
     expect(res).toBeInstanceOf(ApolloError)
     expect(res.message).toContain('For more details check Log Id:')
     expect(res.message.includes('Error message')).toBeFalsy()

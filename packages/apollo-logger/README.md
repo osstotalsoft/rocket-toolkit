@@ -77,14 +77,14 @@ The `ApolloLoggerPlugin` class can be instantiated using the following configura
 
 ```javascript
 {
-    // Indicates either the logs should be persisted or not
-    persistLogs: boolean
+    // If 'true', errors thrown inside Apollo Server are wrapped in a 'user friendly message'. Default is 'true'.
+    securedMessages: boolean
     // Custom implementation that allows the user to persist the logs in a file, in a database or using some other technologies.
     persistLogsFn: (context: ApolloContextExtension) => void | Promise<void>
 }
 ```
 
-### - `initializeLogger` options
+### - `initializeLogger` LoggingOptions interface
 
 ```javascript
 {
@@ -92,9 +92,9 @@ The `ApolloLoggerPlugin` class can be instantiated using the following configura
     context: ApolloContextExtension | any,
     // Some operation name, request name, identifier name
     operationName: string,
-    // If 'true', the errors messages are wrapped in a 'user friendly message'.
-    securedMessages?: boolean,
     // Custom implementation that allows the user to persist the logs in a file, in a database or using some other technologies.
     persistLogsFn?: (context: ApolloContextExtension) => void | Promise<void>
+    // If 'true', the errors messages are wrapped in a 'user friendly message'.
+    securedMessages?: boolean,
 }
 ```

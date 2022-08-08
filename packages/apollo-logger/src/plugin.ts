@@ -17,7 +17,7 @@ import { initializeLogger } from './utils'
 
 export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExtension> {
   private securedMessages: boolean
-  private persistLogsFn: (context: ApolloContextExtension) => void | Promise<void>
+  private persistLogsFn?: (context: ApolloContextExtension) => void | Promise<void>
 
   constructor(options: ApolloLoggingOptions) {
     this.securedMessages = options.securedMessages === undefined ? true : options.securedMessages
@@ -29,12 +29,11 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
     request,
     operationName
   }: GraphQLRequestContext<ApolloContextExtension>): Promise<GraphQLRequestListener<ApolloContextExtension>> {
-    const { logInfo, logDebug, logError } = initializeLogger(
+    const { logInfo, logDebug, logError } = initializeLogger({
       context,
-      request.operationName ?? operationName ?? 'unidentifiedOperation',
-      this.persistLogsFn,
-      this.securedMessages
-    )
+      operationName: request.operationName ?? operationName ?? 'unidentifiedOperation',
+      securedMessages: this.securedMessages
+    })
     context.requestId = context.requestId ?? v4()
 
     logInfo(`Request for operation name <${request.operationName ?? operationName}> started!`, '[REQUEST_STARTED]')
@@ -80,8 +79,10 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
         context
       }: GraphQLRequestContextWillSendResponse<ApolloContextExtension>) => {
         logDebug(`A response for the operation <${operationName}> was sent!`, '[GraphQL_Response]')
-        await this.persistLogsFn(context)
-        context.logs = []
+        if (this.persistLogsFn) {
+          await this.persistLogsFn(context)
+          context.logs = []
+        }
       }
     }
   }
