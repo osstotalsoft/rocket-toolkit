@@ -3,7 +3,7 @@
 
 import { Knex } from 'knex'
 
-export type name = string | null
+export type Name = string | null
 
 export type hookMapping = 'innerJoin' | 'leftJoin' | 'rightJoin' | 'fullOuterJoin' | 'crossJoin'
 
@@ -18,17 +18,17 @@ export interface Join {
   cross: hookMapping
 }
 
-export type buildTableHasColumnPredicate = (column: name, knex: Knex<any, any>) => Promise<(table: name) => boolean>
+export type buildTableHasColumnPredicate = (column: Name, knex: Knex<any, any>) => Promise<(table: Name) => boolean>
 
 export interface FromClause {
-  table: name
+  table: Name
   only: boolean
   joinType: keyof Join
 }
 
-export type FromHook = (table: name, alias: name, queryBuilder: Knex.QueryBuilder, clause: FromClause) => void
+export type FromHook = (table: Name, alias: Name, queryBuilder: Knex.QueryBuilder, clause: FromClause) => void
 
-export type JoinHook = (table: name, alias: name, queryBuilder: Knex.QueryBuilder, clause: Knex.JoinClause) => void
+export type JoinHook = (table: Name, alias: Name, queryBuilder: Knex.QueryBuilder, clause: Knex.JoinClause) => void
 
 export interface AdvancedSelectHooks {
   from: FromHook
@@ -40,17 +40,17 @@ export interface AdvancedSelectHooks {
 }
 
 export type SimpleSelectHook = (
-  table: name,
-  alias: name,
+  table: Name,
+  alias: Name,
   queryBuilder: Knex.QueryBuilder,
   clause: FromClause & Knex.JoinClause
 ) => void
 
-export type InsertHook = (table: name, alias: name, queryBuilder: Knex.QueryBuilder, inserted: any) => void
+export type InsertHook = (table: Name, alias: Name, queryBuilder: Knex.QueryBuilder, inserted: any) => void
 
-export type UpdateHook = (table: name, alias: name, queryBuilder: Knex.QueryBuilder, updates: any) => void
+export type UpdateHook = (table: Name, alias: Name, queryBuilder: Knex.QueryBuilder, updates: any) => void
 
-export type DeleteHook = (table: name, alias: name, queryBuilder: Knex.QueryBuilder) => void
+export type DeleteHook = (table: Name, alias: Name, queryBuilder: Knex.QueryBuilder) => void
 
 export interface Hooks {
   onSelect?: SimpleSelectHook | AdvancedSelectHooks
@@ -59,4 +59,4 @@ export interface Hooks {
   onDelete?: DeleteHook
 }
 
-export type Filter = (table: name) => Hooks
+export type Filter = (table: Name) => Hooks

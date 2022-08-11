@@ -2,7 +2,7 @@
 // This source code is licensed under the MIT license.
 
 import * as R from 'ramda'
-import type { buildTableHasColumnPredicate, name } from '../types'
+import type { buildTableHasColumnPredicate, Name } from '../types'
 import { Knex } from 'knex'
 
 const getDefaultSchemaAndDbName = async (knex: Knex<any, any>): Promise<[any, any]> => {
@@ -12,7 +12,7 @@ const getDefaultSchemaAndDbName = async (knex: Knex<any, any>): Promise<[any, an
   return [schema, db]
 }
 
-const getTablesWithColumn = async (column: name, knex: Knex<any, any>): Promise<any[] | null> => {
+const getTablesWithColumn = async (column: Name, knex: Knex<any, any>): Promise<any[] | null> => {
   if (!knex || !column) return null
 
   const data = await knex
@@ -22,7 +22,7 @@ const getTablesWithColumn = async (column: name, knex: Knex<any, any>): Promise<
   return data
 }
 
-const decompose = (tableName: name): [name, name, name] => {
+const decompose = (tableName: Name): [Name, Name, Name] => {
   if (!tableName) return [null, null, null]
   const components = tableName.split('.').map(x => x.trim().replace(/"/g, ''))
 
@@ -35,7 +35,7 @@ const decompose = (tableName: name): [name, name, name] => {
   }
 }
 
-const pg: buildTableHasColumnPredicate = async (column: name, knex: Knex<any, any>) => {
+const pg: buildTableHasColumnPredicate = async (column: Name, knex: Knex<any, any>) => {
   const [defaultSchema, dbName] = await getDefaultSchemaAndDbName(knex)
 
   const tablesWithColumn = await getTablesWithColumn(column, knex)

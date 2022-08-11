@@ -3,3 +3,4 @@ package-lock.json
 coverage
 __tests__
 __mocks__
+__samples__

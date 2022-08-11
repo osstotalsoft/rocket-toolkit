@@ -2,13 +2,13 @@
 // This source code is licensed under the MIT license.
 
 import { Knex } from 'knex'
-import type { Filter, FromClause, Join, name } from './types'
+import type { Filter, FromClause, Join, Name } from './types'
 
 function applyOrMap(fn: (item: any, index?: number, array?: any[]) => unknown, objOrArray: Object | Array<any>) {
   return Array.isArray(objOrArray) ? objOrArray.map(fn) : fn(objOrArray)
 }
 
-function splitTableAndAlias(table: name): Array<name> {
+function splitTableAndAlias(table: Name): Array<Name> {
   if (typeof table != 'string') {
     return [null, null]
   }

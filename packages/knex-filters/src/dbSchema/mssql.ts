@@ -2,10 +2,10 @@
 // This source code is licensed under the MIT license.
 
 import * as R from 'ramda'
-import type { buildTableHasColumnPredicate, name } from '../types'
+import type { buildTableHasColumnPredicate, Name } from '../types'
 import { Knex } from 'knex'
 
-async function getTablesWithColumn(column: name, knex: Knex<any, any>): Promise<any[]> {
+async function getTablesWithColumn(column: Name, knex: Knex<any, any>): Promise<any[]> {
   const data = await knex
     .distinct('TABLE_NAME as [table]', 'TABLE_SCHEMA as [schema]')
     .from('INFORMATION_SCHEMA.COLUMNS')
@@ -18,7 +18,7 @@ async function getDefaultSchemaAndDbName(knex: Knex<any, any>): Promise<[any, an
   return [data[0].schema, data[0].db]
 }
 
-function decompose(tableName: name): [name, name, name] {
+function decompose(tableName: Name): [Name, Name, Name] {
   if (!tableName) return [null, null, null]
   const components = tableName.split('.').map(x => x.trim().replace('[', '').replace(']', ''))
 
@@ -31,7 +31,7 @@ function decompose(tableName: name): [name, name, name] {
   }
 }
 
-const mssql: buildTableHasColumnPredicate = async (column: name, knex: Knex<any, any>) => {
+const mssql: buildTableHasColumnPredicate = async (column: Name, knex: Knex<any, any>) => {
   const [defaultSchema, dbName] = await getDefaultSchemaAndDbName(knex)
   const tables = await getTablesWithColumn(column, knex)
   const propSchema: (obj: Record<'schema', any>) => string = R.prop('schema')

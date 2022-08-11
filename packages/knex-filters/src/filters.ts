@@ -1,6 +1,6 @@
 import { Knex } from 'knex'
 import { applyFilter } from './queryBuilder'
-import type { Filter, Hooks, name } from './types'
+import type { Filter, Hooks, Name } from './types'
 
 export type registerFilter = (filter: Filter, knex: Knex<any, any>) => void
 
@@ -9,7 +9,7 @@ export type registerFilter = (filter: Filter, knex: Knex<any, any>) => void
  * Creates a filter that will call the hooks when the tablePredicate passes
  * @see link TBD
  */
-export function createFilter(tablePredicate: (table: name) => boolean, hooks: Hooks): Filter {
+export function createFilter(tablePredicate: (table: Name) => boolean, hooks: Hooks): Filter {
   return table => {
     return tablePredicate(table) ? hooks : {}
   }
