@@ -1,9 +1,9 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import { knex } from 'knex'
+import { Knex, knex } from 'knex'
 import mockDb from 'mock-knex'
-import { AdvancedSelectHooks, Filter, registerFilter } from '../src'
+import { AdvancedSelectHooks, createFilter, Filter, FromClause, Hooks, Name, registerFilter } from '../src'
 import * as MSSQLMockKnex from '../__mocks__/MSSQLMockKnex'
 
 describe('filter tests', () => {
@@ -407,5 +407,50 @@ describe('filter tests', () => {
     //assert
     expect(filter).not.toHaveBeenCalled()
     expect(hooks.onSelect).not.toHaveBeenCalled()
+  })
+})
+
+describe('create filter tests', () => {
+  test('calls table predicate', () => {
+    // arrange
+    const tablePredicate: (tableName: Name) => boolean = jest.fn(() => true)
+    const hooks: Hooks = {}
+
+    // act
+    createFilter(tablePredicate, hooks)(null)
+
+    // assert
+    expect(tablePredicate).toBeCalledTimes(1)
+    expect(tablePredicate).toBeCalledWith(null)
+  })
+
+  test('returns given hook if table predicate results in true', () => {
+    // arrange
+    const tablePredicate: (tableName: Name) => boolean = jest.fn(() => true)
+    const hooks: Hooks = {
+      onSelect: (_table: Name, _alias: Name, _queryBuilder: Knex.QueryBuilder, _clause: FromClause & Knex.JoinClause) => {}
+    }
+
+    // act
+    const res = createFilter(tablePredicate, hooks)(null)
+
+    // assert
+    expect(res).toBe(hooks)
+    expect(res).not.toEqual({})
+  })
+
+  test('returns empty hook if table predicate results in false', () => {
+    // arrange
+    const tablePredicate: (tableName: Name) => boolean = jest.fn(() => false)
+    const hooks: Hooks = {
+      onSelect: (_table: Name, _alias: Name, _queryBuilder: Knex.QueryBuilder, _clause: FromClause & Knex.JoinClause) => {}
+    }
+
+    // act
+    const res = createFilter(tablePredicate, hooks)(null)
+
+    // assert
+    expect(res).not.toBe(hooks)
+    expect(res).toEqual({})
   })
 })
