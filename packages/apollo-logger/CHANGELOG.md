@@ -1,5 +1,11 @@
 # @totalsoft/apollo-logger
 
+## 1.0.7
+
+### Patch Changes
+
+- 9bcf546: Removed 'persistLogs' config
+
 ## 1.0.6
 
 ### Patch Changes
