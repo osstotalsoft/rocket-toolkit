@@ -2,7 +2,7 @@
 // This source code is licensed under the MIT license.
 
 import * as R from 'ramda'
-import type { buildTableHasColumnPredicate, Name } from '../types'
+import type { BuildTableHasColumnPredicate, Name } from '../types'
 import { Knex } from 'knex'
 
 const getDefaultSchemaAndDbName = async (knex: Knex<any, any>): Promise<[any, any]> => {
@@ -35,7 +35,7 @@ const decompose = (tableName: Name): [Name, Name, Name] => {
   }
 }
 
-const pg: buildTableHasColumnPredicate = async (column: Name, knex: Knex<any, any>) => {
+const pg: BuildTableHasColumnPredicate = async (column: Name, knex: Knex<any, any>) => {
   const [defaultSchema, dbName] = await getDefaultSchemaAndDbName(knex)
 
   const tablesWithColumn = await getTablesWithColumn(column, knex)

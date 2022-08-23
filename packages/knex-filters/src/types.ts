@@ -18,7 +18,12 @@ export interface Join {
   cross: hookMapping
 }
 
-export type buildTableHasColumnPredicate = (column: Name, knex: Knex<any, any>) => Promise<(table: Name) => boolean>
+/**
+ *
+ * Use this type to build a table predicate that can be used within a filter
+ * @see link https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/knex-filters#BuildTableHasColumnPredicate-type
+ */
+export type BuildTableHasColumnPredicate = (column: Name, knex: Knex<any, any>) => Promise<(table: Name) => boolean>
 
 export interface FromClause {
   table: Name

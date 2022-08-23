@@ -7,7 +7,7 @@ export type registerFilter = (filter: Filter, knex: Knex<any, any>) => void
 /**
  *
  * Creates a filter that will call the hooks when the tablePredicate passes
- * @see link TBD
+ * @see link https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/knex-filters#createfilter
  */
 export function createFilter(tablePredicate: (table: Name) => boolean, hooks: Hooks): Filter {
   return table => {
@@ -18,7 +18,7 @@ export function createFilter(tablePredicate: (table: Name) => boolean, hooks: Ho
 /**
  *
  * Registers a filter with a Knex instance
- * @see link TBD
+ * @see link https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/knex-filters#registerFilter
  */
 export function registerFilter(filter: Filter, knex: Knex<any, any>): void {
   function extendKnex(knex: Knex<any, any>) {
