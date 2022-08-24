@@ -1,5 +1,5 @@
 ---
-'@totalsoft/knex-filters': major
+'@totalsoft/knex-filters': minor
 ---
 
 Added knex-filters package
