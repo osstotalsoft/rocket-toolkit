@@ -1,7 +1,7 @@
 {
   "name": "@totalsoft/key-per-file-configuration",
   "description": "Key per file configuration provider",
-  "version": "2.4.2",
+  "version": "1.0.0",
   "author": "TotalSoft",
   "packageManager": "yarn@3.2.0",
   "type": "commonjs",
