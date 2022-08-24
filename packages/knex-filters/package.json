@@ -1,7 +1,7 @@
 {
   "name": "@totalsoft/knex-filters",
   "description": "A custom Knex global filter plugin",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "author": "TotalSoft",
   "packageManager": "yarn@3.2.0",
   "type": "commonjs",
