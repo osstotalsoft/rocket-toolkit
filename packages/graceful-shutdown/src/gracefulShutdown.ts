@@ -7,7 +7,7 @@ let isShuttingDown = false
 const exit = process.exit
 
 function gracefulShutdown({
-  onShutdown = (_: any) => Promise.resolve(),
+  onShutdown = (_: string) => Promise.resolve(),
   timeout = 5000,
   terminationSignals = ['SIGINT', 'SIGTERM'],
   unrecoverableEvents = ['uncaughtException', 'unhandledRejection'],
@@ -27,7 +27,7 @@ function gracefulShutdown({
       await onShutdown(reason)
       logger.info('Shutdown complete')
     } catch (e) {
-      logger.error('Error during shutdown: ', e)
+      logger.error(e, 'Error during shutdown: ')
       exit(1)
     }
   }

@@ -13,7 +13,7 @@ const getCorrelationId = () => {
   return correlationIdStore?.get(correlationIdKey)
 }
 
-async function useCorrelationId(correlationId: string, next: () => Promise<void>) {
+async function useCorrelationId(correlationId: string | null, next: () => Promise<void>) {
   return asyncLocalStorage.run(store, async () => {
     store.set(correlationIdKey, correlationId || v4())
     return await next()

@@ -5,26 +5,28 @@ import * as chokidar from 'chokidar'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as glob from 'glob'
-import { ConfigWatcher, Options } from './types'
+import { ConfigWatcher, Logger, Options } from './types'
 
 const { KEY_PER_FILE_CONFIG_PATH } = process.env
 const defaultConfigPath = 'runtime'
 
 export function load(options?: Options): ConfigWatcher {
   const cleanConfigPath = _cleanConfigPath(options?.configPath)
+  const logger = options?.logger ?? console
 
-  console.info(`Loading "Key per File" configuration at: ${cleanConfigPath}`)
+  logger.info(`Loading "Key per File" configuration at: ${cleanConfigPath}`)
 
   // Load files to env
   const filePaths = glob.sync(cleanConfigPath, { nodir: true })
-  filePaths.forEach(_loadValue)
+  const loadValue = _loadValue(logger)
+  filePaths.forEach(loadValue)
 
   // Watch for file changes
   const watcher = chokidar
     .watch(cleanConfigPath, { awaitWriteFinish: true /*, usePolling: true*/ })
     .on('unlink', _removeValue)
-    .on('add', _loadValue)
-    .on('change', _loadValue)
+    .on('add', loadValue)
+    .on('change', loadValue)
 
   return { close: () => watcher.close() }
 }
@@ -44,16 +46,18 @@ function _cleanConfigPath(configPath = KEY_PER_FILE_CONFIG_PATH || defaultConfig
   return cleanConfigPath
 }
 
-function _loadValue(filePath: string) {
-  const key = path.basename(filePath)
-  const value = fs.readFileSync(filePath).toString()
+function _loadValue(logger: Logger) {
+  return function (filePath: string) {
+    const key = path.basename(filePath)
+    const value = fs.readFileSync(filePath).toString()
 
-  const oldValue = process.env[key]
-  if (oldValue != undefined && oldValue !== value) {
-    console.debug(`Refreshed env: ${key}`)
+    const oldValue = process.env[key]
+    if (oldValue != undefined && oldValue !== value) {
+      logger.debug(`Refreshed env: ${key}`)
+    }
+
+    process.env[key] = value
   }
-
-  process.env[key] = value
 }
 
 function _removeValue(filePath: string) {
