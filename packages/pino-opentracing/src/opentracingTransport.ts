@@ -40,7 +40,7 @@ function errorTagExists(span: Span) {
   return any(x => x?.key === Tags.ERROR, tags)
 }
 
-export default function (_options: {}) {
+export default function (_options: {} = {}) {
   const result = split((data: string) => {
     try {
       const log = JSON.parse(data)
