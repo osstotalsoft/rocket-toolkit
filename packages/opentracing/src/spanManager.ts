@@ -7,8 +7,8 @@ const asyncLocalStorage = new AsyncLocalStorage<Span[]>()
 
 function getActiveSpan() {
   const context = asyncLocalStorage.getStore()
-  const rootSpan = context && context.length ? context[context.length - 1] : null
-  return rootSpan
+  const activeSpan = context && context.length ? context[context.length - 1] : null
+  return activeSpan
 }
 
 async function useSpanManager(rootSpan: Span, scopeAction: () => Promise<void>) {

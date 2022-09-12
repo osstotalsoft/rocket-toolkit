@@ -49,7 +49,7 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
         logger.debug(`[GraphQL_Parsing] The parsing of operation <${getOperationName(request, operationName)}> started!`)
         return async (err: Error | undefined) => {
           if (err) {
-            await logger.error(`[GraphQL_Parsing][Error] ${err}`)
+            logger.error(`[GraphQL_Parsing][Error] ${err}`)
           }
         }
       },

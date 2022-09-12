@@ -3,8 +3,8 @@
 
 import { tenantContextAccessor } from '../src'
 
-describe('correlation tests:', () => {
-  it('passes correlation id in async flow', async () => {
+describe('tenant context accessor tests:', () => {
+  it('passes tenant context in async flow', async () => {
     //arrange
     const tenant = { id: 'tenant1', code: 'tenant1-code', enabled: true }
     let tenantContext
@@ -21,7 +21,7 @@ describe('correlation tests:', () => {
     expect(tenantContext).toHaveProperty('tenant', tenant)
   })
 
-  it('returns empty context if correlation context not set', async () => {
+  it('returns empty context if tenant context not set', async () => {
     //arrange
     let tenantContext
     async function inner() {

@@ -3,17 +3,6 @@ import { ApolloLoggerPlugin } from '../src'
 import { Logger} from 'pino'
 
 describe('logging plugin tests:', () => {
-  const OLD_ENV = process.env
-
-  beforeEach(() => {
-    jest.resetModules()
-    process.env = { ...OLD_ENV }
-  })
-
-  afterAll(() => {
-    process.env = OLD_ENV
-  })
-
   function getFakeLogger() : Logger {
     const childFakeLogger = { info: jest.fn(), debug: jest.fn(), error: jest.fn() }
     const fakeLogger = {

@@ -4,7 +4,7 @@
 /* eslint-env browser */
 import build from 'pino-abstract-transport'
 import knex from 'knex'
-import { Knex} from 'knex'
+import { Knex } from 'knex'
 import pino from 'pino'
 import { parseConnectionString } from './utils'
 import { setTimeout } from 'timers/promises'
@@ -24,7 +24,7 @@ const generateKnexConfig = ({
   password,
   database,
   trustServerCertificate
-}: ConnectionInfo) : Knex.Config => ({
+}: ConnectionInfo): Knex.Config => ({
   client: 'mssql',
   connection: {
     server,
@@ -107,7 +107,7 @@ function batchQueueProcessor(batchHandler: (logs: any[]) => Promise<void>, { int
 
 export default async function dbTransport(opts: MsSqlServerTransportOptions) {
   const connectionInfo = parseConnectionString(opts.connectionString)
-    const dbInstance = knex(generateKnexConfig(connectionInfo))
+  const dbInstance = knex(generateKnexConfig(connectionInfo))
   const queueProcessor = batchQueueProcessor(insertLogs, { interval: 2000 })
 
   async function insertLogs(logsBatch: any[]) {

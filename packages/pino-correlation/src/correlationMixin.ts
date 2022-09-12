@@ -3,8 +3,8 @@
 
 import { correlationManager } from '@totalsoft/correlation'
 
-function correlationIdEnricher(): { correlationId?: string } {
+function correlationIdMixin(): { correlationId?: string } {
   return { correlationId: correlationManager.getCorrelationId() }
 }
 
-export default correlationIdEnricher
+export default correlationIdMixin
