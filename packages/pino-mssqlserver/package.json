@@ -41,7 +41,8 @@
     "humps": "^2.0.1",
     "knex": "^2.3.0",
     "pino": "^8.5.0",
-    "pino-abstract-transport": "^1.0.0"
+    "pino-abstract-transport": "^1.0.0",
+    "tedious": "^15.1.0"
   },
   "jest": {
     "preset": "ts-jest",

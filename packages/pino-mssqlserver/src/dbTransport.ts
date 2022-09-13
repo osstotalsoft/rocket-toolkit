@@ -7,7 +7,7 @@ import knex from 'knex'
 import { Knex } from 'knex'
 import pino from 'pino'
 import { parseConnectionString } from './utils'
-import { setTimeout } from 'timers/promises'
+import { batchQueueProcessor } from './batchQueueProcessor'
 import { ConnectionInfo } from './types'
 
 interface MsSqlServerTransportOptions {
@@ -52,67 +52,25 @@ const generateKnexConfig = ({
   useNullAsDefault: true
 })
 
-function batchQueueProcessor(batchHandler: (logs: any[]) => Promise<void>, { interval = 20, batchLimit = 10 } = {}) {
-  const queue: any[] = []
-  const ac = new AbortController()
-
-  function abort() {
-    try {
-      ac.abort()
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
-  function enqueue(obj: any) {
-    queue.push(obj)
-  }
-
-  async function flush() {
-    const crtQueue = queue
-    //queue = []
-
-    for (let batch; (batch = crtQueue.splice(0, batchLimit)), batch.length > 0; ) {
-      await batchHandler(batch)
-    }
-  }
-
-  async function wait() {
-    try {
-      await setTimeout(interval, undefined, { signal: ac.signal })
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        return false
-      }
-      throw err
-    }
-
-    return true
-  }
-
-  async function run() {
-    while (await wait()) {
-      await flush()
-    }
-  }
-
-  // Fire and forget
-  run()
-
-  return {
-    enqueue,
-    flush,
-    abort
+function buildDbInstance(connectionString: string) {
+  try {
+    const connectionInfo = parseConnectionString(connectionString)
+    const dbInstance = knex(generateKnexConfig(connectionInfo))
+    return dbInstance
+  }catch(error) {
+    console.error(error)
   }
 }
 
 export default async function dbTransport(opts: MsSqlServerTransportOptions) {
-  const connectionInfo = parseConnectionString(opts.connectionString)
-  const dbInstance = knex(generateKnexConfig(connectionInfo))
+  const dbInstance = buildDbInstance(opts.connectionString)
+  if (!dbInstance) {
+    return build(() => {}) // Don't crash if db connection could not be established
+  }
+
   const interval = opts.flushInterval || 2000
-
   const queueProcessor = batchQueueProcessor(insertLogs, { interval })
-
+  
   async function insertLogs(logsBatch: any[]) {
     try {
       const logs = logsBatch.map(log => ({
@@ -125,7 +83,7 @@ export default async function dbTransport(opts: MsSqlServerTransportOptions) {
         TenantId: log.tenantId,
         Exception: log.err ? JSON.stringify(log.err) : undefined
       }))
-      await dbInstance(opts.tableName).insert(logs)
+      await dbInstance?.(opts.tableName).insert(logs)
     } catch (e) {
       console.error(e)
     }

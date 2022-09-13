@@ -1,4 +1,4 @@
-import { dbTransport } from '../src'
+import dbTransport from '../src'
 import { pino } from 'pino'
 import knex from 'knex'
 import { setTimeout } from 'timers/promises'

@@ -24,7 +24,8 @@ describe('pino-opentracing tests:', () => {
   it('sets error tag', async () => {
     //arrange
     const rootSpan = {
-      setTag: jest.fn()
+      setTag: jest.fn(),
+      log: jest.fn()
     }
     const dest = opentracingTransport()
     const logger = pino({}, dest)
