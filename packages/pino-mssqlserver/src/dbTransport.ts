@@ -14,6 +14,7 @@ interface MsSqlServerTransportOptions {
   connectionString: string
   tableName: string
   serviceName: string
+  flushInterval?: number
 }
 
 const generateKnexConfig = ({
@@ -108,7 +109,9 @@ function batchQueueProcessor(batchHandler: (logs: any[]) => Promise<void>, { int
 export default async function dbTransport(opts: MsSqlServerTransportOptions) {
   const connectionInfo = parseConnectionString(opts.connectionString)
   const dbInstance = knex(generateKnexConfig(connectionInfo))
-  const queueProcessor = batchQueueProcessor(insertLogs, { interval: 2000 })
+  const interval = opts.flushInterval || 2000
+
+  const queueProcessor = batchQueueProcessor(insertLogs, { interval })
 
   async function insertLogs(logsBatch: any[]) {
     try {

@@ -3,7 +3,7 @@ import { pino } from 'pino'
 import { spanManager } from '@totalsoft/opentracing'
 import { Tags } from 'opentracing'
 
-describe('correlation tests:', () => {
+describe('pino-opentracing tests:', () => {
   it('logs message to active span', async () => {
     //arrange
     const rootSpan = {
