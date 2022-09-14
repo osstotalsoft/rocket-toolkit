@@ -1,7 +1,0 @@
-{
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {    
-    "outDir": "./dist" /* Redirect output structure to the directory. */,
-  },
-  "exclude": ["dist/**", "coverage/**"]
-}
