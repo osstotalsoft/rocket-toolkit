@@ -15,7 +15,7 @@ import { GraphQLRequestListener } from 'apollo-server-plugin-base/src/index'
 import { v4 } from 'uuid'
 import { ApolloContextExtension, ApolloLoggingOptions } from './types'
 import { Logger } from 'pino'
-import {correlationManager} from '@totalsoft/correlation'
+import { correlationManager } from '@totalsoft/correlation'
 
 export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExtension> {
   private securedMessages: boolean
