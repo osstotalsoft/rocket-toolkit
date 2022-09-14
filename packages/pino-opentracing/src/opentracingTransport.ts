@@ -40,6 +40,11 @@ function errorTagExists(span: Span) {
   return any(x => x?.key === Tags.ERROR, tags)
 }
 
+/**
+ * Creates a pino stream that logs the events to the opentracing client
+ * @param _options - options for creating the stream
+ * @returns - the pino stream
+ */
 export default function (_options: {} = {}) {
   const result = split((data: string) => {
     try {

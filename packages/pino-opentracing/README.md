@@ -13,3 +13,12 @@ or
 ```javascript
 yarn add @totalsoft/pino-opentracing
 ```
+
+## Usage
+```javascript
+import { opentracingTransport } from '@totalsoft/pino-opentracing'
+import { pino } from 'pino'
+
+const destination = opentracingTransport()
+const logger = pino({}, destination)
+```

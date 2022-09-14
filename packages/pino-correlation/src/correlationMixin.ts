@@ -3,6 +3,10 @@
 
 import { correlationManager } from '@totalsoft/correlation'
 
+/**
+ * Creates a pino mixin object containing the current correlation id
+ * @returns - the pino mixin object
+ */
 function correlationIdMixin(): { correlationId?: string } {
   return { correlationId: correlationManager.getCorrelationId() }
 }

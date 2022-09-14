@@ -1,6 +1,6 @@
 # pino-apollo
 
-An Apollo server plugin that logs the main events related to a request.
+An [apollo server](https://github.com/apollographql/apollo-server) plugin that logs the main events related to a request. It uses the [pino](https://github.com/pinojs/pino) logger.
 
 In addition, it comes with a cool feature called `securedMessages` which will make sure that sensitive error messages does not leak outside your server. All the errors thrown inside an Apollo Server, are wrapped in a 'user friendly message', helping increase the security of your server.
 
@@ -39,7 +39,7 @@ The `ApolloLoggerPlugin` class can be instantiated using the following configura
 
 ```javascript
 {
-  // Pre-configured apollo logger
+  // Pre-configured pino logger
   logger: Logger
   // If 'true', errors thrown inside Apollo Server are wrapped in a 'user friendly message'. Default is 'true'.
   securedMessages?: boolean

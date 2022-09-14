@@ -8,14 +8,7 @@ import { Knex } from 'knex'
 import pino from 'pino'
 import { parseConnectionString } from './utils'
 import { batchQueueProcessor } from './batchQueueProcessor'
-import { ConnectionInfo } from './types'
-
-interface MsSqlServerTransportOptions {
-  connectionString: string
-  tableName: string
-  serviceName: string
-  flushInterval?: number
-}
+import { ConnectionInfo, MsSqlServerTransportOptions } from './types'
 
 const generateKnexConfig = ({
   server,
@@ -69,7 +62,8 @@ export default async function dbTransport(opts: MsSqlServerTransportOptions) {
   }
 
   const interval = opts.flushInterval || 2000
-  const queueProcessor = batchQueueProcessor(insertLogs, { interval })
+  const batchLimit = opts.batchLimit || 20
+  const queueProcessor = batchQueueProcessor(insertLogs, { interval, batchLimit })
   
   async function insertLogs(logsBatch: any[]) {
     try {

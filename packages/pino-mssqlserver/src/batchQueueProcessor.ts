@@ -1,6 +1,6 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
-import { setTimeout } from "timers/promises"
+import { setTimeout } from 'timers/promises'
 
 export function batchQueueProcessor(batchHandler: (logs: any[]) => Promise<void>, { interval = 20, batchLimit = 10 } = {}) {
     const queue: any[] = []

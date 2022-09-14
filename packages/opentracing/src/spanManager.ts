@@ -5,6 +5,10 @@ import { AsyncLocalStorage } from 'async_hooks'
 import { Span } from 'opentracing'
 const asyncLocalStorage = new AsyncLocalStorage<Span[]>()
 
+/**
+ * Gets the active span in scope
+ * @returns - the active span
+ */
 function getActiveSpan() {
   const context = asyncLocalStorage.getStore()
   const activeSpan = context && context.length ? context[context.length - 1] : null
@@ -29,6 +33,11 @@ function endScope() {
   context?.pop()
 }
 
+/**
+ * Open a scope for the active span
+ * @param span - the active span
+ * @param action - the wrapped function that has access to the active span
+ */
 async function withScope(span: Span, action: () => Promise<void>) {
   try {
     beginScope(span)

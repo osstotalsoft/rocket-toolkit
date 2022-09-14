@@ -106,3 +106,18 @@ export interface Tenant {
 }
 ```
 The service throws an exception when the tenant with the specified id is not found.
+
+### tenantContextAccessor
+Allows propagating a tenant context across async/await calls.
+```typescript
+async function inner() {
+    // Access tenant context
+    const tenantContext = tenantContextAccessor.getTenantContext()
+}
+
+const tenant = { id: 'tenant1', code: 'tenant1-code', enabled: true }
+//Create context for the current tenant and
+tenantContextAccessor.useTenantContext({ tenant }, async () => {
+    await inner()
+})
+```

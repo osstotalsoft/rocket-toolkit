@@ -3,6 +3,10 @@
 
 import { tenantContextAccessor } from '@totalsoft/multitenancy-core'
 
+/**
+ * Creates a pino mixin object containing the current tenant id
+ * @returns - the pino mixin object
+ */
 function tenantIdMixin() {
   return { tenantId: tenantContextAccessor.getTenantContext()?.tenant?.id }
 }
