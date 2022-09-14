@@ -1,6 +1,6 @@
 {
   "name": "rocket-toolkit",
-  "packageManager": "yarn@3.2.1",
+  "packageManager": "yarn@3.2.3",
   "private": true,
   "engines": {
     "node": ">=16.x"
