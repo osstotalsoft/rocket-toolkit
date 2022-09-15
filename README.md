@@ -6,9 +6,16 @@ A collection of plugins and other GraphQL utilities.
 
 ## Packages
   - [apollo-logger](./packages/apollo-logger#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fapollo-logger.svg)](https://badge.fury.io/js/@totalsoft%2Fapollo-logger)
+  - [correlation](./packages/correlation#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fcorrelation.svg)](https://badge.fury.io/js/@totalsoft%2Fcorrelation)
+  - [graceful-shutdown](./packages/graceful-shutdown#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fgraceful-shutdown.svg)](https://badge.fury.io/js/@totalsoft%2Fgraceful-shutdown)
   - [key-per-file-configuration](./packages/key-per-file-configuration#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fkey-per-file-configuration.svg)](https://badge.fury.io/js/@totalsoft%2Fkey-per-file-configuration)
   - [knex-filters](./packages/knex-filters#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fknex-filters.svg)](https://badge.fury.io/js/@totalsoft%2Fknex-filters)
-  - [tenant-configuration](./packages/tenant-configuration#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Ftenant-configuration.svg)](https://badge.fury.io/js/@totalsoft%2Ftenant-configuration)
+  - [opentracing](./packages/opentracing#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fopentracing.svg)](https://badge.fury.io/js/@totalsoft%2Fopentracing)
+  - [pino-apollo](./packages/pino-apollo#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fpino-apollo.svg)](https://badge.fury.io/js/@totalsoft%2Fpino-apollo)
+  - [pino-correlation](./packages/pino-correlation#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fpino-correlation.svg)](https://badge.fury.io/js/@totalsoft%2Fpino-correlation)
+  - [pino-mssqlserver](./packages/pino-mssqlserver#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fpino-mssqlserver.svg)](https://badge.fury.io/js/@totalsoft%2Fpino-mssqlserver)
+  - [pino-multitenancy](./packages/pino-multitenancy#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fpino-multitenancy.svg)](https://badge.fury.io/js/@totalsoft%2Fpino-multitenancy)
+  - [pino-opentracing](./packages/pinoopentracing#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fpino-opentracing.svg)](https://badge.fury.io/js/@totalsoft%2Fpino-opentracing)     
 
 ## Contributing guide
 When using Visual Studio Code please follow these steps: [Editor Setup for VSCode](https://yarnpkg.com/getting-started/editor-sdks#vscode) (allows VSCode to read .zip yarn cache files and supports features like go-to-definition).

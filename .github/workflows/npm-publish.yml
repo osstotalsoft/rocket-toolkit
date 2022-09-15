@@ -24,6 +24,8 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install Dependencies
         run: yarn install
+      - name: Build
+        run: yarn build
       - name: Run tests
         run: yarn test
       - name: Upgrade version based on Changeset

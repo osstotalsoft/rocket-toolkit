@@ -9,7 +9,8 @@ jest.mock('fs/promises')
 
 describe('key-per-file configuration tests:', () => {
   const OLD_ENV = process.env
-
+  const emptyLogger = { info: () => {}, debug: () => {} }
+  
   beforeEach(() => {
     jest.resetModules()
     process.env = { ...OLD_ENV }
@@ -30,7 +31,7 @@ describe('key-per-file configuration tests:', () => {
     })
 
     //act
-    const watcher = load()
+    const watcher = load({ logger: emptyLogger })
     await watcher.close()
 
     //assert
@@ -49,7 +50,7 @@ describe('key-per-file configuration tests:', () => {
     })
 
     //act
-    const watcher = load({ configPath: 'customLocation/**' })
+    const watcher = load({ configPath: 'customLocation/**', logger: emptyLogger })
     await watcher.close()
 
     //assert
@@ -68,7 +69,7 @@ describe('key-per-file configuration tests:', () => {
     })
 
     //act
-    const watcher = load({ configPath: 'customLocation' })
+    const watcher = load({ configPath: 'customLocation', logger: emptyLogger })
     await watcher.close()
 
     //assert
@@ -85,7 +86,7 @@ describe('key-per-file configuration tests:', () => {
     })
 
     //act
-    const watcher = load({ configPath: 'customLocation/config/ENV1' })
+    const watcher = load({ configPath: 'customLocation/config/ENV1', logger: emptyLogger })
     await watcher.close()
 
     //assert
@@ -102,7 +103,7 @@ describe('key-per-file configuration tests:', () => {
     })
 
     //act
-    const watcher = load()
+    const watcher = load({ logger: emptyLogger })
     vol.fromJSON({
       'runtime/ENV2': env2Value
     })
@@ -125,7 +126,7 @@ describe('key-per-file configuration tests:', () => {
     })
 
     //act
-    const watcher = load()
+    const watcher = load({ logger: emptyLogger })
     vol.fromJSON({
       'runtime/ENV1': env1ValueChanged
     })
