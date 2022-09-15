@@ -11,7 +11,7 @@ on:
       - main  
 
 concurrency:
-  group: run-tests
+  group: build-test-publish
 
 jobs:
   release:
