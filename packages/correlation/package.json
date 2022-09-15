@@ -1,7 +1,7 @@
 {
   "name": "@totalsoft/correlation",
   "description": "Core correlation functionality",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "TotalSoft",
   "packageManager": "yarn@3.2.0",
   "type": "commonjs",
