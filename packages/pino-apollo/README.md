@@ -21,8 +21,11 @@ yarn add @totalsoft/pino-apollo
 ```javascript
 import { ApolloLoggerPlugin } from '@totalsoft/pino-apollo'
 import { ApolloServer } from 'apollo-server'
+import pino from 'pino'
 
-const plugins = [ApolloLoggerPlugin({ ...options})]
+const logger = pino()
+
+const plugins = [ApolloLoggerPlugin({ logger, securedMessages: false})]
 const apollo = new ApolloServer({
   plugins,
   ...
@@ -39,7 +42,7 @@ The `ApolloLoggerPlugin` class can be instantiated using the following configura
 
 ```javascript
 {
-  // Pre-configured pino logger
+  // Pre-configured pino logger. Default is `console`.
   logger: Logger
   // If 'true', errors thrown inside Apollo Server are wrapped in a 'user friendly message'. Default is 'true'.
   securedMessages?: boolean
