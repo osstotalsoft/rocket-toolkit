@@ -39,8 +39,10 @@
     "uuid": "^8.3.0"
   },
   "devDependencies": {
+    "@jest/types": "^28.1.0",
     "@types/bluebird": "^3.5.37",
     "@types/humps": "^2.0.2",
+    "@types/jest": "^27.5.1",
     "@types/node": "^18.7.22",
     "@types/rimraf": "^3",
     "@types/uuid": "^8.3.4",
