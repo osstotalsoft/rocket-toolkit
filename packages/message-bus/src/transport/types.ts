@@ -13,10 +13,11 @@ export type MessageHandler = (message: nats.Message) => Promise<void>
 export interface Subscription extends EventEmitter {
   unsubscribe?: () => Promise<unknown>
   _natsSubscription?: nats.Subscription
+  _call?: unknown
 }
 
 export interface Transport {
-  connect(): Promise<Connection>
+  connect(): Promise<EventEmitter>
   disconnect(): Promise<void>
   publish(subject: string, envelope: Envelope<any>, serDes: SerDes): Promise<any>
   subscribe(

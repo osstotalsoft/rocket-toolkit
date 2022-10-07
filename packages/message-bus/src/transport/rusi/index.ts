@@ -5,27 +5,29 @@ import { Mutex } from 'async-mutex'
 import grpc from '@grpc/grpc-js'
 import protoLoader from '@grpc/proto-loader'
 import Promise from 'bluebird'
-import { SubscriptionOptions } from '../../types'
+import { Envelope, SerDes, SubscriptionOptions } from '../../types'
 import EventEmitter from 'events'
+import { Subscription, SubscriptionHandler, Transport } from '../types'
+import { RusiChannel, RusiClient, RusiGrpc, Request, Options, RusiSubscription, RusiConnection } from './types'
 
 const {
   RUSI_GRPC_ENDPOINT,
   RUSI_GRPC_PORT,
-  RUSI_STREAM_PROCESSOR_MaxConcurrentMessages,
-  RUSI_STREAM_PROCESSOR_AckWaitTime,
-  RUSI_PUB_SUB_MaxConcurrentMessages,
-  RUSI_PUB_SUB_AckWaitTime,
-  RUSI_RPC_MaxConcurrentMessages,
-  RUSI_RPC_AckWaitTime,
+  RUSI_STREAM_PROCESSOR_MaxConcurrentMessages = '1',
+  RUSI_STREAM_PROCESSOR_AckWaitTime = '5000',
+  RUSI_PUB_SUB_MaxConcurrentMessages = '100',
+  RUSI_PUB_SUB_AckWaitTime = '5000',
+  RUSI_RPC_MaxConcurrentMessages = '1',
+  RUSI_RPC_AckWaitTime = '5000',
   RUSI_PUB_SUB_NAME
 } = process.env
 
 const PROTO_PATH = __dirname + '/rusi.proto'
 
 const clientMutex = new Mutex()
-let client = null
+let client: RusiClient | null = null
 
-async function _connect() {
+async function _connect(): globalThis.Promise<RusiClient> {
   if (client) {
     return client
   }
@@ -43,9 +45,11 @@ async function _connect() {
       defaults: true,
       oneofs: true
     })
-    const rusi_proto = grpc.loadPackageDefinition(packageDefinition).rusi.proto.runtime.v1
 
-    const c = new rusi_proto.Rusi(
+    const rusiObject: RusiGrpc = grpc.loadPackageDefinition(packageDefinition).rusi
+    const rusi_proto = rusiObject.proto.runtime.v1
+
+    const c: RusiClient = new rusi_proto.Rusi(
       RUSI_GRPC_ENDPOINT || 'localhost:' + (RUSI_GRPC_PORT || 50003),
       grpc.credentials.createInsecure()
     )
@@ -89,10 +93,10 @@ export async function disconnect() {
   }
 }
 
-export async function publish(subject, envelope, serDes) {
+export async function publish(subject: string, envelope: Envelope<any>, serDes: SerDes) {
   const c = await _connect()
   const { payload, headers } = envelope
-  const publishRequest = {
+  const publishRequest: Request = {
     pubsub_name: RUSI_PUB_SUB_NAME,
     topic: subject,
     data: toUTF8Array(serDes.serialize(payload)),
@@ -104,9 +108,14 @@ export async function publish(subject, envelope, serDes) {
   return result
 }
 
-export async function subscribe(subject, handler, opts, serDes) {
+export async function subscribe(
+  subject: string,
+  handler: SubscriptionHandler,
+  opts: SubscriptionOptions,
+  serDes: SerDes
+): globalThis.Promise<Promise<Subscription>> {
   const c = await _connect()
-  const rusiSubOptions = {}
+  const rusiSubOptions: Options = {}
   switch (opts) {
     case SubscriptionOptions.STREAM_PROCESSOR:
       rusiSubOptions.qGroup = { value: true }
@@ -145,7 +154,7 @@ export async function subscribe(subject, handler, opts, serDes) {
       break
   }
 
-  const subscribeRequest = {
+  const subscribeRequest: Request = {
     pubsub_name: RUSI_PUB_SUB_NAME,
     topic: subject,
     options: rusiSubOptions
@@ -174,8 +183,8 @@ export async function subscribe(subject, handler, opts, serDes) {
   return sub
 }
 
-function toUTF8Array(str) {
-  const utf8 = []
+function toUTF8Array(str: string): number[] {
+  const utf8: number[] = []
   for (let i = 0; i < str.length; i++) {
     let charcode = str.charCodeAt(i)
     if (charcode < 0x80) utf8.push(charcode)
@@ -202,7 +211,7 @@ function toUTF8Array(str) {
   return utf8
 }
 
-function fromUTF8Array(data) {
+function fromUTF8Array(data: number[]): string {
   // array of bytes
   let str = '',
     i
@@ -232,8 +241,8 @@ function fromUTF8Array(data) {
   return str
 }
 
-function rusiSubscription(call) {
-  const sub = new EventEmitter()
+function rusiSubscription(call: RusiSubscription): Subscription {
+  const sub: Subscription = new EventEmitter()
   sub.on('removeListener', (event, listener) => {
     call.removeListener(event, listener)
   })
@@ -250,9 +259,9 @@ function rusiSubscription(call) {
   return sub
 }
 
-function wrapClient(client) {
-  const connection = new EventEmitter()
-  const channel = client.getChannel()
+function wrapClient(client: RusiClient): RusiConnection {
+  const connection: RusiConnection = new EventEmitter()
+  const channel: RusiChannel = client.getChannel()
 
   try {
     channel.watchConnectivityState(grpc.connectivityState.READY, Infinity, () => {
@@ -267,7 +276,6 @@ function wrapClient(client) {
     })
   } catch (e) {
     connection.emit('error', new Error('The channel has been closed'))
-    return
   }
 
   connection.on('error', err => {
@@ -277,3 +285,12 @@ function wrapClient(client) {
   connection._rusiClient = client
   return connection
 }
+
+const rusiTransport: Transport = {
+  connect,
+  disconnect,
+  publish,
+  subscribe
+}
+
+export default rusiTransport
