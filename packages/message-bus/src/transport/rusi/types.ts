@@ -17,25 +17,24 @@ export type Request = {
 
 export type RusiListener = (...args: any[]) => void
 
-export type RusiSubscription = {
-  write: (options: any) => void
-  on: (event: string, callback: RusiListener) => void
-  removeListener: (event: string, callback: RusiListener) => void
-  cancel: () => void
+export interface RusiSubscription extends EventEmitter {
+  write?: (options: any) => void
+  cancel?: () => void
+  end?: () => void
 }
 
-export type RusiClient = {
+export interface RusiClient extends EventEmitter {
   close: () => void
   getChannel: () => RusiChannel
-  waitForReady: (deadline: number, callback: (err?: Error) => void) => void
-  Publish: (publishRequest: Request) => any
+  waitForReady: (deadline: number, callback: RusiListener) => void
+  Publish: (publishRequest: Request, callback: RusiListener) => any
   Subscribe: () => RusiSubscription
 }
 
 export type RusiGrpc = (grpc.ProtobufTypeDefinition | grpc.GrpcObject | grpc.ServiceClientConstructor) & { proto?: any }
 
 export type RusiChannel = {
-  watchConnectivityState: (state: grpc.connectivityState, deadline: number, callback: (err?: Error) => void) => void
+  watchConnectivityState: (state: grpc.connectivityState, deadline: number, callback: RusiListener) => void
   getConnectivityState: (tryConnect: boolean) => grpc.connectivityState
 }
 

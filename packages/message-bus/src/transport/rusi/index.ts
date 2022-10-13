@@ -161,14 +161,14 @@ export async function subscribe(
   }
 
   const call = c.Subscribe()
-  call.write({ subscription_request: subscribeRequest })
+  call.write?.call(call, { subscription_request: subscribeRequest })
   call.on('data', async function (msg) {
     const payload = serDes.deSerializePayload(fromUTF8Array(msg.data))
     const headers = msg.metadata
     const envelope = { payload, headers }
     await handler(envelope)
     const ackRequest = { message_id: msg.id /* , error: null*/ }
-    call.write({ ack_request: ackRequest })
+    call.write?.call(call, { ack_request: ackRequest })
   })
   call.on('end', function () {
     // The server has finished sending
@@ -251,7 +251,7 @@ function rusiSubscription(call: RusiSubscription): Subscription {
   })
 
   sub.unsubscribe = function unsubscribe() {
-    call.cancel()
+    call.cancel?.call(call)
     return Promise.resolve()
   }
   sub._call = call
