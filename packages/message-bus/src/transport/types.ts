@@ -16,7 +16,7 @@ export interface Subscription extends EventEmitter {
   _call?: unknown
 }
 
-export interface Transport {
+export type Transport = {
   connect(): Promise<EventEmitter>
   disconnect(): Promise<void>
   publish(subject: string, envelope: Envelope<any>, serDes: SerDes): Promise<any>
