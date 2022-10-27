@@ -1781,8 +1781,11 @@ __metadata:
     copyfiles: ^2.4.1
     dotenv: ^10.0.0
     humps: ^2.0.1
+    jest: ^28.1.0
     node-nats-streaming: 0.3.2
     rimraf: ^3.0.2
+    ts-jest: ^28.0.3
+    typescript: ^4.7.2
     uuid: ^8.3.0
   languageName: unknown
   linkType: soft
