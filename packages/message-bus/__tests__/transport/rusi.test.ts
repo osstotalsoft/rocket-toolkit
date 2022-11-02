@@ -1,20 +1,21 @@
-import { rusi } from '../../src'
-import { RusiConnection, RusiChannel } from '../../src/transport/rusi/types'
+import { rusi, serDes, SubscriptionOptions } from '../../src'
+import { RusiConnection, RusiChannel, RusiSubscription } from '../../src/transport/rusi/types'
 
 jest.mock('@grpc/grpc-js')
 jest.mock('@grpc/proto-loader')
 
 import protoLoader from '@grpc/proto-loader'
 import grpcJs, { GrpcObject } from '@grpc/grpc-js'
+import { Subscription } from '../../src/transport/types'
 
-describe('Testing rusi transport connection', () => {
+describe('Testing rusi transport', () => {
   let mockRusiClient: any = null
-  let channelMock: RusiChannel | null = null
+  let mockChannel: RusiChannel | null = null
 
   beforeEach(() => {
     protoLoader.loadSync = jest.fn(() => ({}))
 
-    channelMock = {
+    mockChannel = {
       watchConnectivityState: jest.fn(),
       getConnectivityState: jest.fn()
     }
@@ -23,14 +24,15 @@ describe('Testing rusi transport connection', () => {
       waitForReady: jest.fn((_deadline, callback) => {
         callback()
       }),
-      getChannel: jest.fn(() => channelMock),
+      getChannel: jest.fn(() => mockChannel),
       Publish: jest.fn((req, cb) => {
         setTimeout(cb, 10)
       }),
       Subscribe: jest.fn(_req => ({
         cancel: jest.fn(),
         end: jest.fn(),
-        write: jest.fn()
+        write: jest.fn(),
+        on: jest.fn()
       })),
       close: jest.fn()
     }
@@ -84,6 +86,7 @@ describe('Testing rusi transport connection', () => {
     expect(Object.is(c1._rusiClient, c3[0]._rusiClient)).toBeTruthy()
     expect(Object.is(c1._rusiClient, c3[1]._rusiClient)).toBeTruthy()
     expect(Object.is(c1._rusiClient, c3[2]._rusiClient)).toBeTruthy()
+    expect(mockRusiClient.waitForReady).toBeCalledTimes(1)
   })
 
   test('protoLoader creates the definition used for GRPC package definition', async () => {
@@ -96,5 +99,86 @@ describe('Testing rusi transport connection', () => {
 
     // assert
     expect(grpcJs.loadPackageDefinition).toBeCalledWith(definition)
+  })
+
+  test('error thrown while watching connectivity state', async () => {
+    // arrange
+    if (!mockChannel) fail()
+
+    mockChannel.watchConnectivityState = jest.fn(() => {
+      throw new Error('fake error')
+    })
+
+    // act - assert
+    await expect(rusi.connect()).rejects.toMatchObject({
+      code: 'ERR_UNHANDLED_ERROR',
+      context: { message: 'The channel has been closed' }
+    })
+  })
+
+  test('publish opens a connection before calling Publish', async () => {
+    // arrange
+    const subject = 'subject'
+    const envelope = { payload: {}, headers: {} }
+
+    // act
+    await rusi.publish(subject, envelope, serDes)
+
+    // assert
+    expect(protoLoader.loadSync).toBeCalled()
+    expect(grpcJs.loadPackageDefinition).toHaveBeenCalled()
+    expect(mockRusiClient.waitForReady).toBeCalled()
+    expect(mockRusiClient.Publish).toBeCalled()
+  })
+
+  test('subscribe opens a connection before calling Subscribe', async () => {
+    // arrange
+    const subject = 'subject'
+    const handler = jest.fn()
+
+    // act
+    await rusi.subscribe(subject, handler, SubscriptionOptions.PUB_SUB, serDes)
+
+    // assert
+    expect(protoLoader.loadSync).toBeCalled()
+    expect(grpcJs.loadPackageDefinition).toHaveBeenCalled()
+    expect(mockRusiClient.waitForReady).toBeCalled()
+    expect(mockRusiClient.Subscribe).toBeCalled()
+  })
+
+  test('unsubscribe calls cancel on the connection', async () => {
+    // arrange
+    const subject = 'subject'
+    const handler = jest.fn()
+
+    // act
+    const sub: Subscription = await rusi.subscribe(subject, handler, SubscriptionOptions.STREAM_PROCESSOR, serDes)
+    await sub.unsubscribe?.call(sub)
+
+    // assert
+    expect((sub._call as RusiSubscription)?.cancel).toBeCalled()
+  })
+
+  test('disconnect happens if the connection is open', async () => {
+    // arrange
+
+    // act
+    await rusi.disconnect()
+
+    // assert
+    expect(mockRusiClient?.close).not.toHaveBeenCalled()
+  })
+
+  test('disconnect closes only once', async () => {
+    // arrange
+
+    // act
+    await rusi.connect()
+    await Promise.all([rusi.disconnect(), rusi.disconnect(), rusi.disconnect()])
+    await rusi.disconnect()
+    await rusi.disconnect()
+
+    // assert
+    expect(mockRusiClient?.close).toBeCalledTimes(1)
   })
 })
