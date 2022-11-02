@@ -25,7 +25,7 @@ describe('Testing rusi transport', () => {
         callback()
       }),
       getChannel: jest.fn(() => mockChannel),
-      Publish: jest.fn((req, cb) => {
+      Publish: jest.fn((_req, cb) => {
         setTimeout(cb, 10)
       }),
       Subscribe: jest.fn(_req => ({
