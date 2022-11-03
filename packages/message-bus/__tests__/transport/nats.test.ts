@@ -67,6 +67,19 @@ describe('Testing nats transport', () => {
     expect(nodeNatsStreaming.connect).toBeCalledTimes(1)
   })
 
+  test('connections pass error along', async () => {
+    // arrange
+    if (!mockConnection) fail()
+
+    mockConnection.on = jest.fn((name, callback) => {
+      if (name === 'error') callback(new Error('Expected test error'))
+      return mockConnection as nodeNatsStreaming.Stan
+    })
+
+    // act - assert
+    await expect(nats.connect()).rejects.toMatchObject({ message: 'Expected test error' })
+  })
+
   test('disconnect happens if a connection is open', async () => {
     // arrange
 
