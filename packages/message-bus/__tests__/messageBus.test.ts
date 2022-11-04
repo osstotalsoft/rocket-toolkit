@@ -1,6 +1,8 @@
-import { SerDes } from '../src'
+import Bluebird from 'bluebird'
+import EventEmitter from 'events'
+import { Context, envelope, SerDes } from '../src'
 import { messageBus, useSerDes, useTransport } from '../src/messageBus'
-import { Transport } from '../src/transport/types'
+import { Subscription, Transport } from '../src/transport/types'
 
 describe('testing message bus', () => {
   let mockSerDes: SerDes | null = null
@@ -64,5 +66,20 @@ describe('testing message bus', () => {
 
     // assert
     expect(mockTransport.subscribe).toBeCalled()
+  })
+
+  test('sendCommandAndReceiveEvent opens a subscription for each event', async () => {
+    // arrange
+    const events = ['1', '2', '3']
+    const sut = messageBus()
+
+    // act
+    await expect(
+      sut.sendCommandAndReceiveEvent('test topic', 'test command', events, undefined, undefined, 1)
+    ).rejects.toThrow()
+
+    // assert
+    expect(mockTransport?.subscribe).toBeCalledTimes(3)
+    expect(mockTransport?.publish).toBeCalledTimes(1)
   })
 })

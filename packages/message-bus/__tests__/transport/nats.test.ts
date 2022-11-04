@@ -7,10 +7,10 @@ import nodeNatsStreaming from 'node-nats-streaming'
 
 describe('Testing nats transport', () => {
   let mockConnection: Connection = null
-  let subscriptionOptions: nodeNatsStreaming.SubscriptionOptions | null = null
+  let mockSubscriptionOptions: nodeNatsStreaming.SubscriptionOptions | null = null
 
   beforeEach(() => {
-    subscriptionOptions = {
+    mockSubscriptionOptions = {
       setStartAt: jest.fn(),
       setDurableName: jest.fn(),
       setDeliverAllAvailable: jest.fn(),
@@ -43,7 +43,7 @@ describe('Testing nats transport', () => {
         }),
         close: jest.fn()
       }),
-      subscriptionOptions: jest.fn(() => subscriptionOptions)
+      subscriptionOptions: jest.fn(() => mockSubscriptionOptions)
     } as unknown as nodeNatsStreaming.Stan
 
     nodeNatsStreaming.connect = jest.fn(() => mockConnection as nodeNatsStreaming.Stan)
@@ -53,6 +53,9 @@ describe('Testing nats transport', () => {
     await nats.disconnect()
     jest.resetAllMocks()
     jest.resetModules()
+
+    mockConnection = null
+    mockSubscriptionOptions = null
   })
 
   test('connections are opened once', async () => {
