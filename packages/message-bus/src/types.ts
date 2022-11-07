@@ -32,17 +32,17 @@ export type EnvelopeType = {
 export enum SubscriptionOptions {
   /**
    * Event driven subscriptions: durable, at-least-once, within a queue group
-   * @see https://github.com/osstotalsoft/nodebb/tree/master/packages/message-bus#subscription--options
+   * @see https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/message-bus#subscription--options
    */
   STREAM_PROCESSOR = 0,
   /**
    * Pub sub subscriptions: lite weight, non-durable, at-most-once, within a queue group
-   * @see https://github.com/osstotalsoft/nodebb/tree/master/packages/message-bus#subscription--options
+   * @see https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/message-bus#subscription--options
    */
   PUB_SUB,
   /**
    * RPC subscriptions: lite weight, non-durable, at-most-once, without queue group
-   * @see https://github.com/osstotalsoft/nodebb/tree/master/packages/message-bus#subscription--options
+   * @see https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/message-bus#subscription--options
    */
   RPC
 }
@@ -63,20 +63,20 @@ export type MessageBusHandler = (msg: Envelope<any>) => Promise<void>
 export interface MessageBus {
   /**
    * Envelopes, serializes and publishes a message on a certain topic
-   * @see https://github.com/osstotalsoft/nodebb/tree/master/packages/message-bus#publish
+   * @see https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/message-bus#publish
    */
   publish<T>(topic: string, msg: T, ctx?: Context, envelopeCustomizer?: EnvelopeCustomizer): Promise<Envelope<T>>
 
   /**
    * Subscribes a handler to a given topic, with the provided options
    * Deserializes the message before calling the handler
-   * @see https://github.com/osstotalsoft/nodebb/tree/master/packages/message-bus#subscribe
+   * @see https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/message-bus#subscribe
    */
   subscribe(topic: string, handler: MessageBusHandler, opts?: SubscriptionOptions): Promise<Subscription>
 
   /**
    * Implements a form of request/response communication over messaging
-   * @see https://github.com/osstotalsoft/nodebb/tree/master/packages/message-bus#request--response-over-messaging
+   * @see https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/message-bus#request--response-over-messaging
    */
   sendCommandAndReceiveEvent(
     topic: string,
