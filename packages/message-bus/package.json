@@ -1,7 +1,7 @@
 {
   "name": "@totalsoft/message-bus",
   "description": "Opinionated, provider independent, messaging patterns",
-  "version": "2.4.6",
+  "version": "2.4.7",
   "author": "TotalSoft",
   "homepage": "https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/message-bus",
   "packageManager": "yarn@3.2.0",
