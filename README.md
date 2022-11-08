@@ -10,6 +10,7 @@ A collection of plugins and other GraphQL utilities.
   - [graceful-shutdown](./packages/graceful-shutdown#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fgraceful-shutdown.svg)](https://badge.fury.io/js/@totalsoft%2Fgraceful-shutdown)
   - [key-per-file-configuration](./packages/key-per-file-configuration#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fkey-per-file-configuration.svg)](https://badge.fury.io/js/@totalsoft%2Fkey-per-file-configuration)
   - [knex-filters](./packages/knex-filters#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fknex-filters.svg)](https://badge.fury.io/js/@totalsoft%2Fknex-filters)
+  - [message-bus](./packages/message-bus#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fmessage-bus.svg)](https://badge.fury.io/js/@totalsoft%2Fmessage-bus)
   - [opentracing](./packages/opentracing#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fopentracing.svg)](https://badge.fury.io/js/@totalsoft%2Fopentracing)
   - [pino-apollo](./packages/pino-apollo#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fpino-apollo.svg)](https://badge.fury.io/js/@totalsoft%2Fpino-apollo)
   - [pino-correlation](./packages/pino-correlation#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fpino-correlation.svg)](https://badge.fury.io/js/@totalsoft%2Fpino-correlation)
