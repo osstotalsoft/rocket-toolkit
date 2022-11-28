@@ -2,8 +2,8 @@
 // This source code is licensed under the MIT license.
 
 import { Mutex } from 'async-mutex'
-import grpc from '@grpc/grpc-js'
-import protoLoader from '@grpc/proto-loader'
+import * as grpc from '@grpc/grpc-js'
+import * as protoLoader from '@grpc/proto-loader'
 import Promise from 'bluebird'
 import { Envelope, SerDes, SubscriptionOptions } from '../../types'
 import EventEmitter from 'events'
