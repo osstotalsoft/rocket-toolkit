@@ -4,16 +4,25 @@ import { RusiConnection, RusiChannel, RusiSubscription } from '../../src/transpo
 jest.mock('@grpc/grpc-js')
 jest.mock('@grpc/proto-loader')
 
-import protoLoader from '@grpc/proto-loader'
-import grpcJs, { GrpcObject } from '@grpc/grpc-js'
+import * as protoLoader from '@grpc/proto-loader'
+import * as grpcJs from '@grpc/grpc-js'
+import { GrpcObject } from '@grpc/grpc-js'
 import { Subscription } from '../../src/transport/types'
+
+const mockProtoLoader = protoLoader as {
+  loadSync: typeof protoLoader.loadSync
+}
+const mockGrpcJs = grpcJs as { 
+  loadPackageDefinition: typeof grpcJs.loadPackageDefinition 
+}
 
 describe('Testing rusi transport', () => {
   let mockRusiClient: any = null
   let mockChannel: RusiChannel | null = null
 
   beforeEach(() => {
-    protoLoader.loadSync = jest.fn(() => ({}))
+    mockProtoLoader.loadSync = jest.fn(() => ({}))
+    //(protoLoader.loadSync as jest.Mock).mockReturnValue({})
 
     mockChannel = {
       watchConnectivityState: jest.fn(),
@@ -37,7 +46,7 @@ describe('Testing rusi transport', () => {
       close: jest.fn()
     }
 
-    grpcJs.loadPackageDefinition = jest.fn(
+    mockGrpcJs.loadPackageDefinition = jest.fn(
       () =>
         ({
           rusi: {
@@ -61,7 +70,7 @@ describe('Testing rusi transport', () => {
 
   test('if the proto loader fails', async () => {
     // arrange
-    protoLoader.loadSync = jest.fn(() => {
+    mockProtoLoader.loadSync = jest.fn(() => {
       throw new Error('Loading failed!')
     })
 
@@ -92,7 +101,7 @@ describe('Testing rusi transport', () => {
   test('protoLoader creates the definition used for GRPC package definition', async () => {
     // arrange
     const definition = { fake: {} }
-    protoLoader.loadSync = jest.fn(() => definition)
+    mockProtoLoader.loadSync = jest.fn(() => definition)
 
     // act
     await rusi.connect()
