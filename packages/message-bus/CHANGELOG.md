@@ -1,5 +1,11 @@
 # @totalsoft/message-bus
 
+## 2.4.8
+
+### Patch Changes
+
+- d649104: Fixed grpc default import issue
+
 ## 2.4.7
 
 ### Patch Changes
