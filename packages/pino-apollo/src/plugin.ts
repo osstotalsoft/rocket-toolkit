@@ -1,17 +1,18 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import { ApolloServerPlugin, GraphQLRequestListenerParsingDidEnd } from 'apollo-server-plugin-base'
 import {
+  ApolloServerPlugin,
+  GraphQLRequestListenerParsingDidEnd,
   GraphQLRequest,
   GraphQLRequestContext,
   GraphQLRequestContextDidEncounterErrors,
   GraphQLRequestContextExecutionDidStart,
   GraphQLRequestContextParsingDidStart,
   GraphQLRequestContextValidationDidStart,
-  GraphQLRequestContextWillSendResponse
-} from 'apollo-server-types'
-import { GraphQLRequestListener } from 'apollo-server-plugin-base/src/index'
+  GraphQLRequestContextWillSendResponse,
+  GraphQLRequestListener
+} from '@apollo/server'
 import { v4 } from 'uuid'
 import { ApolloContextExtension, ApolloLoggingOptions } from './types'
 import { Logger } from 'pino'
@@ -24,20 +25,19 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
   constructor(options: ApolloLoggingOptions) {
     this.securedMessages = options.securedMessages === undefined ? true : options.securedMessages
     this.logger = options.logger
-}
+  }
 
   async requestDidStart({
-    context,
+    contextValue,
     request,
     operationName
   }: GraphQLRequestContext<ApolloContextExtension>): Promise<GraphQLRequestListener<ApolloContextExtension>> {
-    
     const logger = this.logger.child({
-      requestId: context.requestId ?? v4(),
+      requestId: contextValue.requestId ?? v4(),
       operationName: getOperationName(request, getOperationName(request, operationName))
     })
 
-    context.logger = logger
+    contextValue.logger = logger
     if (!shouldSkipLogging(getOperationName(request, operationName)))
       logger.info(`[REQUEST_STARTED] Request for operation name <${getOperationName(request, operationName)}> started!`)
 

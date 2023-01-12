@@ -22,7 +22,7 @@ yarn add @totalsoft/apollo-logger
 
 ```javascript
 import { ApolloLoggerPlugin } from '@totalsoft/apollo-logger'
-import { ApolloServer } from 'apollo-server'
+import { ApolloServer } from '@apollo/server'
 
 const plugins = [ApolloLoggerPlugin({ ...options})]
 const apollo = new ApolloServer({

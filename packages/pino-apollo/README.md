@@ -20,7 +20,7 @@ yarn add @totalsoft/pino-apollo
 
 ```javascript
 import { ApolloLoggerPlugin } from '@totalsoft/pino-apollo'
-import { ApolloServer } from 'apollo-server'
+import { ApolloServer } from '@apollo/server'
 import pino from 'pino'
 
 const logger = pino()

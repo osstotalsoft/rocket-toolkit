@@ -1,16 +1,17 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import { ApolloServerPlugin, GraphQLRequestListenerParsingDidEnd } from 'apollo-server-plugin-base'
 import {
+  ApolloServerPlugin,
+  GraphQLRequestListenerParsingDidEnd,
   GraphQLRequestContext,
   GraphQLRequestContextDidEncounterErrors,
   GraphQLRequestContextExecutionDidStart,
   GraphQLRequestContextParsingDidStart,
   GraphQLRequestContextValidationDidStart,
-  GraphQLRequestContextWillSendResponse
-} from 'apollo-server-types'
-import { GraphQLRequestListener } from 'apollo-server-plugin-base/src/index'
+  GraphQLRequestContextWillSendResponse,
+  GraphQLRequestListener
+} from '@apollo/server'
 import { v4 } from 'uuid'
 import { ApolloContextExtension, ApolloLoggingOptions } from './types'
 import { initializeLogger } from './utils'
@@ -25,16 +26,16 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
   }
 
   async requestDidStart({
-    context,
+    contextValue,
     request,
     operationName
   }: GraphQLRequestContext<ApolloContextExtension>): Promise<GraphQLRequestListener<ApolloContextExtension>> {
     const { logInfo, logDebug, logError } = initializeLogger({
-      context,
+      context: contextValue,
       operationName: request.operationName ?? operationName ?? 'unidentifiedOperation',
       securedMessages: this.securedMessages
     })
-    context.requestId = context.requestId ?? v4()
+    contextValue.requestId = contextValue.requestId ?? v4()
 
     logInfo(`Request for operation name <${request.operationName ?? operationName}> started!`, '[REQUEST_STARTED]')
     return {
@@ -76,12 +77,12 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
       },
       willSendResponse: async ({
         operationName,
-        context
+        contextValue
       }: GraphQLRequestContextWillSendResponse<ApolloContextExtension>) => {
         logDebug(`A response for the operation <${operationName}> was sent!`, '[GraphQL_Response]')
         if (this.persistLogsFn) {
-          await this.persistLogsFn(context)
-          context.logs = []
+          await this.persistLogsFn(contextValue)
+          contextValue.logs = []
         }
       }
     }
