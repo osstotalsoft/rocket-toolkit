@@ -1,5 +1,11 @@
 # @totalsoft/pino-apollo
 
+## 2.0.0
+
+### Major Changes
+
+- 42347bf: Update packages to Apollo Server 4
+
 ## 1.1.0
 
 ### Minor Changes
