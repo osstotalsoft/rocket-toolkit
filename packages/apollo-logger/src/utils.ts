@@ -1,7 +1,7 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import { ApolloError } from 'apollo-server'
+import { GraphQLError } from 'graphql'
 import { v4 } from 'uuid'
 import { append } from 'ramda'
 import { ApolloContextExtension, LoggingLevel, Logger, LoggingOptions } from './types'
@@ -114,5 +114,5 @@ export const logDbError = async (
 
   context.logs = []
 
-  return new ApolloError(messageWithLogId, code)
+  return new GraphQLError(messageWithLogId, { extensions: { code } })
 }

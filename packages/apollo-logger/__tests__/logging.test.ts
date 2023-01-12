@@ -1,5 +1,5 @@
 import { shouldSkipLogging, logEvent, logDbError, initializeLogger } from '../src/utils'
-import { ApolloError } from 'apollo-server'
+import { GraphQLError } from 'graphql'
 import { ApolloContextExtension, Log, LoggingLevel } from '../src/types'
 
 describe('logging plugin tests:', () => {
@@ -72,7 +72,7 @@ describe('logging plugin tests:', () => {
     //assert
     expect(global.console.error).toBeCalledTimes(1)
     expect(context.logs.length).toStrictEqual(0)
-    expect(result).toBeInstanceOf(ApolloError)
+    expect(result).toBeInstanceOf(GraphQLError)
     expect(result.message.includes('Error message')).toBeFalsy()
   })
 
@@ -93,7 +93,7 @@ describe('logging plugin tests:', () => {
     //assert
     expect(global.console.error).toBeCalledTimes(1)
     expect(context.logs.length).toStrictEqual(0)
-    expect(result).toBeInstanceOf(ApolloError)
+    expect(result).toBeInstanceOf(GraphQLError)
     expect(result.message).toContain('Error message')
   })
 
@@ -209,7 +209,7 @@ describe('logging plugin tests:', () => {
     expect(context.logs).toStrictEqual([])
   })
 
-  it('logDbError should clear logs from context, call insert logs and return new ApolloError:', async () => {
+  it('logDbError should clear logs from context, call insert logs and return new GraphQLError:', async () => {
     //arrange
     const message = 'Error log message'
     const code = 'Error_Message_Code'
@@ -225,10 +225,10 @@ describe('logging plugin tests:', () => {
     //assert
     expect(context.logs).toStrictEqual([] as Log[])
     expect(console.error).toBeCalled()
-    expect(res).toBeInstanceOf(ApolloError)
+    expect(res).toBeInstanceOf(GraphQLError)
   })
 
-  it('logError should return new ApolloError with wrapped error message:', async () => {
+  it('logError should return new GraphQLError with wrapped error message:', async () => {
     //arrange
     const message = 'Error log message'
     const code = 'Error_Message_Code'
@@ -245,7 +245,7 @@ describe('logging plugin tests:', () => {
     //assert
     expect(console.error).toBeCalled()
     expect(persistLogsFn).toBeCalledTimes(1)
-    expect(res).toBeInstanceOf(ApolloError)
+    expect(res).toBeInstanceOf(GraphQLError)
     expect(res.message).toContain('For more details check Log Id:')
     expect(res.message.includes('Error message')).toBeFalsy()
   })

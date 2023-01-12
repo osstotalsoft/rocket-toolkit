@@ -1,7 +1,7 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import { BaseContext } from 'apollo-server-types'
+import { BaseContext } from '@apollo/server'
 
 export interface Log {
   uid: string
