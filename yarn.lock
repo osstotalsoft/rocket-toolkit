@@ -1600,6 +1600,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opentelemetry/semantic-conventions@npm:^1.9.1":
+  version: 1.9.1
+  resolution: "@opentelemetry/semantic-conventions@npm:1.9.1"
+  checksum: 6217ba14b8f0068a3400f054c1f9d918b2e22d1cf8d31112baa712b8d196e207aed7421c6df37ed1403f7109f51c7834c230cbe180313eee07db6f7e0a7797bc
+  languageName: node
+  linkType: hard
+
 "@protobufjs/aspromise@npm:^1.1.1, @protobufjs/aspromise@npm:^1.1.2":
   version: 1.1.2
   resolution: "@protobufjs/aspromise@npm:1.1.2"
@@ -1957,6 +1964,7 @@ __metadata:
   dependencies:
     "@jest/types": ^28.1.0
     "@opentelemetry/api": ^1.4.0
+    "@opentelemetry/semantic-conventions": ^1.9.1
     "@types/jest": ^27.5.1
     "@types/node": ^17.0.32
     "@types/ramda": ^0.28.15

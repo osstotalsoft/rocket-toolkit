@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^1.4.0",
+    "@opentelemetry/semantic-conventions": "^1.9.1",
     "pino": "^8.5.0",
     "ramda": "^0.28.0",
     "split2": "^4.1.0"
