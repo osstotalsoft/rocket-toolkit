@@ -1,15 +1,14 @@
-
-
 import { openTelemetryTracingTransport } from '../src'
 import { pino } from 'pino'
-import {  trace } from '@opentelemetry/api'
+import { trace } from '@opentelemetry/api'
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 
 jest.mock('@opentelemetry/api')
 
 describe('pino-opentelemetry tests:', () => {
   it('logs message to active span', async () => {
     //arrange
-    const rootSpan : any = {
+    const rootSpan: any = {
       addEvent: jest.fn(),
       recordException: jest.fn()
     }
@@ -22,14 +21,14 @@ describe('pino-opentelemetry tests:', () => {
     logger.info('bau')
 
     //assert
-    expect(rootSpan.addEvent).toBeCalledWith('info', expect.objectContaining({ event: 'info', message: 'bau' }), expect.anything())
+    expect(rootSpan.addEvent).toBeCalledWith('info', expect.objectContaining({ message: 'bau' }), expect.anything())
   })
 
   it('records exception', async () => {
     jest.resetAllMocks()
     //arrange
-    
-    const rootSpan : any = {
+
+    const rootSpan: any = {
       addEvent: jest.fn(),
       recordException: jest.fn(),
       setAttribute: jest.fn()
@@ -41,11 +40,18 @@ describe('pino-opentelemetry tests:', () => {
     jest.spyOn(trace, 'getActiveSpan').mockReturnValue(rootSpan)
 
     //act
-    
+
     logger.error(error, 'bau')
 
-
     //assert
-    expect(rootSpan.recordException).toBeCalledWith(expect.objectContaining(error), expect.anything())
+    expect(rootSpan.addEvent).toBeCalledWith(
+      'error',
+      expect.objectContaining({
+        message: 'bau',
+        [SemanticAttributes.EXCEPTION_MESSAGE]: error.message,
+        [SemanticAttributes.EXCEPTION_STACKTRACE]: error.stack
+      }),
+      expect.anything()
+    )
   })
 })
