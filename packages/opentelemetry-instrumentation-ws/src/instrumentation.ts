@@ -12,51 +12,30 @@ import {
 import { getIncomingRequestAttributes } from '@opentelemetry/instrumentation-http'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 import type * as http from 'http'
-import type * as https from 'http'
+import type * as https from 'https'
 import { IncomingMessage } from 'http'
-import isPromise from 'is-promise'
 import { Duplex } from 'stream'
 import WS, { ErrorEvent, Server, WebSocket } from 'ws'
 import { WSInstrumentationConfig } from './types'
 import { ExtendedWebsocket } from './internal-types'
+import { endSpan, limitLength } from './utils'
 
 import { VERSION } from './version'
 
-const endSpan = (traced: () => any | Promise<any>, span: Span) => {
-  try {
-    const result = traced()
-    if (isPromise(result)) {
-      return Promise.resolve(result)
-        .catch(err => {
-          if (err) {
-            if (typeof err === 'string') {
-              span.setStatus({ code: SpanStatusCode.ERROR, message: err })
-            } else {
-              span.recordException(err)
-              span.setStatus({ code: SpanStatusCode.ERROR, message: err?.message })
-            }
-          }
-          throw err
-        })
-        .finally(() => span.end())
-    } else {
-      span.end()
-      return result
-    }
-  } catch (error: any) {
-    span.recordException(error)
-    span.setStatus({ code: SpanStatusCode.ERROR, message: error?.message })
-    span.end()
-    throw error
-  }
+const DEFAULT_CONFIG: WSInstrumentationConfig = {
+  generateReceiveSpans: true,
+  generateSendSpans: true,
+  maxMessageLength: 1022
 }
+
+const MESSAGE_ATTRIBUTE = 'message'
 
 /** Instrumentation for the `ws` library WebSocket class */
 export class WSInstrumentation extends InstrumentationBase<WS> {
   protected _requestSpans = new WeakMap<IncomingMessage, Span>()
 
   constructor(config: WSInstrumentationConfig = {}) {
-    super('@totalsoft/opentelemetry-instrumentation-ws', VERSION, { ...config })
+    super('@totalsoft/opentelemetry-instrumentation-ws', VERSION, { ...DEFAULT_CONFIG, ...config })
   }
 
   override getConfig(): WSInstrumentationConfig {
@@ -64,7 +43,7 @@ export class WSInstrumentation extends InstrumentationBase<WS> {
   }
 
   override setConfig(config: WSInstrumentationConfig = {}) {
-    this._config = { ...config }
+    this._config = { ...DEFAULT_CONFIG, ...config }
   }
 
   protected init() {
@@ -89,16 +68,14 @@ export class WSInstrumentation extends InstrumentationBase<WS> {
           if (isWrapped(OriginalWebSocket.prototype.constructor)) {
             this._unwrap(OriginalWebSocket.prototype, 'constructor')
           }
-          const WebSocket: typeof WS.WebSocket = <any>(
-            this._wrap(OriginalWebSocket.prototype, 'constructor', this._patchConstructor)
-          )
+          const WebSocket: typeof WS = <any>this._wrap(OriginalWebSocket.prototype, 'constructor', this._patchConstructor)
 
           if (isWrapped(WebSocket.prototype.emit)) {
             this._unwrap(WebSocket.prototype, 'emit')
           }
           this._wrap(WebSocket.prototype, 'emit', this._patchEmit)
 
-          if (self.getConfig().sendSpans) {
+          if (self.getConfig().generateSendSpans) {
             if (isWrapped(WebSocket.prototype.send)) {
               this._unwrap(WebSocket.prototype, 'send')
             }
@@ -260,17 +237,19 @@ export class WSInstrumentation extends InstrumentationBase<WS> {
 
       const ctx = trace.setSpan(context.active(), this._openSpan)
 
-      if (!self.getConfig().receiveSpans) {
+      if (!self.getConfig().generateReceiveSpans) {
         return context.with(ctx, () => {
           return original.call(this, type, ...args)
         })
       }
       const [buffer, isBinary] = args
+      const maxLength = self.getConfig().maxMessageLength!
+      const message = maxLength !== 0 && !isBinary ? limitLength(String(buffer), maxLength) : undefined
 
       return context.with(ctx, () => {
         const span = self.tracer.startSpan('WS receive', {
           attributes: {
-            message: !isBinary ? String(buffer) : undefined
+            [MESSAGE_ATTRIBUTE]: message
           }
         })
 
@@ -290,11 +269,14 @@ export class WSInstrumentation extends InstrumentationBase<WS> {
         options = {}
       }
 
+      const maxLength = self.getConfig().maxMessageLength!
+      const message = maxLength !== 0 ? limitLength(data, maxLength) : undefined
+
       const span = self.tracer.startSpan('WS send', {
         kind: SpanKind.CLIENT,
         attributes: {
           [SemanticAttributes.MESSAGING_DESTINATION]: this.url,
-          message: data
+          [MESSAGE_ATTRIBUTE]: message
         }
       })
 
