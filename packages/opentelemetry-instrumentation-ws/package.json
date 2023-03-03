@@ -28,8 +28,9 @@
   },
   "devDependencies": {
     "@jest/types": "^28.1.0",
+    "@opentelemetry/core": "^1.9.1",
     "@opentelemetry/instrumentation": "^0.34.0",
-    "@opentelemetry/semantic-conventions": "^1.9.0",
+    "@opentelemetry/semantic-conventions": "^1.9.1",
     "@types/jest": "^27.5.1",
     "@types/node": "^17.0.32",
     "@types/uuid": "^8.3.4",
