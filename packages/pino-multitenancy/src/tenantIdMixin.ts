@@ -8,7 +8,8 @@ import { tenantContextAccessor } from '@totalsoft/multitenancy-core'
  * @returns - the pino mixin object
  */
 function tenantIdMixin() {
-  return { tenantId: tenantContextAccessor.getTenantContext()?.tenant?.id }
+  const tenant = tenantContextAccessor.getTenantContext()?.tenant
+  return { tenantId: tenant?.id }
 }
 
 export default tenantIdMixin
