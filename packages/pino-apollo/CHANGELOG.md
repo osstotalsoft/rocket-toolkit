@@ -1,5 +1,11 @@
 # @totalsoft/pino-apollo
 
+## 2.1.0
+
+### Minor Changes
+
+- a17f1e1: Additional error handlers in logging plugin
+
 ## 2.0.0
 
 ### Major Changes
