@@ -1,5 +1,11 @@
 # @totalsoft/message-bus
 
+## 2.4.9
+
+### Patch Changes
+
+- 3107104: Fixed sendCommandAndWaitForEvent unhandled rejection
+
 ## 2.4.8
 
 ### Patch Changes

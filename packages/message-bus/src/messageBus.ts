@@ -76,12 +76,14 @@ function _messageBus(transport: Transport, serDes: SerDes): MessageBus {
       events.map(eventTopic =>
         subscribe(
           eventTopic,
-          ev => {
-            if (!publishedMsg) return Promise.reject('Message missing')
-            if (!resolveEventReceived) return Promise.reject('Resolver not set')
-            if (envelope.getCorrelationId(ev) != envelope.getCorrelationId(publishedMsg)) return Promise.reject()
-            resolveEventReceived([eventTopic, ev])
-            return Promise.resolve()
+          async ev => {
+            if (
+              publishedMsg &&
+              resolveEventReceived &&
+              envelope.getCorrelationId(ev) == envelope.getCorrelationId(publishedMsg)
+            ) {
+              resolveEventReceived([eventTopic, ev])
+            }
           },
           SubscriptionOptions.RPC
         )
