@@ -89,7 +89,7 @@ const [topic, event] = await msgBus.sendCommandAndReceiveEvent(
 Messaging__TopicPrefix="deprecated_please_use_Messaging__Env"
 Messaging__Env="messaging_env"
 Messaging__Source="your_service_name"
-Messaging__Transport="nats_or_rusi"
+Messaging__Transport="jetstream_nats_or_rusi"
 
 NATS_URL="your_nats_url"
 NATS_CLUSTER="your_nats_cluster"

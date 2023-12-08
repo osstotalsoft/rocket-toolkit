@@ -1,27 +1,15 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import * as transport from './transport'
+import transport from './transport'
 import * as topicRegistry from './topicRegistry'
 import defaultSerDes from './serDes'
-import {
-  Context,
-  Envelope,
-  EnvelopeCustomizer,
-  isTransportType,
-  MessageBus,
-  MessageBusHandler,
-  SerDes,
-  SubscriptionOptions,
-  TransportType
-} from './types'
+import { Context, Envelope, EnvelopeCustomizer, MessageBus, MessageBusHandler, SerDes, SubscriptionOptions } from './types'
 import { envelope } from './envelope'
 import { Subscription, Transport } from './transport/types'
 
-const { Messaging__Transport } = process.env
-const envTransport: TransportType = isTransportType(Messaging__Transport) ? Messaging__Transport : 'nats'
-
-let currentTransport: Transport = transport[envTransport]
+const { Messaging__Transport = 'nats' } = process.env
+let currentTransport: Transport = transport[Messaging__Transport] ?? transport.nats
 
 export function useTransport(t: Transport) {
   currentTransport = t

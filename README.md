@@ -20,6 +20,8 @@ A collection of plugins and other GraphQL utilities.
 
 ## Contributing guide
 When using Visual Studio Code please follow these steps: [Editor Setup for VSCode](https://yarnpkg.com/getting-started/editor-sdks#vscode) (allows VSCode to read .zip yarn cache files and supports features like go-to-definition).
+
+When using Visual Studio Code please use the extension [`Licenser`](https://marketplace.visualstudio.com/items?itemName=ymotongpoo.licenser) for applying the license header in files.
 ### - Build
 ```javascript
 yarn install

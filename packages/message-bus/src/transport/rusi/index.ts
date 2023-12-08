@@ -4,7 +4,7 @@
 import { Mutex } from 'async-mutex'
 import * as grpc from '@grpc/grpc-js'
 import * as protoLoader from '@grpc/proto-loader'
-import Promise from 'bluebird'
+import bluebird from 'bluebird'
 import { Envelope, SerDes, SubscriptionOptions } from '../../types'
 import EventEmitter from 'events'
 import { Subscription, SubscriptionHandler, Transport } from '../types'
@@ -27,7 +27,7 @@ const PROTO_PATH = __dirname + '/rusi.proto'
 const clientMutex = new Mutex()
 let client: RusiClient | null = null
 
-async function _connect(): globalThis.Promise<RusiClient> {
+async function _connect(): Promise<RusiClient> {
   if (client) {
     return client
   }
@@ -53,7 +53,7 @@ async function _connect(): globalThis.Promise<RusiClient> {
       RUSI_GRPC_ENDPOINT || 'localhost:' + (RUSI_GRPC_PORT || 50003),
       grpc.credentials.createInsecure()
     )
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       const timeoutMilliseconds = 1000
       const deadline = Date.now() + timeoutMilliseconds
       c.waitForReady(deadline, err => {
@@ -103,7 +103,7 @@ export async function publish(subject: string, envelope: Envelope<any>, serDes: 
     data_content_type: serDes.getInfo().contentType,
     metadata: headers
   }
-  const _publish = Promise.promisify(c.Publish, { context: c })
+  const _publish = bluebird.Promise.promisify(c.Publish, { context: c })
   const result = await _publish(publishRequest)
   return result
 }
@@ -113,7 +113,7 @@ export async function subscribe(
   handler: SubscriptionHandler,
   opts: SubscriptionOptions,
   serDes: SerDes
-): globalThis.Promise<Promise<Subscription>> {
+): Promise<Subscription> {
   const c = await _connect()
   const rusiSubOptions: Options = {}
   switch (opts) {
@@ -241,8 +241,8 @@ function fromUTF8Array(data: number[]): string {
   return str
 }
 
-function rusiSubscription(call: RusiSubscription): Subscription {
-  const sub: Subscription = new EventEmitter()
+function rusiSubscription(call: grpc.ClientDuplexStream<any, any>): Subscription {
+  const sub: RusiSubscription = new EventEmitter()
   sub.on('removeListener', (event, listener) => {
     call.removeListener(event, listener)
   })

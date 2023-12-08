@@ -1,6 +1,10 @@
+// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 import grpc from '@grpc/grpc-js'
 import EventEmitter from 'events'
 import { Headers } from '../../types'
+import { Subscription } from '../types'
 
 export type Options = {
   [index: string]: { value: any }
@@ -17,10 +21,8 @@ export type Request = {
 
 export type RusiListener = (...args: any[]) => void
 
-export interface RusiSubscription extends EventEmitter {
-  write?: (options: any) => void
-  cancel?: () => void
-  end?: () => void
+export interface RusiSubscription extends Subscription {
+  _call?: grpc.ClientDuplexStream<any, any>
 }
 
 export interface RusiClient extends EventEmitter {
@@ -28,7 +30,7 @@ export interface RusiClient extends EventEmitter {
   getChannel: () => RusiChannel
   waitForReady: (deadline: number, callback: RusiListener) => void
   Publish: (publishRequest: Request, callback: RusiListener) => any
-  Subscribe: () => RusiSubscription
+  Subscribe: () => grpc.ClientDuplexStream<any, any>
 }
 
 export type RusiGrpc = (grpc.ProtobufTypeDefinition | grpc.GrpcObject | grpc.ServiceClientConstructor) & { proto?: any }

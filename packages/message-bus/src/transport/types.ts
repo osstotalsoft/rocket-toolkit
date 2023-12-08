@@ -3,17 +3,16 @@
 
 import { SubscriptionOptions, Envelope, SerDes } from '../types'
 import { EventEmitter } from 'events'
-import nats from 'node-nats-streaming'
-import BlueBird from 'bluebird'
+//import nats from 'node-nats-streaming'
 
-export type Connection = nats.Stan | null
+// export type Connection = nats.Stan | null
 export type SubscriptionHandler = (envelope: Envelope<any>) => Promise<void>
-export type MessageHandler = (message: nats.Message) => Promise<void>
+//export type MessageHandler = (message: nats.Message) => Promise<void>
 
 export interface Subscription extends EventEmitter {
   unsubscribe?: () => Promise<unknown>
-  _natsSubscription?: nats.Subscription
-  _call?: unknown
+  // _natsSubscription?: nats.Subscription
+  // _call?: unknown
 }
 
 export type Transport = {
@@ -25,5 +24,11 @@ export type Transport = {
     handler: SubscriptionHandler,
     opts: SubscriptionOptions,
     serDes: SerDes
-  ): Promise<BlueBird<Subscription>>
+  ): Promise<Subscription>
+}
+
+export type BuiltInTransports = {
+  nats: Transport
+  rusi: Transport
+  jetstream: Transport
 }
