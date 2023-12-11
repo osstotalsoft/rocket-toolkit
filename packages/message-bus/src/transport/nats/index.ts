@@ -92,7 +92,7 @@ export async function subscribe(
   handler: SubscriptionHandler,
   opts: SubscriptionOptions,
   serDes: SerDes
-): Promise<Subscription> {
+): Promise<NatsSubscription> {
   const client = await connect()
   const natsOpts = client.subscriptionOptions()
   let useQGroup = false
@@ -165,8 +165,8 @@ export async function subscribe(
   return result
 }
 
-function wrapSubscription(natsSubscription: nats.Subscription) {
-  const sub: NatsSubscription = new EventEmitter()
+function wrapSubscription(natsSubscription: nats.Subscription): NatsSubscription {
+  const sub = <NatsSubscription>new EventEmitter()
   sub.on('removeListener', (event, listener) => {
     natsSubscription.removeListener(event, listener)
   })

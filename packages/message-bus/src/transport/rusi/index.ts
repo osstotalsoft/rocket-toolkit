@@ -113,7 +113,7 @@ export async function subscribe(
   handler: SubscriptionHandler,
   opts: SubscriptionOptions,
   serDes: SerDes
-): Promise<Subscription> {
+): Promise<RusiSubscription> {
   const c = await _connect()
   const rusiSubOptions: Options = {}
   switch (opts) {
@@ -241,8 +241,8 @@ function fromUTF8Array(data: number[]): string {
   return str
 }
 
-function rusiSubscription(call: grpc.ClientDuplexStream<any, any>): Subscription {
-  const sub: RusiSubscription = new EventEmitter()
+function rusiSubscription(call: grpc.ClientDuplexStream<any, any>): RusiSubscription {
+  const sub = <RusiSubscription> new EventEmitter()
   sub.on('removeListener', (event, listener) => {
     call.removeListener(event, listener)
   })

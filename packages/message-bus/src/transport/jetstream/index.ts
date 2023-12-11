@@ -1,7 +1,17 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import { AckPolicy, Consumer, ConsumerConfig, DeliverPolicy, JetStreamClient, NatsConnection, StringCodec, connect as natsConnect, ConsumerMessages } from 'nats'
+import {
+  AckPolicy,
+  Consumer,
+  ConsumerConfig,
+  DeliverPolicy,
+  JetStreamClient,
+  NatsConnection,
+  StringCodec,
+  connect as natsConnect,
+  ConsumerMessages
+} from 'nats'
 import { Mutex } from 'async-mutex'
 // import uuid from 'uuid'
 import { Subscription, SubscriptionHandler, Transport } from '../types'
@@ -10,25 +20,16 @@ import { JetstreamConnection, JetstreamSubscription } from './types'
 import { Envelope, SerDes, SubscriptionOptions } from '../../types'
 
 const {
-  // JETSTREAM_CLUSTER = '',
   JETSTREAM_URL,
+  JETSTREAM_CLIENT_ID,
   JETSTREAM_COMMANDS_STREAM,
   JETSTREAM_EVENTS_STREAM,
-  JETSTREAM_CLIENT_ID,
   JETSTREAM_STREAM_PROCESSOR_MaxConcurrentMessages = '1',
-  JETSTREAM_STREAM_PROCESSOR_AckWaitTime = '5000',
+  JETSTREAM_STREAM_PROCESSOR_AckWaitTime = '5000000000', // 5 seconds
   JETSTREAM_PUB_SUB_MaxConcurrentMessages = '100',
-  JETSTREAM_PUB_SUB_AckWaitTime = '5000',
+  JETSTREAM_PUB_SUB_AckWaitTime = '5000000000', // 5 seconds
   JETSTREAM_RPC_MaxConcurrentMessages = '1',
-  JETSTREAM_RPC_AckWaitTime = '5000'
-  // NATS_Q_GROUP = '',
-  // NATS_DURABLE_NAME = '',
-  // NATS_STREAM_PROCESSOR_MaxInflight = '',
-  // NATS_STREAM_PROCESSOR_AckWait,
-  // NATS_PUB_SUB_MaxInflight = '',
-  // NATS_PUB_SUB_AckWait,
-  // NATS_RPC_MaxInflight = '',
-  // NATS_RPC_AckWait
+  JETSTREAM_RPC_AckWaitTime = '5000000000' // 5 seconds
 } = process.env
 
 //const clientID = `${JETSTREAM_CLIENT_ID}-${uuid.v4()}`
@@ -49,7 +50,11 @@ async function _connect() {
 
     try {
       natsConnection = await natsConnect({ servers: JETSTREAM_URL })
-      natsConnection.closed().then(err => console.info(`🛰️  Jetstream connection closed. ${err}`))
+      natsConnection
+        .closed()
+        .then(err =>
+          err ? console.error(`🛰️  Jetstream connection closed. ${err}`) : console.info('🛰️  Jetstream connection closed.')
+        )
     } catch (err: any) {
       console.error(`Jetstream connection error: ${err}`)
       throw err
@@ -66,8 +71,6 @@ async function _connect() {
     release()
   }
 }
-
-
 
 async function connect() {
   const nc = await _connect()
@@ -105,36 +108,40 @@ async function subscribe(
   handler: SubscriptionHandler,
   opts: SubscriptionOptions,
   serDes: SerDes
-): Promise<Subscription> {
+): Promise<JetstreamSubscription> {
   const nc = await _connect()
   const jsClient = nc.jetstream()
   const stream = getStream(subject)
-  const [consumer, manualAck] = await getConsumer(jsClient, subject, stream, opts)
+  const consumer = await getConsumer(jsClient, subject, stream, opts)
+  const ci = await consumer.info(true)
+  const manualAck = ci.config.ack_policy == AckPolicy.Explicit || ci.config.ack_policy == AckPolicy.All
   const sc = StringCodec()
-  // const messages: nats.ConsumerMessages = await consumer.consume()
-  // const fireAndForget = (async (sub: nats.ConsumerMessages) => {
-  //   for await (const m of sub) {
+
+  //const messages = await consumer.consume()
+  // const _fireAndForget = (async () => {
+  //   for await (const m of messages) {
   //     const envelope = serDes.deSerialize(sc.decode(m.data))
   //     const r = handler(envelope)
   //     if (manualAck) {
   //       r.then(() => m.ack())
   //     }
   //   }
-  // })
-
-  // fireAndForget(messages)
-
+  // })()
 
   const messages = await consumer.consume({
-    callback: (m) => {
+    callback: m => {
       const envelope = serDes.deSerialize(sc.decode(m.data))
       const r = handler(envelope)
       if (manualAck) {
         r.then(() => m.ack())
       }
-    },
+    }
   })
 
+  // const status = await messages.status()
+  // for await (const s of status){
+  //   console.log(s)
+  // }
 
 
   // subscription.on('error', err => {
@@ -152,22 +159,13 @@ async function subscribe(
   //   console.info(`Subscription closed for subject ${subject}.`)
   // })
 
-  // const result: Subscription = await new Promise((resolve, reject) => {
-  //   subscription.on('ready', () => {
-  //     resolve(wrapSubscription(subscription))
-  //   })
-  //   subscription.on('error', err => {
-  //     reject(err)
-  //   })
-  // })
-
   return jetstreamSubscription(messages)
 }
 
 function getStream(subject: string): string {
   const stream = subject.toLowerCase().includes('commands') ? JETSTREAM_COMMANDS_STREAM : JETSTREAM_EVENTS_STREAM
   if (!stream) {
-    throw new Error(`Jetstream stream not found for subject ${subject}.`)
+    throw new Error(`Jetstream stream cannot be resolved for subject ${subject}.`)
   }
   return stream
 }
@@ -177,21 +175,18 @@ async function getConsumer(
   subject: string,
   stream: string,
   opts: SubscriptionOptions
-): Promise<[Consumer, boolean]> {
+): Promise<Consumer> {
   const jsm = await jsClient.jetstreamManager()
   const consumerCfg: Partial<ConsumerConfig> = {
     filter_subject: subject
   }
-  let manualAck = false
-
   switch (opts) {
     case SubscriptionOptions.STREAM_PROCESSOR:
-      consumerCfg.durable_name = (JETSTREAM_CLIENT_ID + subject).replace('.', '_')
+      consumerCfg.durable_name = (JETSTREAM_CLIENT_ID + '_' + subject).replace('.', '_')
       consumerCfg.deliver_policy = DeliverPolicy.All
       consumerCfg.ack_wait = parseInt(JETSTREAM_STREAM_PROCESSOR_AckWaitTime, 10)
       consumerCfg.max_ack_pending = parseInt(JETSTREAM_STREAM_PROCESSOR_MaxConcurrentMessages, 10)
       consumerCfg.ack_policy = AckPolicy.Explicit
-      manualAck = true
       break
 
     case SubscriptionOptions.PUB_SUB:
@@ -212,7 +207,7 @@ async function getConsumer(
 
   const ci = await jsm.consumers.add(stream, consumerCfg)
   const consumer = await jsClient.consumers.get(stream, ci.name)
-  return [consumer, manualAck]
+  return consumer
 }
 
 function jetstreamConnection(nc: NatsConnection): JetstreamConnection {
@@ -223,7 +218,7 @@ function jetstreamConnection(nc: NatsConnection): JetstreamConnection {
 }
 
 function jetstreamSubscription(messages: ConsumerMessages): JetstreamSubscription {
-  const js: any = new EventEmitter()
+  const js = <JetstreamSubscription>new EventEmitter()
   js._natsConsumerMessages = messages
   js.unsubscribe = async () => {
     await messages.close()

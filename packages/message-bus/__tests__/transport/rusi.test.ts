@@ -1,4 +1,5 @@
-import { rusi, serDes, SubscriptionOptions } from '../../src'
+import { serDes, SubscriptionOptions } from '../../src'
+import rusi from '../../src/transport/rusi'
 import { RusiConnection, RusiChannel, RusiSubscription } from '../../src/transport/rusi/types'
 
 jest.mock('@grpc/grpc-js')
@@ -7,13 +8,12 @@ jest.mock('@grpc/proto-loader')
 import * as protoLoader from '@grpc/proto-loader'
 import * as grpcJs from '@grpc/grpc-js'
 import { GrpcObject } from '@grpc/grpc-js'
-import { Subscription } from '../../src/transport/types'
 
 const mockProtoLoader = protoLoader as {
   loadSync: typeof protoLoader.loadSync
 }
-const mockGrpcJs = grpcJs as { 
-  loadPackageDefinition: typeof grpcJs.loadPackageDefinition 
+const mockGrpcJs = grpcJs as {
+  loadPackageDefinition: typeof grpcJs.loadPackageDefinition
 }
 
 describe('Testing rusi transport', () => {
@@ -161,11 +161,11 @@ describe('Testing rusi transport', () => {
     const handler = jest.fn()
 
     // act
-    const sub: Subscription = await rusi.subscribe(subject, handler, SubscriptionOptions.STREAM_PROCESSOR, serDes)
+    const sub = <RusiSubscription>await rusi.subscribe(subject, handler, SubscriptionOptions.STREAM_PROCESSOR, serDes)
     await sub.unsubscribe?.call(sub)
 
     // assert
-    expect((sub._call as RusiSubscription)?.cancel).toBeCalled()
+    expect(sub._call?.cancel).toBeCalled()
   })
 
   test('disconnect happens if the connection is open', async () => {

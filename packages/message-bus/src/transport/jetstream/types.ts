@@ -3,11 +3,12 @@
 
 import EventEmitter from 'events'
 import { NatsConnection, ConsumerMessages } from 'nats'
+import { Subscription } from '../types'
 
 export interface JetstreamConnection extends EventEmitter {
   _natsConnection?: NatsConnection
 }
 
-export interface JetstreamSubscription extends EventEmitter {
+export interface JetstreamSubscription extends Subscription {
   _natsConsumerMessages?: ConsumerMessages
 }

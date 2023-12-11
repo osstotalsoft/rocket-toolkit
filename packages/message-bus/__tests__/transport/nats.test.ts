@@ -1,12 +1,14 @@
-import { nats, serDes, SubscriptionOptions } from '../../src'
-import { Connection } from '../../src/transport/types'
+import { serDes, SubscriptionOptions } from '../../src'
+import nats from '../../src/transport/nats'
+import { NatsSubscription } from '../../src/transport/nats/types'
 
 jest.mock('node-nats-streaming')
 
 import nodeNatsStreaming from 'node-nats-streaming'
 
+
 describe('Testing nats transport', () => {
-  let mockConnection: Connection = null
+  let mockConnection: nodeNatsStreaming.Stan | null = null
   let mockSubscriptionOptions: nodeNatsStreaming.SubscriptionOptions | null = null
 
   beforeEach(() => {
@@ -138,7 +140,7 @@ describe('Testing nats transport', () => {
     const handler = jest.fn()
 
     // act
-    const sub = await nats.subscribe(subject, handler, SubscriptionOptions.STREAM_PROCESSOR, serDes)
+    const sub = <NatsSubscription>await nats.subscribe(subject, handler, SubscriptionOptions.STREAM_PROCESSOR, serDes)
     sub.unsubscribe?.call(sub)
 
     // assert
