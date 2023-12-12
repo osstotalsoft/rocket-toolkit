@@ -14,7 +14,7 @@ import {
 } from 'nats'
 import { Mutex } from 'async-mutex'
 // import uuid from 'uuid'
-import { Subscription, SubscriptionHandler, Transport } from '../types'
+import { SubscriptionHandler, Transport } from '../types'
 import { EventEmitter } from 'stream'
 import { JetstreamConnection, JetstreamSubscription } from './types'
 import { Envelope, SerDes, SubscriptionOptions } from '../../types'
