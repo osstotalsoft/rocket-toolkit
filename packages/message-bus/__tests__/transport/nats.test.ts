@@ -1,9 +1,6 @@
 import { serDes, SubscriptionOptions } from '../../src'
 import nats from '../../src/transport/nats'
 import { NatsSubscription } from '../../src/transport/nats/types'
-
-jest.mock('node-nats-streaming')
-
 import nodeNatsStreaming from 'node-nats-streaming'
 
 

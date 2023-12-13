@@ -1,17 +1,7 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import {
-  AckPolicy,
-  Consumer,
-  ConsumerConfig,
-  DeliverPolicy,
-  JetStreamClient,
-  NatsConnection,
-  StringCodec,
-  connect as natsConnect,
-  ConsumerMessages
-} from 'nats'
+import nats from 'nats'
 import { Mutex } from 'async-mutex'
 // import uuid from 'uuid'
 import { SubscriptionHandler, Transport } from '../types'
@@ -34,7 +24,7 @@ const {
 
 //const clientID = `${JETSTREAM_CLIENT_ID}-${uuid.v4()}`
 const natsConnectionMutex = new Mutex()
-let natsConnection: NatsConnection | null = null
+let natsConnection: nats.NatsConnection | null = null
 
 async function _connect() {
   if (natsConnection) {
@@ -49,7 +39,7 @@ async function _connect() {
     }
 
     try {
-      natsConnection = await natsConnect({ servers: JETSTREAM_URL })
+      natsConnection = await nats.connect({ servers: JETSTREAM_URL })
       natsConnection
         .closed()
         .then(err =>
@@ -98,7 +88,7 @@ async function publish(subject: string, envelope: Envelope<any>, serDes: SerDes)
   const nc = await _connect()
   const jsClient = nc.jetstream()
   const msg = serDes.serialize(envelope)
-  const sc = StringCodec()
+  const sc = nats.StringCodec()
   const result = await jsClient.publish(subject, sc.encode(msg))
   return result
 }
@@ -114,8 +104,8 @@ async function subscribe(
   const stream = getStream(subject)
   const consumer = await getConsumer(jsClient, subject, stream, opts)
   const ci = await consumer.info(true)
-  const manualAck = ci.config.ack_policy == AckPolicy.Explicit || ci.config.ack_policy == AckPolicy.All
-  const sc = StringCodec()
+  const manualAck = ci.config.ack_policy == nats.AckPolicy.Explicit || ci.config.ack_policy == nats.AckPolicy.All
+  const sc = nats.StringCodec()
 
   //const messages = await consumer.consume()
   // const _fireAndForget = (async () => {
@@ -171,33 +161,33 @@ function getStream(subject: string): string {
 }
 
 async function getConsumer(
-  jsClient: JetStreamClient,
+  jsClient: nats.JetStreamClient,
   subject: string,
   stream: string,
   opts: SubscriptionOptions
-): Promise<Consumer> {
+): Promise<nats.Consumer> {
   const jsm = await jsClient.jetstreamManager()
-  const consumerCfg: Partial<ConsumerConfig> = {
+  const consumerCfg: Partial<nats.ConsumerConfig> = {
     filter_subject: subject
   }
   switch (opts) {
     case SubscriptionOptions.STREAM_PROCESSOR:
       consumerCfg.durable_name = (JETSTREAM_CLIENT_ID + '_' + subject).replace('.', '_')
-      consumerCfg.deliver_policy = DeliverPolicy.All
+      consumerCfg.deliver_policy = nats.DeliverPolicy.All
       consumerCfg.ack_wait = parseInt(JETSTREAM_STREAM_PROCESSOR_AckWaitTime, 10)
       consumerCfg.max_ack_pending = parseInt(JETSTREAM_STREAM_PROCESSOR_MaxConcurrentMessages, 10)
-      consumerCfg.ack_policy = AckPolicy.Explicit
+      consumerCfg.ack_policy = nats.AckPolicy.Explicit
       break
 
     case SubscriptionOptions.PUB_SUB:
       consumerCfg.name = (JETSTREAM_CLIENT_ID + subject).replace('.', '_')
-      consumerCfg.deliver_policy = DeliverPolicy.New
+      consumerCfg.deliver_policy = nats.DeliverPolicy.New
       consumerCfg.ack_wait = parseInt(JETSTREAM_PUB_SUB_AckWaitTime, 10)
       consumerCfg.max_ack_pending = parseInt(JETSTREAM_PUB_SUB_MaxConcurrentMessages, 10)
       break
 
     case SubscriptionOptions.RPC:
-      consumerCfg.deliver_policy = DeliverPolicy.New
+      consumerCfg.deliver_policy = nats.DeliverPolicy.New
       consumerCfg.ack_wait = parseInt(JETSTREAM_RPC_AckWaitTime, 10)
       consumerCfg.max_ack_pending = parseInt(JETSTREAM_RPC_MaxConcurrentMessages, 10)
       break
@@ -210,14 +200,14 @@ async function getConsumer(
   return consumer
 }
 
-function jetstreamConnection(nc: NatsConnection): JetstreamConnection {
+function jetstreamConnection(nc: nats.NatsConnection): JetstreamConnection {
   const jc: any = new EventEmitter()
   jc._natsConnection = nc
   nc.closed().then(err => jc.emit('close', err))
   return jc
 }
 
-function jetstreamSubscription(messages: ConsumerMessages): JetstreamSubscription {
+function jetstreamSubscription(messages: nats.ConsumerMessages): JetstreamSubscription {
   const js = <JetstreamSubscription>new EventEmitter()
   js._natsConsumerMessages = messages
   js.unsubscribe = async () => {
