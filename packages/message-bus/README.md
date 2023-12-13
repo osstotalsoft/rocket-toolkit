@@ -18,7 +18,7 @@ By default the message bus uses the Nats streaming transport. When working with 
 ```javascript
 const { messageBus, useTransport, transport } = require('@totalsoft/message-bus');
 
-useTransport(transport.rusi) //or transport.nats or whatever transport
+useTransport(transport.rusi) //or transport.nats or transport.jetstream
 const msgBus = messageBus() //now every message bus instance points to that transport
 await msgBus.publish('some_subject', {});
 ```
@@ -89,7 +89,7 @@ const [topic, event] = await msgBus.sendCommandAndReceiveEvent(
 Messaging__TopicPrefix="deprecated_please_use_Messaging__Env"
 Messaging__Env="messaging_env"
 Messaging__Source="your_service_name"
-Messaging__Transport="nats_or_rusi"
+Messaging__Transport="jetstream_nats_or_rusi"
 
 NATS_URL="your_nats_url"
 NATS_CLUSTER="your_nats_cluster"
@@ -112,5 +112,16 @@ RUSI_PUB_SUB_MaxConcurrentMessages="100"
 RUSI_PUB_SUB_AckWaitTime="5000"
 RUSI_RPC_MaxConcurrentMessages="1"
 RUSI_RPC_AckWaitTime="5000"
+
+JETSTREAM_URL,
+JETSTREAM_CLIENT_ID,
+JETSTREAM_COMMANDS_STREAM,
+JETSTREAM_EVENTS_STREAM,
+JETSTREAM_STREAM_PROCESSOR_MaxConcurrentMessages = '1',
+JETSTREAM_STREAM_PROCESSOR_AckWaitTime = '5000000000', // 5 seconds
+JETSTREAM_PUB_SUB_MaxConcurrentMessages = '100',
+JETSTREAM_PUB_SUB_AckWaitTime = '5000000000', // 5 seconds
+JETSTREAM_RPC_MaxConcurrentMessages = '1',
+JETSTREAM_RPC_AckWaitTime = '5000000000' // 5 seconds
 
 

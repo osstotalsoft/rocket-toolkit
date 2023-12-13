@@ -1,14 +1,15 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import nats from 'node-nats-streaming'
+import nats, { Stan } from 'node-nats-streaming'
 import { v4 } from 'uuid'
-import Promise from 'bluebird'
-import { SerDes, SubscriptionOptions } from '../types'
+import bluebird from 'bluebird'
+import { SerDes, SubscriptionOptions } from '../../types'
 import { Mutex } from 'async-mutex'
 import EventEmitter from 'events'
-import { timeout } from '../timeout'
-import { Connection, MessageHandler, Subscription, SubscriptionHandler, Transport } from './types'
+import { timeout } from '../../timeout'
+import { Subscription, SubscriptionHandler, Transport } from '../types'
+import { NatsSubscription } from './types'
 
 const {
   NATS_CLIENT_ID,
@@ -26,7 +27,7 @@ const {
 
 const clientID = `${NATS_CLIENT_ID}-${v4()}`
 const connectionMutex = new Mutex()
-let connection: Connection = null
+let connection: Stan | null = null
 
 export async function connect() {
   if (connection) {
@@ -45,7 +46,7 @@ export async function connect() {
     cn.on('disconnect', () => console.info('🛰️  Nats connection disconnected.'))
     cn.on('reconnect', () => console.info('🛰️  Nats connection reconnected.'))
     cn.on('reconnecting', () => console.info('🛰️  Nats connection reconnecting.'))
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       cn.on('connect', () => {
         resolve()
       })
@@ -78,7 +79,7 @@ export async function disconnect() {
 
 export async function publish(subject: string, envelope: any, serDes: SerDes) {
   const client = await connect()
-  const _publish = Promise.promisify(client.publish, {
+  const _publish = bluebird.Promise.promisify(client.publish, {
     context: client
   })
   const msg = serDes.serialize(envelope)
@@ -91,7 +92,7 @@ export async function subscribe(
   handler: SubscriptionHandler,
   opts: SubscriptionOptions,
   serDes: SerDes
-): globalThis.Promise<Promise<Subscription>> {
+): Promise<NatsSubscription> {
   const client = await connect()
   const natsOpts = client.subscriptionOptions()
   let useQGroup = false
@@ -125,8 +126,9 @@ export async function subscribe(
     default:
   }
 
-  const stanMsgHandler: MessageHandler = async msg => {
-    const envelope = serDes.deSerialize(msg.getData())
+  const stanMsgHandler = async (msg: nats.Message) => {
+    const data = <string>msg.getData()
+    const envelope = serDes.deSerialize(data)
     await handler(envelope)
     if (natsOpts.manualAcks) {
       msg.ack()
@@ -163,8 +165,8 @@ export async function subscribe(
   return result
 }
 
-function wrapSubscription(natsSubscription: nats.Subscription) {
-  const sub: Subscription = new EventEmitter()
+function wrapSubscription(natsSubscription: nats.Subscription): NatsSubscription {
+  const sub = <NatsSubscription>new EventEmitter()
   sub.on('removeListener', (event, listener) => {
     natsSubscription.removeListener(event, listener)
   })
@@ -173,7 +175,7 @@ function wrapSubscription(natsSubscription: nats.Subscription) {
   })
   sub.unsubscribe = function unsubscribe() {
     return timeout(
-      new Promise((resolve, reject) => {
+      new Promise<void>((resolve, reject) => {
         natsSubscription.on('closed', () => {
           resolve()
         })

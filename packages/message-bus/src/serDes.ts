@@ -11,9 +11,8 @@ export function serialize(msg: any): string {
   return data
 }
 
-export function deSerialize(data: String | Buffer): Envelope<any> {
-  const stringData: string = data.toString()
-  const msg = JSON.parse(stringData)
+export function deSerialize(data: string): Envelope<any> {
+  const msg = JSON.parse(data)
   const payload = msg.payload || humps.camelizeKeys(msg.Payload)
   const headers = msg.headers || msg.Headers
   const result = {

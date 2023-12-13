@@ -53,7 +53,7 @@ export interface SerDesInfo {
 
 export interface SerDes {
   serialize: (msg: any) => string
-  deSerialize: (data: String | Buffer) => Envelope<any>
+  deSerialize: (data: string) => Envelope<any>
   deSerializePayload: (payload: string) => any
   getInfo: () => SerDesInfo
 }
@@ -96,11 +96,4 @@ export interface MessageBus {
    * The [de]serialization used
    */
   serDes: SerDes
-}
-
-export type TransportType = keyof typeof transport
-export function isTransportType(param: string | undefined): param is TransportType {
-  if (!param) return false
-  const validValues = Object.keys(transport)
-  return validValues.includes(param)
 }
