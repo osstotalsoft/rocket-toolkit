@@ -1,5 +1,11 @@
 # @totalsoft/message-bus
 
+## 2.5.0
+
+### Minor Changes
+
+- adf0957: Added JetStream messaging transport for message-bus
+
 ## 2.4.9
 
 ### Patch Changes
