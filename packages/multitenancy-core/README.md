@@ -54,6 +54,22 @@ const { tenantConfiguration } = require("@totalsoft/multitenancy-core")
 //}
 const tenantSpecifficValue = tenantConfiguration.getValue('3c841325-eccc-4670-a577-09546df7b1fc', "tenantProp")
 ```
+The `getAll` function retrieves all tenant configurations from environment variables:
+
+```javascript
+const { tenantConfiguration } = require("@totalsoft/multitenancy-core")
+
+// process.env = {
+//    IS_MULTITENANT: 'true',
+//    MultiTenancy__Tenants__Tenant1__TenantId: '3c841325-eccc-4670-a577-09546df7b1fc',
+//    MultiTenancy__Tenants__Tenant1__Name: 'tenant 1 name',
+//    MultiTenancy__Tenants__Tenant1__Enabled: 'true',
+//    MultiTenancy__Tenants__Tenant2__TenantId: '9c841325-eccc-4670-a577-09546df7b1fc',
+//    MultiTenancy__Tenants__Tenant2__Name: 'tenant 2 name',
+//    MultiTenancy__Tenants__Tenant2__Enabled: 'false',
+//}
+const tenants = tenantConfiguration.getAll();
+```
 The `getConnectionInfo` extension reads the configuration to return a connection information object:
 ```javascript
 const { tenantConfiguration } = require("@totalsoft/multitenancy-core")
@@ -92,9 +108,28 @@ const { tenantService } = require("@totalsoft/multitenancy-core")
 //     IS_MULTITENANT: 'true',
 //     MultiTenancy__Tenants__Tenant1__TenantId: tenantId,
 //     MultiTenancy__Tenants__Tenant1__Name: 'Tenant 1 name'
-}
+//}
 
 const res = await tenantService.getTenantFromId(tenantId)
+```
+
+### tenantService.getAll
+
+The `getAll` function retrieves all enabled tenants:
+
+```javascript
+const { tenantService } = require("@totalsoft/multitenancy-core")
+
+// process.env = {
+//    IS_MULTITENANT: 'true',
+//    MultiTenancy__Tenants__Tenant1__TenantId: '3c841325-eccc-4670-a577-09546df7b1fc',
+//    MultiTenancy__Tenants__Tenant1__Name: 'tenant 1 name',
+//    MultiTenancy__Tenants__Tenant1__Enabled: 'true',
+//    MultiTenancy__Tenants__Tenant2__TenantId: '9c841325-eccc-4670-a577-09546df7b1fc',
+//    MultiTenancy__Tenants__Tenant2__Name: 'tenant 2 name',
+//    MultiTenancy__Tenants__Tenant2__Enabled: 'false',
+//}
+const tenants = await tenantService.getAll();
 ```
 
 The returned `Tenant` object has the following structure:
@@ -103,9 +138,10 @@ export interface Tenant {
     id: string,
     code: string,
     name?: string
+    enabled: boolean
 }
 ```
-The service throws an exception when the tenant with the specified id is not found.
+This function is useful when you need to retrieve all enabled tenants at once, for example, when initializing your application or when performing bulk operations on all tenants.
 
 ### tenantContextAccessor
 Allows propagating a tenant context across async/await calls.

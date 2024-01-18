@@ -27,6 +27,7 @@ export interface TenantMapByCode {
 export interface TenantSection {
   tenantId: string
   code: string
+  [key: string]: any
 }
 
 export interface TenantContext {
