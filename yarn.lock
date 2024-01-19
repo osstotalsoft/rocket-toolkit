@@ -1919,7 +1919,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@totalsoft/multitenancy-core@1.1.0, @totalsoft/multitenancy-core@workspace:packages/multitenancy-core":
+"@totalsoft/multitenancy-core@1.2.0, @totalsoft/multitenancy-core@workspace:packages/multitenancy-core":
   version: 0.0.0-use.local
   resolution: "@totalsoft/multitenancy-core@workspace:packages/multitenancy-core"
   dependencies:
@@ -2051,7 +2051,7 @@ __metadata:
   resolution: "@totalsoft/pino-multitenancy@workspace:packages/pino-multitenancy"
   dependencies:
     "@jest/types": ^28.1.0
-    "@totalsoft/multitenancy-core": 1.1.0
+    "@totalsoft/multitenancy-core": 1.2.0
     "@types/jest": ^27.5.1
     "@types/node": ^17.0.32
     "@types/uuid": ^8.3.4
