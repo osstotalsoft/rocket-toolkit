@@ -79,4 +79,57 @@ describe('tenant service tests:', () => {
     ///Assert
     await expect(action).rejects.toThrowError('disabled')
   })
+
+  it('should load tenants', async () => {
+    // Arrange
+    const tenants = [
+      { id: '3c841325-eccc-4670-a577-09546df7b1fc', name: 'tenant 1 name', code: 'tenant1', enabled: true },
+      { id: '9c841325-eccc-4670-a577-09546df7b1fc', name: 'tenant 2 name', code: 'tenant2', enabled: true }
+    ]
+
+    process.env = {
+      IS_MULTITENANT: 'true',
+      ...tenants.reduce(
+        (env, { id, name, code }) => ({
+          ...env,
+          [`MultiTenancy__Tenants__${code}__TenantId`]: id,
+          [`MultiTenancy__Tenants__${code}__Name`]: name
+        }),
+        {}
+      )
+    }
+
+    const { tenantService } = require('../src')
+
+    // Act
+    const res = await tenantService.getAll()
+
+    // Assert
+    expect(res).toEqual(tenants)
+  })
+
+  it('should return an empty array if no tenants are enabled', async () => {
+    // Arrange
+    const tenant = {
+      id: '3c841325-eccc-4670-a577-09546df7b1fc',
+      name: 'tenant 1 name',
+      code: 'tenant1',
+      enabled: 'false'
+    }
+
+    process.env = {
+      IS_MULTITENANT: 'true',
+      [`MultiTenancy__Tenants__${tenant.code}__TenantId`]: tenant.id,
+      [`MultiTenancy__Tenants__${tenant.code}__Name`]: tenant.name,
+      [`MultiTenancy__Tenants__${tenant.code}__Enabled`]: tenant.enabled
+    }
+
+    const { tenantService } = require('../src')
+
+    // Act
+    const res = await tenantService.getAll()
+
+    // Assert
+    expect(res).toHaveLength(0)
+  })
 })

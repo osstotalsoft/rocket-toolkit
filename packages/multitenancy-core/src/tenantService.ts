@@ -23,3 +23,14 @@ export async function getTenantFromId(tenantId: string): Promise<Tenant | null> 
   }
   return tenant
 }
+
+/**
+ * Retrieves all enabled tenants.
+ * @returns A promise that resolves to an array of Tenant objects.
+ */
+export async function getAll(): Promise<Tenant[]> {
+  const configTenants = tenantConfiguration.getAll()
+  return configTenants
+    .filter(tenant => tenant.enabled !== 'false')
+    .map(({ tenantId: id, name, code }) => ({ id, name, code, enabled: true }))
+}

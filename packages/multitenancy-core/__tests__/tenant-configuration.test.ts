@@ -153,4 +153,32 @@ describe('logging plugin tests:', () => {
     expect(connectionInfo.password).toBe(pass)
     expect(connectionInfo.otherParams).toBe(otherParams)
   })
+
+  it('should load all tenant configurations:', () => {
+    // Arrange
+    const tenants = [
+      { tenantId: '3c841325-eccc-4670-a577-09546df7b1fc', tenantProp: 'tenant 1 speciffic prop', code: 'tenant1' },
+      { tenantId: '9a841325-eccc-4670-a577-09546df7b1fc', tenantProp: 'tenant 2 speciffic prop', code: 'tenant2' }
+    ]
+
+    process.env = {
+      IS_MULTITENANT: 'true',
+      ...tenants.reduce(
+        (env, { tenantId, tenantProp, code }, _) => ({
+          ...env,
+          [`MultiTenancy__Tenants__${code}__TenantId`]: tenantId,
+          [`MultiTenancy__Tenants__${code}__TenantProp`]: tenantProp
+        }),
+        {}
+      )
+    }
+
+    const { tenantConfiguration } = require('../src')
+
+    // Act
+    const res = tenantConfiguration.getAll()
+
+    // Assert
+    expect(res).toEqual(tenants)
+  })
 })

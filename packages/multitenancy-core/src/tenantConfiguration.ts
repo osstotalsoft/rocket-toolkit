@@ -5,7 +5,7 @@ import objectPath from 'object-path'
 import humps from 'humps'
 import debounce from 'debounce'
 import deepmerge from 'deepmerge'
-import { TenantMapByCode, TenantMapById } from './types'
+import { TenantMapByCode, TenantMapById, TenantSection } from './types'
 const { IS_MULTITENANT } = process.env
 const isMultiTenant = JSON.parse(IS_MULTITENANT || 'false')
 const debounceTimeoutMs = 5000
@@ -31,6 +31,28 @@ export function getValue(tenantId: string, key?: string) {
   }
 
   return tenantValue || defaultValue
+}
+
+/**
+ * Retrieves all tenant configurations.
+ * If multi-tenancy is disabled, an empty array is returned.
+ * If multi-tenancy is enabled, the function merges the default configuration with each tenant configuration
+ * and returns an array of merged configurations.
+ * @returns An array of TenantSection objects representing the merged tenant configurations.
+ */
+export function getAll(): TenantSection[] {
+  if (!isMultiTenant) {
+    return []
+  }
+
+  const defaults = _getDefaultsDebounced()
+  const allTenantsMap = _getTenantsDebounced()
+
+  return Object.entries(allTenantsMap).map(([tid, tenantSection]) => {
+    return _isObject(defaults) && _isObject(tenantSection)
+      ? deepmerge(defaults, tenantSection)
+      : tenantSection || defaults
+  })
 }
 
 function _getDefaults(): TenantMapByCode {
