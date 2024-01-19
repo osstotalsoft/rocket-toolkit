@@ -30,6 +30,8 @@ jobs:
         run: yarn test
       - name: Upgrade version based on Changeset
         run: yarn changeset version && yarn install
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false        
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Increase packages version
