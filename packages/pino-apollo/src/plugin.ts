@@ -107,7 +107,7 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
       },
       didEncounterErrors: async (requestContext: GraphQLRequestContextDidEncounterErrors<ApolloContextExtension>) => {
         for (const error of requestContext.errors) {
-          const isValidationError = error?.extensions?.code === 'GRAPHQL_VALIDATION_FAILED'
+          const isValidationError = error?.extensions?.code === 'VALIDATION_ERROR'
           if (isValidationError) return
           const message =
             '[GraphQL_Execution][Error] The server encounters errors while parsing, validating, or executing the operation'
