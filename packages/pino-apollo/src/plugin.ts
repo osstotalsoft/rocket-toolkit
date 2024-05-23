@@ -45,13 +45,18 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
     messagePrefix: string,
     { request, operationName }: GraphQLRequestContext<ApolloContextExtension>,
     extensions?: GraphQLErrorExtensions,
-    logger = this.logger
+    logger = this.logger,
+    skipEnrichment = false
   ) {
     const message = `${messagePrefix} < ${getOperationName(request, operationName)} > \r\n`
     const fullErrorMessage = `${message} ${error?.message} ${error?.stack} ${JSON.stringify(extensions)}`
 
     if (!shouldSkipLogging(getOperationName(request, operationName))) logger.error(error, message)
 
+    if (skipEnrichment) {
+      if (this.securedMessages) error.stack = undefined
+      return
+    }
     this._enrichError(error, message, fullErrorMessage)
   }
 
@@ -107,11 +112,10 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
       },
       didEncounterErrors: async (requestContext: GraphQLRequestContextDidEncounterErrors<ApolloContextExtension>) => {
         for (const error of requestContext.errors) {
-          const isValidationError = error?.extensions?.code === 'VALIDATION_ERROR'
-          if (isValidationError) return
+          const shouldSkipEnrichment = error?.extensions?.code === 'BUSINESS_ERROR'
           const message =
             '[GraphQL_Execution][Error] The server encounters errors while parsing, validating, or executing the operation'
-          this._logRequestError(error, message, requestContext, error?.extensions, logger)
+          this._logRequestError(error, message, requestContext, error?.extensions, logger, shouldSkipEnrichment)
         }
       },
       willSendResponse: async ({ operationName }: GraphQLRequestContextWillSendResponse<ApolloContextExtension>) => {
