@@ -1,5 +1,11 @@
 # @totalsoft/pino-apollo
 
+## 2.1.1
+
+### Patch Changes
+
+- bcad952: Refactor ApolloLoggerPlugin to skip message enrichment for business errors.
+
 ## 2.1.0
 
 ### Minor Changes

@@ -1,7 +1,7 @@
 {
   "name": "@totalsoft/pino-apollo",
   "description": "A custom Apollo logging plugin",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "author": "TotalSoft",
   "packageManager": "yarn@3.2.0",
   "type": "commonjs",
