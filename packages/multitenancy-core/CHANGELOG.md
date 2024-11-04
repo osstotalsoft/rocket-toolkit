@@ -1,5 +1,11 @@
 # @totalsoft/multitenancy-core
 
+## 2.0.0
+
+### Major Changes
+
+- d7203a5: Update all dependencies
+
 ## 1.2.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @totalsoft/pino-multitenancy
 
+## 2.0.0
+
+### Major Changes
+
+- d7203a5: Update all dependencies
+
+### Patch Changes
+
+- Updated dependencies [d7203a5]
+  - @totalsoft/multitenancy-core@2.0.0
+
 ## 1.2.1
 
 ### Patch Changes

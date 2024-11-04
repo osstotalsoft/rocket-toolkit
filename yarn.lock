@@ -2104,7 +2104,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@totalsoft/correlation@1.1.0, @totalsoft/correlation@workspace:packages/correlation":
+"@totalsoft/correlation@2.0.0, @totalsoft/correlation@workspace:packages/correlation":
   version: 0.0.0-use.local
   resolution: "@totalsoft/correlation@workspace:packages/correlation"
   dependencies:
@@ -2212,7 +2212,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@totalsoft/multitenancy-core@1.2.0, @totalsoft/multitenancy-core@workspace:packages/multitenancy-core":
+"@totalsoft/multitenancy-core@2.0.0, @totalsoft/multitenancy-core@workspace:packages/multitenancy-core":
   version: 0.0.0-use.local
   resolution: "@totalsoft/multitenancy-core@workspace:packages/multitenancy-core"
   dependencies:
@@ -2284,7 +2284,7 @@ __metadata:
     "@apollo/server": ^4.11.2
     "@colors/colors": ^1.6.0
     "@jest/types": ^29.6.3
-    "@totalsoft/correlation": 1.1.0
+    "@totalsoft/correlation": 2.0.0
     "@types/jest": ^29.5.14
     "@types/node": ^22.8.7
     "@types/ramda": 0.30.2
@@ -2306,7 +2306,7 @@ __metadata:
   resolution: "@totalsoft/pino-correlation@workspace:packages/pino-correlation"
   dependencies:
     "@jest/types": ^29.6.3
-    "@totalsoft/correlation": 1.1.0
+    "@totalsoft/correlation": 2.0.0
     "@types/jest": ^29.5.14
     "@types/node": ^22.8.7
     "@types/uuid": ^10.0.0
@@ -2322,7 +2322,7 @@ __metadata:
   resolution: "@totalsoft/pino-mssqlserver@workspace:packages/pino-mssqlserver"
   dependencies:
     "@jest/types": ^29.6.3
-    "@totalsoft/correlation": 1.1.0
+    "@totalsoft/correlation": 2.0.0
     "@types/humps": ^2.0.6
     "@types/jest": ^29.5.14
     "@types/node": ^22.8.7
@@ -2344,7 +2344,7 @@ __metadata:
   resolution: "@totalsoft/pino-multitenancy@workspace:packages/pino-multitenancy"
   dependencies:
     "@jest/types": ^29.6.3
-    "@totalsoft/multitenancy-core": 1.2.0
+    "@totalsoft/multitenancy-core": 2.0.0
     "@types/jest": ^29.5.14
     "@types/node": ^22.8.7
     "@types/uuid": ^10.0.0
