@@ -1,5 +1,11 @@
 # @totalsoft/pino-mssqlserver
 
+## 1.2.0
+
+### Minor Changes
+
+- 2185fd3: Update all references
+
 ## 1.1.0
 
 ### Minor Changes
