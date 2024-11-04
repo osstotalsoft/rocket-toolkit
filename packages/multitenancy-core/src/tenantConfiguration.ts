@@ -10,8 +10,8 @@ const { IS_MULTITENANT } = process.env
 const isMultiTenant = JSON.parse(IS_MULTITENANT || 'false')
 const debounceTimeoutMs = 5000
 
-const _getTenantsDebounced = debounce(_getTenants, debounceTimeoutMs, true)
-const _getDefaultsDebounced = debounce(_getDefaults, debounceTimeoutMs, true)
+const _getTenantsDebounced = debounce(_getTenants, debounceTimeoutMs, {immediate:true})
+const _getDefaultsDebounced = debounce(_getDefaults, debounceTimeoutMs, {immediate:true})
 
 export function getValue(tenantId: string, key?: string) {
   if (!isMultiTenant) {
@@ -19,11 +19,11 @@ export function getValue(tenantId: string, key?: string) {
   }
 
   const defaults = _getDefaultsDebounced()
-  const tenantSection = _getTenantsDebounced()[tenantId?.toLowerCase()]
+  const tenantSection = _getTenantsDebounced()?.[tenantId?.toLowerCase()]
 
   if (!tenantSection) throw new Error(`Configuration not found for tenant '${tenantId}'`)
 
-  const defaultValue = objectPath.get(defaults, key || '')
+  const defaultValue = defaults?objectPath.get(defaults, key || ''):''
   const tenantValue = objectPath.get(tenantSection, key || '')
 
   if (_isObject(defaultValue) && _isObject(tenantValue)) {
@@ -48,11 +48,11 @@ export function getAll(): TenantSection[] {
   const defaults = _getDefaultsDebounced()
   const allTenantsMap = _getTenantsDebounced()
 
-  return Object.entries(allTenantsMap).map(([tid, tenantSection]) => {
-    return _isObject(defaults) && _isObject(tenantSection)
+  return allTenantsMap? Object.entries(allTenantsMap).map(([_tid, tenantSection]) => {
+    return defaults &&_isObject(defaults) && _isObject(tenantSection)
       ? deepmerge(defaults, tenantSection)
       : tenantSection || defaults
-  })
+  }):[]
 }
 
 function _getDefaults(): TenantMapByCode {
