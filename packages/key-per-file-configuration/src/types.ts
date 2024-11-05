@@ -12,5 +12,5 @@ export interface Options {
 }
 
 export interface ConfigWatcher {
-  close: () => Promise<void>
+  close: () => Promise<void> | undefined
 }
