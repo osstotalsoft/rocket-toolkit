@@ -34,7 +34,7 @@ await configWatcher.close()
 
 ```javascript
  Options {
-    // The path where the configuration files can be found (supports glob)
+    // The path where the configuration files can be found
     configPath?: string;
 }
 ```
