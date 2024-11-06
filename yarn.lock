@@ -2136,7 +2136,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@totalsoft/correlation@2.0.0, @totalsoft/correlation@workspace:packages/correlation":
+"@totalsoft/correlation@3.0.0, @totalsoft/correlation@workspace:packages/correlation":
   version: 0.0.0-use.local
   resolution: "@totalsoft/correlation@workspace:packages/correlation"
   dependencies:
@@ -2294,7 +2294,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@totalsoft/opentracing@1.1.0, @totalsoft/opentracing@workspace:packages/opentracing":
+"@totalsoft/opentracing@2.0.0, @totalsoft/opentracing@workspace:packages/opentracing":
   version: 0.0.0-use.local
   resolution: "@totalsoft/opentracing@workspace:packages/opentracing"
   dependencies:
@@ -2316,7 +2316,7 @@ __metadata:
     "@apollo/server": ^4.11.2
     "@colors/colors": ^1.6.0
     "@jest/types": ^29.6.3
-    "@totalsoft/correlation": 2.0.0
+    "@totalsoft/correlation": 3.0.0
     "@types/jest": ^29.5.14
     "@types/node": ^22.8.7
     "@types/ramda": 0.30.2
@@ -2338,7 +2338,7 @@ __metadata:
   resolution: "@totalsoft/pino-correlation@workspace:packages/pino-correlation"
   dependencies:
     "@jest/types": ^29.6.3
-    "@totalsoft/correlation": 2.0.0
+    "@totalsoft/correlation": 3.0.0
     "@types/jest": ^29.5.14
     "@types/node": ^22.8.7
     "@types/uuid": ^10.0.0
@@ -2354,7 +2354,7 @@ __metadata:
   resolution: "@totalsoft/pino-mssqlserver@workspace:packages/pino-mssqlserver"
   dependencies:
     "@jest/types": ^29.6.3
-    "@totalsoft/correlation": 2.0.0
+    "@totalsoft/correlation": 3.0.0
     "@types/humps": ^2.0.6
     "@types/jest": ^29.5.14
     "@types/node": ^22.8.7
@@ -2414,7 +2414,7 @@ __metadata:
   resolution: "@totalsoft/pino-opentracing@workspace:packages/pino-opentracing"
   dependencies:
     "@jest/types": ^28.1.0
-    "@totalsoft/opentracing": 1.1.0
+    "@totalsoft/opentracing": 2.0.0
     "@types/jest": ^27.5.1
     "@types/node": ^17.0.32
     "@types/ramda": ^0.28.15

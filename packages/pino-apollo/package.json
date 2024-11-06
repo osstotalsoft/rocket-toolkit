@@ -1,7 +1,7 @@
 {
   "name": "@totalsoft/pino-apollo",
   "description": "A custom Apollo logging plugin",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "author": "TotalSoft",
   "packageManager": "yarn@3.2.0",
   "type": "commonjs",
@@ -44,7 +44,7 @@
   "dependencies": {
     "@apollo/server": "^4.11.2",
     "@colors/colors": "^1.6.0",
-    "@totalsoft/correlation": "2.0.0",
+    "@totalsoft/correlation": "3.0.0",
     "graphql": "^16.9.0",
     "pino": "^9.5.0",
     "ramda": "^0.30.1",

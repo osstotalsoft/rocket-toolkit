@@ -1,5 +1,12 @@
 # @totalsoft/pino-opentracing
 
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies [31d2ace]
+  - @totalsoft/opentracing@2.0.0
+
 ## 1.1.0
 
 ### Minor Changes

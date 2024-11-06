@@ -1,5 +1,11 @@
 # @totalsoft/graceful-shutdown
 
+## 2.0.0
+
+### Major Changes
+
+- 31d2ace: update dependencies for the following packages: correlation, graceful-shutdown, key-per-file-configuration, opentracing, pino-opentelemetry
+
 ## 1.1.0
 
 ### Minor Changes
