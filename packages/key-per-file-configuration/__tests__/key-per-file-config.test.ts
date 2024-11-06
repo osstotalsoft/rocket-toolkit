@@ -39,7 +39,7 @@ describe('key-per-file configuration tests:', () => {
     expect(process.env.ENV2).toBe(env2Value)
   })
 
-  it('reads config from custom glob location', async () => {
+  it('fails to reads config from custom glob location', async () => {
     //arrange
     const env1Value = 'ENV1-value'
     const env2Value = 'ENV2-value'
@@ -50,12 +50,12 @@ describe('key-per-file configuration tests:', () => {
     })
 
     //act
-    const watcher = load({ configPath: 'customLocation/**', logger: emptyLogger })
-    await watcher.close()
+    const tryLoad = () => {
+      const _watcher = load({ configPath: 'customLocation/**', logger: emptyLogger })
+    }
 
     //assert
-    expect(process.env.ENV1).toBe(env1Value)
-    expect(process.env.ENV2).toBe(env2Value)
+    expect(tryLoad).toThrow('Glob patterns are not supported in the config path')
   })
 
   it('reads config from custom direcotry location', async () => {

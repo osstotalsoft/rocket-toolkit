@@ -11,19 +11,19 @@ const { KEY_PER_FILE_CONFIG_PATH } = process.env
 const defaultConfigPath = 'runtime'
 
 export function load(options?: Options): ConfigWatcher {
-  const cleanConfigPath = _cleanConfigPath(options?.configPath)
+  const configFolderPath = _getAbsolutePath(options?.configPath)
   const logger = options?.logger ?? console
 
-  logger.info(`Loading "Key per File" configuration at: ${cleanConfigPath}`)
+  logger.info(`Loading "Key per File" configuration at: ${configFolderPath}`)
 
   // Load files to env
-  const filePaths = glob.sync(cleanConfigPath, { nodir: true })
+  const filePaths = _getFilePaths(configFolderPath)
   const loadValue = _loadValue(logger)
   filePaths.forEach(loadValue)
 
   // Watch for file changes
   const watcher = chokidar
-    .watch(cleanConfigPath, { awaitWriteFinish: true /*, usePolling: true*/ })
+    .watch(configFolderPath, { awaitWriteFinish: true /*, usePolling: true*/ })
     .on('unlink', _removeValue)
     .on('add', loadValue)
     .on('change', loadValue)
@@ -31,19 +31,25 @@ export function load(options?: Options): ConfigWatcher {
   return { close: () => watcher.close() }
 }
 
-function _cleanConfigPath(configPath = KEY_PER_FILE_CONFIG_PATH || defaultConfigPath): string {
-  let cleanConfigPath = path.join(process.cwd(), configPath)
+function _getAbsolutePath(configPath = KEY_PER_FILE_CONFIG_PATH || defaultConfigPath): string {
+  const cleanConfigPath = path.join(process.cwd(), configPath)
 
-  if (!glob.hasMagic(cleanConfigPath)) {
-    if (!fs.existsSync(cleanConfigPath) || fs.lstatSync(cleanConfigPath).isDirectory()) {
-      cleanConfigPath = path.join(cleanConfigPath, '**')
-    }
+  if (glob.hasMagic(cleanConfigPath)) {
+    throw 'Glob patterns are not supported in the config path'
   }
 
-  // glob only works with forward slashes
-  cleanConfigPath = cleanConfigPath.replace(/\\/g, '/')
-
   return cleanConfigPath
+}
+
+function _getFilePaths(configPath: string) {
+
+    if (!fs.existsSync(configPath) || fs.lstatSync(configPath).isDirectory()) {
+      configPath = path.join(configPath, '**')
+    }
+
+    configPath = configPath.replace(/\\/g, '/')
+
+    return glob.sync(configPath, { nodir: true })
 }
 
 function _loadValue(logger: Logger) {
