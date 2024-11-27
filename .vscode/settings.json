@@ -7,10 +7,7 @@
     "source.fixAll.eslint": "explicit"
   },
   "files.eol": "\n",
-  "eslint.validate": [
-    "typescript",
-    "javascript"
-  ],
+  "eslint.validate": ["typescript", "javascript"],
   "typescript.validate.enable": true,
   "prettier.prettierPath": ".yarn/sdks/prettier/index.cjs",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -20,11 +17,8 @@
   "eslint.nodePath": ".yarn/sdks",
   "typescript.tsdk": ".yarn/sdks/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "eslint.packageManager": "yarn",
   "npm.packageManager": "yarn",
-  "cSpell.words": [
-    "uuidv"
-  ],
+  "cSpell.words": ["uuidv"],
   "licenser.license": "Custom",
   "licenser.author": "TotalSoft",
   "licenser.customHeader": "Copyright (c) @AUTHOR@.\nThis source code is licensed under the MIT license.",

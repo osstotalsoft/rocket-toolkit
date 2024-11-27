@@ -4,7 +4,7 @@
 import { Knex } from 'knex'
 import type { Filter, FromClause, Join, Name } from './types'
 
-function applyOrMap(fn: (item: any, index?: number, array?: any[]) => unknown, objOrArray: Object | Array<any>) {
+function applyOrMap(fn: (item: any, index?: number, array?: any[]) => unknown, objOrArray: object | Array<any>) {
   return Array.isArray(objOrArray) ? objOrArray.map(fn) : fn(objOrArray)
 }
 
@@ -15,6 +15,7 @@ function splitTableAndAlias(table: Name): Array<Name> {
   return table.split(/ as /i).map(x => x.trim().replace(/[[\]]/g, ''))
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 function isFunction(f: any): f is Function {
   return typeof f === 'function'
 }
