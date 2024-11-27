@@ -1,8 +1,8 @@
-import  Koa from 'koa'
-import v8 from 'v8' // sau import v8 from 'node:v8'
+import Koa from 'koa'
+import { getHeapSnapshot } from 'v8' // sau import v8 from 'node:v8'
 import numeral from 'numeral'
-import R from 'ramda'
-import {Logger} from 'pino'
+import { mapObjIndexed } from 'ramda'
+import { Logger } from 'pino'
 import { RouteHandler } from './types'
 
 const routerCfg: Record<string, RouteHandler> = {
@@ -12,7 +12,7 @@ const routerCfg: Record<string, RouteHandler> = {
 }
 
 const app = new Koa()
-app.use(async (ctx:Koa.Context, next:() => Promise<void>) => {
+app.use(async (ctx: Koa.Context, next: () => Promise<void>) => {
   const routeHandler = routerCfg[ctx.request.path.toLowerCase()]
   if (routeHandler) {
     routeHandler(ctx)
@@ -21,18 +21,18 @@ app.use(async (ctx:Koa.Context, next:() => Promise<void>) => {
   }
 })
 
-function heapDump(ctx:Koa.Context) {
-  ctx.body = v8.getHeapSnapshot()
+function heapDump(ctx: Koa.Context) {
+  ctx.body = getHeapSnapshot()
   const fileName = `${Date.now()}.heapsnapshot`
   ctx.attachment(fileName)
 }
 
-function memoryUsage(ctx:Koa.Context) {
-  const res = R.mapObjIndexed(num => numeral(num).format('0.0 b'), process.memoryUsage())
+function memoryUsage(ctx: Koa.Context) {
+  const res = mapObjIndexed(num => numeral(num).format('0.0 b'), process.memoryUsage())
   ctx.body = res
 }
 
-function index(ctx:Koa.Context) {
+function index(ctx: Koa.Context) {
   const bodyContent = Object.keys(routerCfg)
     .map(path => `<a href="${path}">${path}</a>`)
     .join('</br>')
@@ -43,10 +43,7 @@ function index(ctx:Koa.Context) {
 
 const port = process.env.DIAGNOSTICS_PORT || 4001
 
-
-function startServer(logger: Logger) : void  {
+export function startDiagnostics(logger: Logger): void {
   app.listen(port)
   logger.info(`🚀 Diagnostics server ready at http://localhost:${port}/`)
 }
-
-export {startServer}

@@ -1,6 +1,6 @@
 import { MeterProvider, View, ExplicitBucketHistogramAggregation, InstrumentType } from '@opentelemetry/sdk-metrics'
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
-import{ metrics, ValueType }from '@opentelemetry/api'
+import { metrics, ValueType } from '@opentelemetry/api'
 import { Logger } from 'pino'
 import { MetricsContext } from './types'
 
@@ -31,40 +31,25 @@ metrics.setGlobalMeterProvider(meterProvider)
 
 const meter = meterProvider.getMeter('node/memory-usage')
 
-meter.createObservableGauge(
-  'nodejs_rss',
-  {
-    description: 'Resident Set Size'
-  }
-)
+meter.createObservableGauge('nodejs_rss', {
+  description: 'Resident Set Size'
+})
 
-meter.createObservableGauge(
-  'nodejs_heapTotal',
-  {
-    description: 'Total heap size'
-  }
-)
+meter.createObservableGauge('nodejs_heapTotal', {
+  description: 'Total heap size'
+})
 
-meter.createObservableGauge(
-  'nodejs_heapUsed',
-  {
-    description: 'Heap used'
-  }
-)
+meter.createObservableGauge('nodejs_heapUsed', {
+  description: 'Heap used'
+})
 
-meter.createObservableGauge(
-  'nodejs_external',
-  {
-    description: 'External'
-  }
-)
+meter.createObservableGauge('nodejs_external', {
+  description: 'External'
+})
 
-meter.createObservableGauge(
-  'nodejs_arrayBuffer',
-  {
-    description: 'Array Buffer'
-  }
-)
+meter.createObservableGauge('nodejs_arrayBuffer', {
+  description: 'Array Buffer'
+})
 
 const requestStarted = meter.createCounter('gql_request_started', { description: 'The number of received requests.' })
 
@@ -81,28 +66,28 @@ const requestDurationSeconds = meter.createHistogram('gql_request_duration_secon
   valueType: ValueType.DOUBLE
 })
 
-async function startServer(logger:Logger) : Promise<void> {
+async function startMetrics(logger: Logger): Promise<void> {
   await exporter.startServer()
   logger.info(`🚀 Metrics server ready at http://localhost:${port}${endpoint}`)
 }
 
-function _getLabelsFromContext(context : MetricsContext) {
+function _getLabelsFromContext(context: MetricsContext) {
   return {
     operationName: context?.request?.operationName,
     operationType: context?.operation?.operation
   }
 }
 
-function recordRequestStarted(context :MetricsContext) {
+function recordRequestStarted(context: MetricsContext) {
   const { operationName } = _getLabelsFromContext(context)
   requestStarted.add(1, { operationName })
 }
 
-function recordRequestFailed(context :MetricsContext) {
+function recordRequestFailed(context: MetricsContext) {
   requestFailed.add(1, _getLabelsFromContext(context))
 }
 
-function recordRequestDuration(duration :number, context: MetricsContext) {
+function recordRequestDuration(duration: number, context: MetricsContext) {
   requestDuration.record(duration, {
     ..._getLabelsFromContext(context),
     success: (context.errors?.length ?? 0) === 0 ? 'true' : 'false'
@@ -114,9 +99,4 @@ function recordRequestDuration(duration :number, context: MetricsContext) {
   })
 }
 
-export {
-  startServer,
-  recordRequestDuration,
-  recordRequestStarted,
-  recordRequestFailed
-}
+export { startMetrics, recordRequestDuration, recordRequestStarted, recordRequestFailed }
