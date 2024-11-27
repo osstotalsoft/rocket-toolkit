@@ -1,6 +1,6 @@
 {
   "name": "rocket-toolkit",
-  "packageManager": "yarn@3.3.1",
+  "packageManager": "yarn@4.5.3",
   "private": true,
   "engines": {
     "node": ">=20.x"
@@ -9,9 +9,9 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn workspaces foreach run build",
-    "test": "yarn workspaces foreach run test",
-    "lint": "yarn workspaces foreach run lint",
+    "build": "yarn workspaces foreach --all run build",
+    "test": "yarn workspaces foreach --all run test",
+    "lint": "yarn workspaces foreach --all run lint",
     "release": "run build && changeset publish"
   },
   "devDependencies": {
