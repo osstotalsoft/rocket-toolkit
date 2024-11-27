@@ -1,0 +1,42 @@
+{
+    "name": "@totalsoft/metrics",
+    "description": "A custom plugin for metrics and diagnostics",
+    "version": "1.0.0",
+    "author": "TotalSoft",
+    "packageManager": "yarn@3.2.0",
+    "type": "commonjs",
+    "main": "dist/src/index.js",
+    "types": "dist/src/index.d.ts",
+    "publishConfig": {
+        "access": "public"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/osstotalsoft/rocket-toolkit.git",
+        "directory": "packages/metrics"
+    },
+    "keywords": [
+        "metrics",
+        "diagnostics",
+        "plugin"
+    ],
+    "scripts": {
+        "build": "run clean && tsc --project tsconfig.build.json",
+        "lint": "eslint src/*.ts",
+        "clean": "rimraf dist",
+        "test": "jest --collectCoverage --passWithNoTests --verbose --silent=false --runInBand"
+    },
+    "dependencies": {
+        "@opentelemetry/api": "^1.9.0",
+        "@opentelemetry/exporter-prometheus": "^0.55.0",
+        "@opentelemetry/sdk-metrics": "^1.28.0",
+        "koa": "^2.15.3",
+        "numeral": "^2.0.6",
+        "pino": "^9.5.0"
+    },
+    "devDependencies": {
+        "@types/koa": "^2.15.0",
+        "@types/numeral": "^2.0.5",
+        "typescript": "^5.7.2"
+    }
+}
