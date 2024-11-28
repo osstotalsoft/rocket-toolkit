@@ -60,6 +60,7 @@ const requestDuration = meter.createHistogram('gql_request_duration', {
   unit: 'milliseconds',
   valueType: ValueType.INT
 })
+
 const requestDurationSeconds = meter.createHistogram('gql_request_duration_seconds', {
   description: 'The total duration of a request (in seconds).',
   unit: 'seconds',
