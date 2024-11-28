@@ -5,11 +5,13 @@ const logger = {
 }
 
 describe('Metrics module', () => {
-  test('should start metrics server with no errors', async () => {
+  it('should start metrics server with no errors', async () => {
     const port = 9464
     const endpoint = '/metrics'
 
     await expect(startMetrics(logger as any)).resolves.not.toThrow()
+
+    //Assert logger.info is called with the correct message
     expect(logger.info).toHaveBeenCalledWith(`🚀 Metrics server ready at http://localhost:${port}${endpoint}`)
   })
 })
