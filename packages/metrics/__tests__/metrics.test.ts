@@ -1,7 +1,8 @@
 import { startMetrics } from '../src'
 
+// Mocking logger.info
 const logger = {
-  info: jest.fn() // Mocking logger.info
+  info: jest.fn() 
 }
 
 describe('Metrics module', () => {

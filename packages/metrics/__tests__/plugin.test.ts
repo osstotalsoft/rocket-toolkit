@@ -39,7 +39,6 @@ describe('Plugin', () => {
       .mockImplementationOnce(() => 1100) // Mock request end time
 
     const lifecycle = metricsPlugin.requestDidStart(mockContext as any)
-
     await lifecycle.willSendResponse(mockContext as any)
 
     // Assert recordRequestDuration is called with the correct duration 

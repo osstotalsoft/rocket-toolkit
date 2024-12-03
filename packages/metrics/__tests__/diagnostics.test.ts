@@ -1,7 +1,8 @@
 import { startDiagnostics, stopDiagnostics } from '../src'
 
+// Mocking logger.info
 const logger = {
-  info: jest.fn() // Mocking logger.info
+  info: jest.fn() 
 }
 
 describe('Diagnostics module', () => {
