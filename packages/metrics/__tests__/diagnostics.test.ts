@@ -1,4 +1,4 @@
-import { startDiagnostics } from '../src'
+import { startDiagnostics, stopDiagnostics } from '../src'
 
 const logger = {
   info: jest.fn() // Mocking logger.info
@@ -13,5 +13,7 @@ describe('Diagnostics module', () => {
 
     //Assert logger.info is called with the correct message
     expect(logger.info).toHaveBeenCalledWith(`🚀 Diagnostics server ready at http://localhost:${port}${endpoint}`)
+
+    stopDiagnostics(logger as any)
   })
 })
