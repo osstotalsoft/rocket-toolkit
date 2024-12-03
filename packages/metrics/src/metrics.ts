@@ -2,7 +2,7 @@ import { MeterProvider, View, ExplicitBucketHistogramAggregation, InstrumentType
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
 import { metrics, ValueType } from '@opentelemetry/api'
 import { Logger } from 'pino'
-import { MetricsContext } from './types'
+import { MetricsContext, SubscribeMessage } from './types'
 
 const { endpoint, port } = PrometheusExporter.DEFAULT_OPTIONS
 
@@ -100,4 +100,15 @@ function recordRequestDuration(duration: number, context: MetricsContext) {
   })
 }
 
-export { startMetrics, recordRequestDuration, recordRequestStarted, recordRequestFailed }
+const subscriptionStarted = meter.createCounter('gql_subscription_started', {
+  description: 'The number of subscriptions.'
+})
+
+function recordSubscriptionStarted(message: SubscribeMessage) {
+  subscriptionStarted.add(1, {
+    operationName: message?.payload?.operationName || undefined,
+    operationType: message.type
+  })
+}
+
+export { startMetrics, recordRequestDuration, recordRequestStarted, recordRequestFailed, recordSubscriptionStarted }

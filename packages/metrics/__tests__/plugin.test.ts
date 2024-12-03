@@ -10,7 +10,7 @@ jest.mock('../src/metrics', () => ({
 describe('Plugin', () => {
   it('should call recordRequestStarted when requestDidStart is invoked', () => {
     const metricsPlugin = createMetricsPlugin()
-    const mockContext = { request: 'mockRequest' } // Mock context
+    const mockContext = { request: 'mockRequest' }
 
     metricsPlugin.requestDidStart(mockContext as any)
 
@@ -20,7 +20,7 @@ describe('Plugin', () => {
 
   it('should call recordRequestFailed when didEncounterErrors is invoked', async () => {
     const metricsPlugin = createMetricsPlugin()
-    const mockContext = { request: 'mockRequest' } // Mock context
+    const mockContext = { request: 'mockRequest' }
 
     const lifecycle = metricsPlugin.requestDidStart(mockContext as any)
     await lifecycle.didEncounterErrors(mockContext as any)
@@ -33,7 +33,6 @@ describe('Plugin', () => {
     const metricsPlugin = createMetricsPlugin()
     const mockContext = { request: 'mockRequest' }
 
-    // Mock Date.now for request lifecycle
     jest
       .spyOn(global.Date, 'now')
       .mockImplementationOnce(() => 1000) // Mock request start time
@@ -43,7 +42,7 @@ describe('Plugin', () => {
 
     await lifecycle.willSendResponse(mockContext as any)
 
-    // Assert recordRequestDuration is called with the correct duration (100 ms)
+    // Assert recordRequestDuration is called with the correct duration 
     expect(recordRequestDuration).toHaveBeenCalledWith(100, mockContext)
 
     // Restore Date.now to prevent interference with other tests
