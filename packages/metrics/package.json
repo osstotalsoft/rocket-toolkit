@@ -1,7 +1,7 @@
 {
   "name": "@totalsoft/metrics",
   "description": "A custom plugin for metrics and diagnostics",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "TotalSoft",
   "packageManager": "yarn@3.2.0",
   "type": "commonjs",
