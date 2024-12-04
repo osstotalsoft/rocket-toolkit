@@ -1,5 +1,5 @@
 import Koa from 'koa'
-import { getHeapSnapshot } from 'v8' // sau import v8 from 'node:v8'
+import { getHeapSnapshot } from 'v8'
 import numeral from 'numeral'
 import { mapObjIndexed } from 'ramda'
 import { Logger } from 'pino'
