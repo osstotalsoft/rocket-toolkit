@@ -9,6 +9,7 @@ A collection of plugins and other GraphQL utilities.
   - [key-per-file-configuration](./packages/key-per-file-configuration#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fkey-per-file-configuration.svg)](https://badge.fury.io/js/@totalsoft%2Fkey-per-file-configuration)
   - [knex-filters](./packages/knex-filters#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fknex-filters.svg)](https://badge.fury.io/js/@totalsoft%2Fknex-filters)
   - [message-bus](./packages/message-bus#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fmessage-bus.svg)](https://badge.fury.io/js/@totalsoft%2Fmessage-bus)
+  - [metrics](./packages/metrics#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fmetrics.svg)](https://badge.fury.io/js/@totalsoft%2Fmetrics)
   - [multitenancy-core](./packages/multitenancy-core#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fmultitenancy-core.svg)](https://badge.fury.io/js/@totalsoft%2Fmultitenancy-core)
   - [opentelemetry-instrumentation-ws](./packages/opentelemetry-instrumentation-ws#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fopentelemetry-instrumentation-ws.svg)](https://badge.fury.io/js/@totalsoft%2Fopentelemetry-instrumentation-ws)
   - [opentracing](./packages/opentracing#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fopentracing.svg)](https://badge.fury.io/js/@totalsoft%2Fopentracing)
