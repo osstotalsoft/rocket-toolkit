@@ -1,5 +1,5 @@
 ---
-'@totalsoft/message-bus': major
+'@totalsoft/message-bus': minor
 ---
 
 Bump nats version and refactor streams
