@@ -1,5 +1,11 @@
 # @totalsoft/message-bus
 
+## 2.6.0
+
+### Minor Changes
+
+- 9b78c0a: Bump nats version and refactor streams
+
 ## 2.5.0
 
 ### Minor Changes
