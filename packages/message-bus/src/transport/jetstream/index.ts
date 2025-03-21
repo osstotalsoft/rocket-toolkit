@@ -12,8 +12,6 @@ import { Envelope, SerDes, SubscriptionOptions } from '../../types'
 const {
   JETSTREAM_URL,
   JETSTREAM_CLIENT_ID,
-  JETSTREAM_COMMANDS_STREAM,
-  JETSTREAM_EVENTS_STREAM,
   JETSTREAM_STREAM_PROCESSOR_MaxConcurrentMessages = '1',
   JETSTREAM_STREAM_PROCESSOR_AckWaitTime = '5000000000', // 5 seconds
   JETSTREAM_PUB_SUB_MaxConcurrentMessages = '100',
@@ -101,22 +99,11 @@ async function subscribe(
 ): Promise<JetstreamSubscription> {
   const nc = await _connect()
   const jsClient = nc.jetstream()
-  const stream = getStream(subject)
+  const stream = await getStream(jsClient, subject)
   const consumer = await getConsumer(jsClient, subject, stream, opts)
   const ci = await consumer.info(true)
   const manualAck = ci.config.ack_policy == nats.AckPolicy.Explicit || ci.config.ack_policy == nats.AckPolicy.All
   const sc = nats.StringCodec()
-
-  //const messages = await consumer.consume()
-  // const _fireAndForget = (async () => {
-  //   for await (const m of messages) {
-  //     const envelope = serDes.deSerialize(sc.decode(m.data))
-  //     const r = handler(envelope)
-  //     if (manualAck) {
-  //       r.then(() => m.ack())
-  //     }
-  //   }
-  // })()
 
   const messages = await consumer.consume({
     callback: m => {
@@ -125,39 +112,38 @@ async function subscribe(
       if (manualAck) {
         r.then(() => m.ack())
       }
-    }
+    },
+    max_messages: getMaxMessages(opts)
   })
-
-  // const status = await messages.status()
-  // for await (const s of status){
-  //   console.log(s)
-  // }
-
-
-  // subscription.on('error', err => {
-  //   console.error(`Nats subscription error for subject ${subject}: ${err}`)
-  // })
-  // subscription.on('timeout', err => {
-  //   console.error(`Nats subscription timeout error for subject ${subject}: ${err}`)
-  // })
-
-  // subscription.on('unsubscribed', () => {
-  //   console.info(`Unsubscribed from subject ${subject}.`)
-  // })
-
-  // subscription.on('closed', () => {
-  //   console.info(`Subscription closed for subject ${subject}.`)
-  // })
 
   return jetstreamSubscription(messages)
 }
 
-function getStream(subject: string): string {
-  const stream = subject.toLowerCase().includes('commands') ? JETSTREAM_COMMANDS_STREAM : JETSTREAM_EVENTS_STREAM
+async function getStream(jsClient: nats.JetStreamClient, subject: string): Promise<string> {
+  const jsm = await jsClient.jetstreamManager()
+  const stream = await jsm.streams.find(subject)
+
   if (!stream) {
     throw new Error(`Jetstream stream cannot be resolved for subject ${subject}.`)
   }
   return stream
+}
+
+function getMaxMessages(opts: SubscriptionOptions): number {
+
+  switch (opts) {
+    case SubscriptionOptions.STREAM_PROCESSOR:
+      return parseInt(JETSTREAM_STREAM_PROCESSOR_MaxConcurrentMessages, 10)
+
+    case SubscriptionOptions.PUB_SUB:
+      return parseInt(JETSTREAM_PUB_SUB_MaxConcurrentMessages, 10)
+
+    case SubscriptionOptions.RPC:
+      return parseInt(JETSTREAM_RPC_MaxConcurrentMessages, 10)
+
+    default:
+      throw new Error(`Unsupported subscription option: ${opts}`);
+  }
 }
 
 async function getConsumer(
@@ -175,7 +161,6 @@ async function getConsumer(
       consumerCfg.durable_name = (JETSTREAM_CLIENT_ID + '_' + subject).replace('.', '_')
       consumerCfg.deliver_policy = nats.DeliverPolicy.All
       consumerCfg.ack_wait = parseInt(JETSTREAM_STREAM_PROCESSOR_AckWaitTime, 10)
-      consumerCfg.max_ack_pending = parseInt(JETSTREAM_STREAM_PROCESSOR_MaxConcurrentMessages, 10)
       consumerCfg.ack_policy = nats.AckPolicy.Explicit
       break
 
@@ -183,16 +168,15 @@ async function getConsumer(
       consumerCfg.name = (JETSTREAM_CLIENT_ID + subject).replace('.', '_')
       consumerCfg.deliver_policy = nats.DeliverPolicy.New
       consumerCfg.ack_wait = parseInt(JETSTREAM_PUB_SUB_AckWaitTime, 10)
-      consumerCfg.max_ack_pending = parseInt(JETSTREAM_PUB_SUB_MaxConcurrentMessages, 10)
       break
 
     case SubscriptionOptions.RPC:
       consumerCfg.deliver_policy = nats.DeliverPolicy.New
       consumerCfg.ack_wait = parseInt(JETSTREAM_RPC_AckWaitTime, 10)
-      consumerCfg.max_ack_pending = parseInt(JETSTREAM_RPC_MaxConcurrentMessages, 10)
       break
 
     default:
+      throw new Error(`Unsupported subscription option: ${opts}`);
   }
 
   const ci = await jsm.consumers.add(stream, consumerCfg)

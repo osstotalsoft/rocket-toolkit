@@ -4,8 +4,6 @@
 process.env.JETSTREAM_URL = 'localhost:4222'
 process.env.Messaging__Env = ''
 process.env.Messaging__TopicPrefix = ''
-process.env.JETSTREAM_COMMANDS_STREAM = 'commands'
-process.env.JETSTREAM_EVENTS_STREAM = 'events'
 process.env.JETSTREAM_CLIENT_ID = 'rocket-samples'
 
 process.env.JETSTREAM_STREAM_PROCESSOR_AckWaitTime = '5000000000000000'

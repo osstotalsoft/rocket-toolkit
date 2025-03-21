@@ -13,7 +13,8 @@ const natsConsumerMock: any = {
 const jetStreamClientMock: any = {
   publish: jest.fn().mockResolvedValue({}),
   jetstreamManager: jest.fn().mockImplementation(() => ({
-    consumers: { add: jest.fn().mockResolvedValue({}) }
+    consumers: { add: jest.fn().mockResolvedValue({}) },
+    streams: { find: jest.fn().mockResolvedValue({}) }
   })),
   consumers: {
     get: jest.fn().mockResolvedValue(natsConsumerMock)
