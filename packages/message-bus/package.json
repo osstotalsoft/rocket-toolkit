@@ -5,22 +5,34 @@
   "author": "TotalSoft",
   "homepage": "https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/message-bus",
   "packageManager": "yarn@3.2.0",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
   "composite": true,
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": {
+        "require": "./dist/cjs/index.d.ts",
+        "default": "./dist/esm/index.d.ts"
+      }
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
-  "type": "commonjs",
   "engines": {
-    "node": ">=12.9.0"
+    "node": ">=20"
   },
   "scripts": {
-    "build": "run clean && tsc --project tsconfig.build.json && yarn copy-files",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm && yarn copy-files",
+    "build:cjs": "tsc -p tsconfig.build.cjs.json",
+    "build:esm": "tsc -p tsconfig.build.esm.json",
     "lint": "eslint src/*.ts",
     "clean": "rimraf dist",
     "test": "jest --collectCoverage --passWithNoTests --verbose --silent=false --runInBand",
-    "copy-files": "copyfiles -u 1 src/**/*.proto dist/src/",
+    "copy-files": "copyfiles -u 1 src/**/*.proto dist/esm/ && copyfiles -u 1 src/**/*.proto dist/cjs/",
     "docker-run-jestream": "docker run -p 4222:4222 -it --rm nats -js",
     "docker-run-nats-streaming": "docker run -p 4222:4222 -p 8222:8222 -it --rm nats-streaming:alpine"
   },

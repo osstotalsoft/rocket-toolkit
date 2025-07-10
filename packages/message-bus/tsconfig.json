@@ -1,7 +1,14 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist" /* Redirect output structure to the directory. */
+    "target": "ES2020",
+    "rootDir": "./src",
+    "module": "ESNext",
+    // "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true
   },
-  "exclude": ["dist/**", "coverage/**"]
+  "extends": "../../tsconfig.base.json",
+  "exclude": ["dist/**", "coverage/**", "__tests__/**", "__mocks__/**", "__samples__/**"]
 }
