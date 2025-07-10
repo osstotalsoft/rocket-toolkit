@@ -3,7 +3,7 @@
 
 import { connect as natsConnect, NatsConnection, JetStreamClient, Consumer,
   ConsumerConfig, ConsumerMessages, 
-  AckPolicy, DeliverPolicy, StringCodec } from "nats";
+  AckPolicy, DeliverPolicy, StringCodec } from 'nats'
 import { Mutex } from 'async-mutex'
 // import uuid from 'uuid'
 import { SubscriptionHandler, Transport } from '../types'
@@ -144,7 +144,7 @@ function getMaxMessages(opts: SubscriptionOptions): number {
       return parseInt(JETSTREAM_RPC_MaxConcurrentMessages, 10)
 
     default:
-      throw new Error(`Unsupported subscription option: ${opts}`);
+      throw new Error(`Unsupported subscription option: ${opts}`)
   }
 }
 
@@ -178,7 +178,7 @@ async function getConsumer(
       break
 
     default:
-      throw new Error(`Unsupported subscription option: ${opts}`);
+      throw new Error(`Unsupported subscription option: ${opts}`)
   }
 
   const ci = await jsm.consumers.add(stream, consumerCfg)
