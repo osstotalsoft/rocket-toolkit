@@ -1,7 +1,7 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import { Subscription, Transport } from './transport/types.js'
+import { Subscription, Transport } from './transport/types'
 
 export interface Context {
   correlationId?: any

@@ -5,10 +5,10 @@ import { Mutex } from 'async-mutex'
 import * as grpc from '@grpc/grpc-js'
 import * as protoLoader from '@grpc/proto-loader'
 import bluebird from 'bluebird'
-import { Envelope, SerDes, SubscriptionOptions } from '../../types.js'
+import { Envelope, SerDes, SubscriptionOptions } from '../../types'
 import EventEmitter from 'events'
-import { Subscription, SubscriptionHandler, Transport } from '../types.js'
-import { RusiChannel, RusiClient, RusiGrpc, Request, Options, RusiSubscription, RusiConnection } from './types.js'
+import { Subscription, SubscriptionHandler, Transport } from '../types'
+import { RusiChannel, RusiClient, RusiGrpc, Request, Options, RusiSubscription, RusiConnection } from './types'
 
 const {
   RUSI_GRPC_ENDPOINT,

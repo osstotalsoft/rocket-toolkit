@@ -2,7 +2,7 @@
 // This source code is licensed under the MIT license.
 
 import humps from 'humps'
-import { Envelope, SerDes, SerDesInfo } from './types.js'
+import { Envelope, SerDes, SerDesInfo } from './types'
 
 const contentType = 'application/json;charset=utf-8'
 

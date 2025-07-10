@@ -4,12 +4,12 @@
 import nats, { Stan } from 'node-nats-streaming'
 import { v4 } from 'uuid'
 import bluebird from 'bluebird'
-import { SerDes, SubscriptionOptions } from '../../types.js'
+import { SerDes, SubscriptionOptions } from '../../types'
 import { Mutex } from 'async-mutex'
 import EventEmitter from 'events'
-import { timeout } from '../../timeout.js'
-import { Subscription, SubscriptionHandler, Transport } from '../types.js'
-import { NatsSubscription } from './types.js'
+import { timeout } from '../../timeout'
+import { Subscription, SubscriptionHandler, Transport } from '../types'
+import { NatsSubscription } from './types'
 
 const {
   NATS_CLIENT_ID,

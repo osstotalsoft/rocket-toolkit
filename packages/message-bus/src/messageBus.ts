@@ -1,12 +1,12 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import transport from './transport/index.js'
-import * as topicRegistry from './topicRegistry.js'
-import defaultSerDes from './serDes.js'
-import { Context, Envelope, EnvelopeCustomizer, MessageBus, MessageBusHandler, SerDes, SubscriptionOptions } from './types.js'
-import { envelope } from './envelope.js'
-import { Subscription, Transport } from './transport/types.js'
+import transport from './transport'
+import * as topicRegistry from './topicRegistry'
+import defaultSerDes from './serDes'
+import { Context, Envelope, EnvelopeCustomizer, MessageBus, MessageBusHandler, SerDes, SubscriptionOptions } from './types'
+import { envelope } from './envelope'
+import { Subscription, Transport } from './transport/types'
 
 const { Messaging__Transport = 'nats' } = process.env
 let currentTransport: Transport = transport[Messaging__Transport] ?? transport.nats
