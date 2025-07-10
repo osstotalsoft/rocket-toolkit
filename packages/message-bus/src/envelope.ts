@@ -2,7 +2,7 @@
 // This source code is licensed under the MIT license.
 
 import { v4 } from 'uuid'
-import type { EnvelopeType, Headers } from './types'
+import type { EnvelopeType, Headers } from './types.js'
 
 const correlationId = 'nbb-correlationId'
 const source = 'nbb-source'

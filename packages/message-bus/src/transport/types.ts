@@ -1,7 +1,7 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import { SubscriptionOptions, Envelope, SerDes } from '../types'
+import { SubscriptionOptions, Envelope, SerDes } from '../types.js'
 import { EventEmitter } from 'events'
 
 export type SubscriptionHandler = (envelope: Envelope<any>) => Promise<void>

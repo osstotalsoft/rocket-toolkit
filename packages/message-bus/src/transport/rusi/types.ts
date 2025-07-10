@@ -3,8 +3,8 @@
 
 import grpc from '@grpc/grpc-js'
 import EventEmitter from 'events'
-import { Headers } from '../../types'
-import { Subscription } from '../types'
+import { Headers } from '../../types.js'
+import { Subscription } from '../types.js'
 
 export type Options = {
   [index: string]: { value: any }

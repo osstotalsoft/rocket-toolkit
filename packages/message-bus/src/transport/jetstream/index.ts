@@ -4,10 +4,10 @@
 import { default as nats } from "nats";
 import { Mutex } from 'async-mutex'
 // import uuid from 'uuid'
-import { SubscriptionHandler, Transport } from '../types'
-import { EventEmitter } from 'stream'
-import { JetstreamConnection, JetstreamSubscription } from './types'
-import { Envelope, SerDes, SubscriptionOptions } from '../../types'
+import { SubscriptionHandler, Transport } from '../types.js'
+import { EventEmitter } from 'events'
+import { JetstreamConnection, JetstreamSubscription } from './types.js'
+import { Envelope, SerDes, SubscriptionOptions } from '../../types.js'
 
 const {
   JETSTREAM_URL,
