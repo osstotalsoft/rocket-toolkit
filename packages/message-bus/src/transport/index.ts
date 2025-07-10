@@ -3,9 +3,9 @@
 
 import { BuiltInTransports, Transport } from './types'
 
-import { default as nats } from './nats/index'
-import { default as rusi } from './rusi/index'
-import { default as jetstream } from './jetstream/index'
+import { default as nats } from './nats'
+import { default as rusi } from './rusi'
+import { default as jetstream } from './jetstream'
 
 const transport: BuiltInTransports & { [key: string]: Transport } = {
   nats,
