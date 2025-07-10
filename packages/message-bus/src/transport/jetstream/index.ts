@@ -160,14 +160,14 @@ async function getConsumer(
   }
   switch (opts) {
     case SubscriptionOptions.STREAM_PROCESSOR:
-      consumerCfg.durable_name = (JETSTREAM_CLIENT_ID + '_' + subject).replace('.', '_')
+      consumerCfg.durable_name = (JETSTREAM_CLIENT_ID + '_' + subject).replaceAll('.', '_')
       consumerCfg.deliver_policy = DeliverPolicy.All
       consumerCfg.ack_wait = parseInt(JETSTREAM_STREAM_PROCESSOR_AckWaitTime, 10)
       consumerCfg.ack_policy = AckPolicy.Explicit
       break
 
     case SubscriptionOptions.PUB_SUB:
-      consumerCfg.name = (JETSTREAM_CLIENT_ID + subject).replace('.', '_')
+      // ephemeral consumer
       consumerCfg.deliver_policy = DeliverPolicy.New
       consumerCfg.ack_wait = parseInt(JETSTREAM_PUB_SUB_AckWaitTime, 10)
       break
