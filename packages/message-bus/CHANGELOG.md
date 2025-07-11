@@ -1,5 +1,11 @@
 # @totalsoft/message-bus
 
+## 2.8.0
+
+### Minor Changes
+
+- 8621f84: fix jetstream default import
+
 ## 2.7.0
 
 ### Minor Changes
