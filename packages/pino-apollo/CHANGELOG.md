@@ -1,5 +1,11 @@
 # @totalsoft/pino-apollo
 
+## 3.1.0
+
+### Minor Changes
+
+- 70cf713: Apollo operation name identification fix
+
 ## 3.0.1
 
 ### Patch Changes
