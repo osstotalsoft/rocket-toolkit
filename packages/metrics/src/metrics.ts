@@ -9,7 +9,7 @@ const { endpoint, port } = PrometheusExporter.DEFAULT_OPTIONS
 const exporter = new PrometheusExporter({ preventServerStart: true })
 
 const meterProvider = new MeterProvider({
-  readers: [exporter],
+  readers: [exporter as any],
   views: [
     new View({
       instrumentType: InstrumentType.HISTOGRAM,
