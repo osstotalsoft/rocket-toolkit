@@ -5,29 +5,32 @@ import type nats from 'nats'
 
 const natsMock: any = jest.createMockFromModule<jest.Mocked<typeof nats>>('nats')
 
-const natsConsumerMock: any = {
+export const __natsConsumerMock: any = {
   info: jest.fn().mockImplementation(() => ({ config: {} })),
   consume: jest.fn().mockResolvedValue({})
 }
 
-const jetStreamClientMock: any = {
+export const __jetStreamClientMock: any = {
   publish: jest.fn().mockResolvedValue({}),
   jetstreamManager: jest.fn().mockImplementation(() => ({
     consumers: { add: jest.fn().mockResolvedValue({}) },
     streams: { find: jest.fn().mockResolvedValue({}) }
   })),
   consumers: {
-    get: jest.fn().mockResolvedValue(natsConsumerMock)
+    get: jest.fn().mockResolvedValue(__natsConsumerMock)
   }
 }
-natsMock.connect = jest.fn().mockResolvedValue({
+export const connect = jest.fn().mockResolvedValue({
   close: jest.fn().mockResolvedValue(undefined),
   closed: jest.fn().mockReturnValue(new Promise(() => {})),
-  jetstream: jest.fn().mockImplementation(() => jetStreamClientMock)
+  jetstream: jest.fn().mockImplementation(() => __jetStreamClientMock)
 })
 
-natsMock.StringCodec = jest.fn().mockImplementation(() => ({
+export const StringCodec = jest.fn().mockImplementation(() => ({
   encode: jest.fn()
 }))
 
-export default { ...natsMock, __jetStreamClientMock: jetStreamClientMock, __natsConsumerMock: natsConsumerMock }
+export const  DeliverPolicy = natsMock.DeliverPolicy 
+
+export const AckPolicy = natsMock.AckPolicy 
+

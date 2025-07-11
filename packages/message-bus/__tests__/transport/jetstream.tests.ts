@@ -3,7 +3,7 @@
 
 process.env.JETSTREAM_EVENTS_STREAM = 'events'
 
-import nats from '../../__mocks__/nats'
+import {connect, __jetStreamClientMock, __natsConsumerMock} from '../../__mocks__/nats'
 import jetstream from '../../src/transport/jetstream'
 import { serDes, SubscriptionOptions } from '../../src'
 
@@ -22,7 +22,7 @@ describe('Testing Jetstream transport', () => {
     await jetstream.connect()
 
     // assert
-    expect(nats.connect).toHaveBeenCalledTimes(1)
+    expect(connect).toHaveBeenCalledTimes(1)
   })
 
   test('publish a message', async () => {
@@ -34,8 +34,8 @@ describe('Testing Jetstream transport', () => {
     await jetstream.publish(subject, envelope, serDes)
 
     // assert
-    expect(nats.connect).toBeCalled()
-    expect(nats.__jetStreamClientMock.publish).toBeCalled()
+    expect(connect).toBeCalled()
+    expect(__jetStreamClientMock.publish).toBeCalled()
   })
 
   test('subscribe to a channel', async () => {
@@ -47,7 +47,7 @@ describe('Testing Jetstream transport', () => {
     await jetstream.subscribe(subject, handler, SubscriptionOptions.PUB_SUB, serDes)
 
     // assert
-    expect(nats.connect).toBeCalled()
-    expect(nats.__natsConsumerMock.consume).toBeCalled()
+    expect(connect).toBeCalled()
+    expect(__natsConsumerMock.consume).toBeCalled()
   })
 })
