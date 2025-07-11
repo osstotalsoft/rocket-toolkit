@@ -6,7 +6,8 @@ import { Logger } from 'pino'
 
 export interface ApolloContextExtension extends BaseContext {
   requestId?: string,
-  logger?: Logger
+  logger?: Logger,
+  operationName?: string
 }
 
 export interface ApolloLoggingOptions {

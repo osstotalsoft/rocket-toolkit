@@ -3,13 +3,9 @@
 
 import {
   ApolloServerPlugin,
-  GraphQLRequestListenerParsingDidEnd,
   GraphQLRequest,
   GraphQLRequestContext,
   GraphQLRequestContextDidEncounterErrors,
-  GraphQLRequestContextExecutionDidStart,
-  GraphQLRequestContextParsingDidStart,
-  GraphQLRequestContextValidationDidStart,
   GraphQLRequestContextWillSendResponse,
   GraphQLRequestListener
 } from '@apollo/server'
@@ -28,7 +24,7 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
     this.logger = options.logger
   }
 
-  async _enrichError(error: Error, message: string, fullErrorMessage: string) {
+  private _enrichError(error: Error, message: string, fullErrorMessage: string) {
     const correlationId = correlationManager.getCorrelationId() || 'Not available'
 
     let messageWithCorrelationId = `${fullErrorMessage} - Correlation Id: < ${correlationId} >`
@@ -40,18 +36,19 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
     error.message = messageWithCorrelationId
   }
 
-  async _logRequestError(
+  private _logRequestError(
     error: Error,
     messagePrefix: string,
-    { request, operationName }: GraphQLRequestContext<ApolloContextExtension>,
+    { request, operationName, contextValue }: GraphQLRequestContext<ApolloContextExtension>,
     extensions?: GraphQLErrorExtensions,
     logger = this.logger,
     skipEnrichment = false
   ) {
-    const message = `${messagePrefix} < ${getOperationName(request, operationName)} > \r\n`
+    const opName = contextValue.operationName || getOperationName(request, operationName)
+    const message = `${messagePrefix} < ${opName} > \r\n`
     const fullErrorMessage = `${message} ${error?.message} ${error?.stack} ${JSON.stringify(extensions)}`
 
-    if (!shouldSkipLogging(getOperationName(request, operationName))) logger.error(error, message)
+    if (!shouldSkipLogging(opName)) logger.error(error, message)
 
     if (skipEnrichment) {
       if (this.securedMessages) error.stack = undefined
@@ -60,7 +57,7 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
     this._enrichError(error, message, fullErrorMessage)
   }
 
-  async _logError(error: Error, messagePrefix: string, logger = this.logger) {
+  private _logError(error: Error, messagePrefix: string, logger = this.logger) {
     const message = `${messagePrefix} \r\n`
     const fullErrorMessage = `${message} ${error?.message} ${error?.stack}}`
 
@@ -75,55 +72,53 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
     operationName
   }: GraphQLRequestContext<ApolloContextExtension>): Promise<GraphQLRequestListener<ApolloContextExtension>> {
     const logger = this.logger.child({
-      requestId: contextValue.requestId ?? v4(),
-      operationName: getOperationName(request, getOperationName(request, operationName))
+      requestId: contextValue.requestId ?? v4()
     })
 
     contextValue.logger = logger
-    if (!shouldSkipLogging(getOperationName(request, operationName)))
-      logger.info(`[REQUEST_STARTED] Request for operation name <${getOperationName(request, operationName)}> started!`)
+    contextValue.operationName = getOperationName(request, operationName)
+
+    if (!shouldSkipLogging(contextValue.operationName))
+      logger.info(`[REQUEST_STARTED] Request for operation name <${contextValue.operationName}> started!`)
 
     return {
-      async parsingDidStart({
-        request,
-        operationName
-      }: GraphQLRequestContextParsingDidStart<ApolloContextExtension>): Promise<GraphQLRequestListenerParsingDidEnd> {
-        logger.debug(`[GraphQL_Parsing] The parsing of operation <${getOperationName(request, operationName)}> started!`)
-        return async (err: Error | undefined) => {
-          if (err) {
-            logger.error(`[GraphQL_Parsing][Error] ${err}`)
+      async didResolveOperation({ document, contextValue }) {
+        // Update operation name from parsed document if available
+        if (document?.definitions?.[0]?.kind === 'OperationDefinition') {
+          const resolvedName = document.definitions[0].name?.value
+          if (resolvedName) {
+            contextValue.operationName = resolvedName
           }
         }
+        logger.debug(`[GraphQL_Validation] Validation successful for operation <${contextValue.operationName}>!`)
       },
-      async validationDidStart({
-        request,
-        operationName
-      }: GraphQLRequestContextValidationDidStart<ApolloContextExtension>): Promise<void> {
-        if (!shouldSkipLogging(getOperationName(request, operationName)))
-          logger.debug(
-            `[GraphQL_Validation] The validation of operation <${getOperationName(request, operationName)}> started!`
-          )
-      },
-      async executionDidStart({ request, operationName }: GraphQLRequestContextExecutionDidStart<ApolloContextExtension>) {
-        if (!shouldSkipLogging(getOperationName(request, operationName)))
-          logger.debug(
-            `[GraphQL_Execution] The execution of operation <${getOperationName(request, operationName)}> started!`
-          )
+      async executionDidStart({ contextValue }) {
+        if (!shouldSkipLogging(contextValue.operationName))
+          logger.debug(`[GraphQL_Execution] Execution for operation <${contextValue.operationName}> started!`)
       },
       didEncounterErrors: async (requestContext: GraphQLRequestContextDidEncounterErrors<ApolloContextExtension>) => {
         for (const error of requestContext.errors) {
           const shouldSkipEnrichment = error?.extensions?.code === 'BUSINESS_ERROR'
           const message =
             '[GraphQL_Execution][Error] The server encounters errors while parsing, validating, or executing the operation'
-          this._logRequestError(error, message, requestContext, error?.extensions, logger, shouldSkipEnrichment)
+          this._logRequestError(
+            error,
+            message,
+            requestContext,
+            error?.extensions,
+            logger,
+            shouldSkipEnrichment
+          )
         }
       },
-      willSendResponse: async ({ operationName }: GraphQLRequestContextWillSendResponse<ApolloContextExtension>) => {
-        logger.debug(
-          `[GraphQL_Response] A response for the operation <${getOperationName(request, operationName)}> was sent!`
-        )
+      willSendResponse: async ({ contextValue }: GraphQLRequestContextWillSendResponse<ApolloContextExtension>) => {
+        logger.debug(`[GraphQL_Response] A response for the operation <${contextValue.operationName}> was sent!`)
       }
     }
+  }
+
+  private _logServerError(error: Error, message: string) {
+    this._logError(error, message)
   }
 
   async unexpectedErrorProcessingRequest?({
@@ -139,24 +134,36 @@ export class ApolloLoggerPlugin implements ApolloServerPlugin<ApolloContextExten
   }
 
   async contextCreationDidFail?({ error }: { error: Error }): Promise<void> {
-    const message = '[GraphQL_CreateContext][Error] The server encountered errors while creating context \r\n'
-    this._logError(error, message)
+    this._logServerError(error, '[GraphQL_CreateContext][Error] The server encountered errors while creating context \r\n')
   }
 
   async invalidRequestWasReceived?({ error }: { error: Error }): Promise<void> {
-    const message = '[GraphQL_InvalidRequest][Error] The server encountered a malformed request \r\n'
-    this._logError(error, message)
+    this._logServerError(error, '[GraphQL_InvalidRequest][Error] The server encountered a malformed request \r\n')
   }
 
   async startupDidFail?({ error }: { error: Error }): Promise<void> {
-    const message = '[GraphQL_Startup][Error] The server encountered errors during startup \r\n'
-    this._logError(error, message)
+    this._logServerError(error, '[GraphQL_Startup][Error] The server encountered errors during startup \r\n')
   }
 }
+
 function shouldSkipLogging(operationName?: string | null) {
   return operationName === 'IntrospectionQuery'
 }
 
-function getOperationName(request: GraphQLRequest, operationName?: string | null) {
-  return request?.operationName ?? operationName ?? 'unidentifiedOperation'
+function getOperationName(request: GraphQLRequest, operationName?: string | null): string {
+  // Return the most direct operation name sources first
+  if (operationName) return operationName
+  if (request?.operationName) return request.operationName
+
+  // Try to extract from query string for anonymous operations
+  const query = request?.query
+  if (typeof query === 'string') {
+    const namedMatch = query.match(/(mutation|query|subscription)\s+([a-zA-Z0-9_]+)/)
+    if (namedMatch?.[2]) return namedMatch[2]
+    
+    const fieldMatch = query.match(/\{\s*([a-zA-Z0-9_]+)/)
+    if (fieldMatch?.[1]) return fieldMatch[1]
+  }
+
+  return 'unidentifiedOperation'
 }

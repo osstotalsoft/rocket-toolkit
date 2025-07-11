@@ -40,7 +40,7 @@ describe('logging plugin tests:', () => {
     expect(contextValue?.logger?.info).toBeCalledTimes(0)
   })
 
-  it('log parse started', async () => {
+  it('log validation successful', async () => {
     //arrange
     const contextValue: ApolloContextExtension = { requestId: 'requestId' }
     const request = { operationName: 'MyOperation' }
@@ -49,22 +49,7 @@ describe('logging plugin tests:', () => {
 
     //act
     const obj = await plugin.requestDidStart(<any>{ contextValue, request })
-    await obj.parsingDidStart?.(<any>{})
-
-    //assert
-    expect(contextValue?.logger?.debug).toBeCalledWith(expect.stringContaining('[GraphQL_Parsing]'))
-  })
-
-  it('log validation started', async () => {
-    //arrange
-    const contextValue: ApolloContextExtension = { requestId: 'requestId' }
-    const request = { operationName: 'MyOperation' }
-    const logger = getFakeLogger()
-    const plugin = new ApolloLoggerPlugin({ logger })
-
-    //act
-    const obj = await plugin.requestDidStart(<any>{ contextValue, request })
-    await obj.validationDidStart?.(<any>{})
+    await obj.didResolveOperation?.(<any>{ contextValue, document: {} })
 
     //assert
     expect(contextValue?.logger?.debug).toBeCalledWith(expect.stringContaining('[GraphQL_Validation]'))
@@ -79,10 +64,24 @@ describe('logging plugin tests:', () => {
 
     //act
     const obj = await plugin.requestDidStart(<any>{ contextValue, request })
-    await obj.executionDidStart?.(<any>{})
+    await obj.executionDidStart?.(<any>{ contextValue })
 
     //assert
     expect(contextValue?.logger?.debug).toBeCalledWith(expect.stringContaining('[GraphQL_Execution]'))
+  })
+
+  it('log operation name resolution', async () => {
+    //arrange
+    const contextValue: ApolloContextExtension = { requestId: 'requestId' }
+    const request = { operationName: 'MyOperation' }
+    const logger = getFakeLogger()
+    const plugin = new ApolloLoggerPlugin({ logger })
+
+    //act
+    await plugin.requestDidStart(<any>{ contextValue, request })
+
+    //assert
+    expect(contextValue.operationName).toBe('MyOperation')
   })
 
   it('log errors secured', async () => {
@@ -95,7 +94,7 @@ describe('logging plugin tests:', () => {
 
     //act
     const obj = await plugin.requestDidStart(<any>{ contextValue, request })
-    await obj.didEncounterErrors?.(<any>{ request, errors })
+    await obj.didEncounterErrors?.(<any>{ request, errors, contextValue })
 
     //assert
     expect(contextValue?.logger?.error).toBeCalledWith(errors[0], expect.stringContaining('[GraphQL_Execution][Error]'))
@@ -113,7 +112,7 @@ describe('logging plugin tests:', () => {
     const plugin = new ApolloLoggerPlugin({ logger, securedMessages: false })
     //act
     const obj = await plugin.requestDidStart(<any>{ contextValue, request })
-    await obj.didEncounterErrors?.(<any>{ request, errors })
+    await obj.didEncounterErrors?.(<any>{ request, errors, contextValue })
 
     //assert
     expect(contextValue?.logger?.error).toBeCalledWith(errors[0], expect.stringContaining('[GraphQL_Execution][Error]'))
@@ -128,7 +127,7 @@ describe('logging plugin tests:', () => {
 
     //act
     const obj = await plugin.requestDidStart(<any>{ contextValue, request: {}, operationName: 'MyOperation' })
-    await obj.willSendResponse?.(<any>{})
+    await obj.willSendResponse?.(<any>{ contextValue })
 
     //assert
     expect(contextValue?.logger?.debug).toBeCalledWith(expect.stringContaining('[GraphQL_Response]'))
