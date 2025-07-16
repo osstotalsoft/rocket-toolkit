@@ -1,13 +1,16 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import { connect as natsConnect, NatsConnection, JetStreamClient, Consumer,
-  ConsumerConfig, ConsumerMessages, 
-  AckPolicy, DeliverPolicy, StringCodec } from 'nats'
+import { connect as natsConnect } from "@nats-io/transport-node"
+import { NatsConnection } from "@nats-io/nats-core"
+import {
+  AckPolicy, Consumer, ConsumerConfig, ConsumerMessages, DeliverPolicy,
+  jetstream, JetStreamClient
+} from "@nats-io/jetstream";
 import { Mutex } from 'async-mutex'
 // import uuid from 'uuid'
 import { SubscriptionHandler, Transport } from '../types'
-import { EventEmitter } from 'stream'
+import EventEmitter from 'events'
 import { JetstreamConnection, JetstreamSubscription } from './types'
 import { Envelope, SerDes, SubscriptionOptions } from '../../types'
 
@@ -27,29 +30,24 @@ const natsConnectionMutex = new Mutex()
 let natsConnection: NatsConnection | null = null
 
 async function _connect() {
-  if (natsConnection) {
+  if (natsConnection && !natsConnection.isClosed()) {
     return natsConnection
   }
 
   const release = await natsConnectionMutex.acquire()
 
   try {
-    if (natsConnection) {
+    if (natsConnection && !natsConnection.isClosed()) {
       return natsConnection
     }
 
-    try {
-      natsConnection = await natsConnect({ servers: JETSTREAM_URL })
-      natsConnection
-        .closed()
-        .then(err =>
-          err ? console.error(`🛰️  Jetstream connection closed. ${err}`) : console.info('🛰️  Jetstream connection closed.')
-        )
-    } catch (err: any) {
-      console.error(`Jetstream connection error: ${err}`)
-      throw err
-    }
-    return natsConnection
+    const nc: NatsConnection = await natsConnect({ servers: JETSTREAM_URL })
+    nc.closed()
+      .then(err =>
+        err ? console.error(`🛰️  Jetstream connection closed. ${err}`) : console.info('🛰️  Jetstream connection closed.'))
+
+    natsConnection = nc
+    return nc
 
     // cn.on('error', err => console.error(`Nats connection error: ${err}`))
     // cn.on('permission_error', err => console.error(`Nats connection permission error: ${err}`))
@@ -86,10 +84,9 @@ async function disconnect() {
 
 async function publish(subject: string, envelope: Envelope<any>, serDes: SerDes) {
   const nc = await _connect()
-  const jsClient = nc.jetstream()
+  const jsClient = jetstream(nc)
   const msg = serDes.serialize(envelope)
-  const sc = StringCodec()
-  const result = await jsClient.publish(subject, sc.encode(msg))
+  const result = await jsClient.publish(subject, msg)
   return result
 }
 
@@ -100,16 +97,15 @@ async function subscribe(
   serDes: SerDes
 ): Promise<JetstreamSubscription> {
   const nc = await _connect()
-  const jsClient = nc.jetstream()
+  const jsClient = jetstream(nc)
   const stream = await getStream(jsClient, subject)
   const consumer = await getConsumer(jsClient, subject, stream, opts)
   const ci = await consumer.info(true)
   const manualAck = ci.config.ack_policy == AckPolicy.Explicit || ci.config.ack_policy == AckPolicy.All
-  const sc = StringCodec()
 
   const messages = await consumer.consume({
     callback: m => {
-      const envelope = serDes.deSerialize(sc.decode(m.data))
+      const envelope = serDes.deSerialize(m.string())
       const r = handler(envelope)
       if (manualAck) {
         r.then(() => m.ack())

@@ -3,7 +3,8 @@
 
 process.env.JETSTREAM_EVENTS_STREAM = 'events'
 
-import {connect, __jetStreamClientMock, __natsConsumerMock} from '../../__mocks__/nats'
+import { connect } from '../../__mocks__/@nats-io/transport-node'
+import { __jetStreamClientMock, __natsConsumerMock } from '../../__mocks__/@nats-io/jetstream'
 import jetstream from '../../src/transport/jetstream'
 import { serDes, SubscriptionOptions } from '../../src'
 

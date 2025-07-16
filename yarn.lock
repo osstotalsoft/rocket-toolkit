@@ -1845,6 +1845,52 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nats-io/jetstream@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "@nats-io/jetstream@npm:3.1.0"
+  dependencies:
+    "@nats-io/nats-core": "npm:3.1.0"
+  checksum: 10c0/a435f08504ca37389eb01d554182f3ae2c38eb6d9821e07f28aa9296122d79515dd92397aed8eb7a84178f6ae4683ed0ef8c0cf8ba65e4dc8ac7af0755a86134
+  languageName: node
+  linkType: hard
+
+"@nats-io/nats-core@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@nats-io/nats-core@npm:3.1.0"
+  dependencies:
+    "@nats-io/nkeys": "npm:2.0.3"
+    "@nats-io/nuid": "npm:2.0.3"
+  checksum: 10c0/c52e3c52858aa869e22d7acb7c6e58570df022412099cc60e2549a524c3af5c9f09d7bcf17e4e01be36956752ff7061fc9249620791faf78b31f78171004daba
+  languageName: node
+  linkType: hard
+
+"@nats-io/nkeys@npm:2.0.3":
+  version: 2.0.3
+  resolution: "@nats-io/nkeys@npm:2.0.3"
+  dependencies:
+    tweetnacl: "npm:^1.0.3"
+  checksum: 10c0/51b80313573d3378f6af57eaad2af34d2974425951fabd42abc0a1e10c5d04ce06ed26bef8c8bf6eb7803eb233d8b0c6b44ccefb1d26168ef249545879c93426
+  languageName: node
+  linkType: hard
+
+"@nats-io/nuid@npm:2.0.3":
+  version: 2.0.3
+  resolution: "@nats-io/nuid@npm:2.0.3"
+  checksum: 10c0/9868aa38c6fefcc476f69c72b7689890ebb08742ad1c0eea39f5d46237434eb038f9a259d382a0ee219a08c126432bfb7a4ab4efd500d3afd51df9dfca49a97f
+  languageName: node
+  linkType: hard
+
+"@nats-io/transport-node@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "@nats-io/transport-node@npm:3.1.0"
+  dependencies:
+    "@nats-io/nats-core": "npm:3.1.0"
+    "@nats-io/nkeys": "npm:2.0.3"
+    "@nats-io/nuid": "npm:2.0.3"
+  checksum: 10c0/743474cd9c6943cccff419f902ab38f6b55327f45b861803fd0071b303867e6f9292d65d2396752929f88f0aa287a7336a404cb46cb12e62fcd20491bf3ebb65
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -2265,6 +2311,8 @@ __metadata:
     "@grpc/grpc-js": "npm:^1.4.1"
     "@grpc/proto-loader": "npm:^0.6.5"
     "@jest/types": "npm:^28.1.0"
+    "@nats-io/jetstream": "npm:^3.1.0"
+    "@nats-io/transport-node": "npm:^3.1.0"
     "@types/bluebird": "npm:^3.5.37"
     "@types/copyfiles": "npm:^2"
     "@types/humps": "npm:^2.0.2"

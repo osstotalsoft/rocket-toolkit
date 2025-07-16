@@ -1,10 +1,6 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import type nats from 'nats'
-
-const natsMock: any = jest.createMockFromModule<jest.Mocked<typeof nats>>('nats')
-
 export const __natsConsumerMock: any = {
   info: jest.fn().mockImplementation(() => ({ config: {} })),
   consume: jest.fn().mockResolvedValue({})
@@ -20,17 +16,17 @@ export const __jetStreamClientMock: any = {
     get: jest.fn().mockResolvedValue(__natsConsumerMock)
   }
 }
-export const connect = jest.fn().mockResolvedValue({
-  close: jest.fn().mockResolvedValue(undefined),
-  closed: jest.fn().mockReturnValue(new Promise(() => {})),
-  jetstream: jest.fn().mockImplementation(() => __jetStreamClientMock)
-})
 
-export const StringCodec = jest.fn().mockImplementation(() => ({
-  encode: jest.fn()
-}))
+export const jetstream = jest.fn().mockImplementation(() => __jetStreamClientMock)
 
-export const  DeliverPolicy = natsMock.DeliverPolicy 
+export const AckPolicy = {
+  None: 'none',
+  All: 'all',
+  Explicit: 'explicit'
+} as const
 
-export const AckPolicy = natsMock.AckPolicy 
-
+export const DeliverPolicy = {
+  All: 'all',
+  Last: 'last',
+  New: 'new'
+} as const
