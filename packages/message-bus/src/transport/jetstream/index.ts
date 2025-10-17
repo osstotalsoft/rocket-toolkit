@@ -1,9 +1,11 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import { connect as natsConnect, NatsConnection, JetStreamClient, Consumer,
-  ConsumerConfig, ConsumerMessages, 
-  AckPolicy, DeliverPolicy, StringCodec } from 'nats'
+import {
+  connect as natsConnect, NatsConnection, JetStreamClient, Consumer,
+  ConsumerConfig, ConsumerMessages,
+  AckPolicy, DeliverPolicy, StringCodec
+} from 'nats'
 import { Mutex } from 'async-mutex'
 // import uuid from 'uuid'
 import { SubscriptionHandler, Transport } from '../types'
@@ -160,7 +162,7 @@ async function getConsumer(
   }
   switch (opts) {
     case SubscriptionOptions.STREAM_PROCESSOR:
-      consumerCfg.durable_name = (JETSTREAM_CLIENT_ID + '_' + subject).replaceAll('.', '_')
+      consumerCfg.durable_name = (JETSTREAM_CLIENT_ID + '__' + subject).replaceAll('.', '_')
       consumerCfg.deliver_policy = DeliverPolicy.All
       consumerCfg.ack_wait = parseInt(JETSTREAM_STREAM_PROCESSOR_AckWaitTime, 10)
       consumerCfg.ack_policy = AckPolicy.Explicit
