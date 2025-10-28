@@ -22,7 +22,8 @@ export const __jetStreamClientMock: any = {
 }
 export const connect = jest.fn().mockResolvedValue({
   close: jest.fn().mockResolvedValue(undefined),
-  closed: jest.fn().mockReturnValue(new Promise(() => {})),
+  isClosed: jest.fn().mockResolvedValue(false),
+  closed: jest.fn().mockReturnValue(new Promise(() => { })),
   jetstream: jest.fn().mockImplementation(() => __jetStreamClientMock)
 })
 
@@ -30,7 +31,7 @@ export const StringCodec = jest.fn().mockImplementation(() => ({
   encode: jest.fn()
 }))
 
-export const  DeliverPolicy = natsMock.DeliverPolicy 
+export const DeliverPolicy = natsMock.DeliverPolicy
 
-export const AckPolicy = natsMock.AckPolicy 
+export const AckPolicy = natsMock.AckPolicy
 
