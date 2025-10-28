@@ -12,6 +12,7 @@ import { SubscriptionHandler, Transport } from '../types'
 import { EventEmitter } from 'events'
 import { JetstreamConnection, JetstreamSubscription } from './types'
 import { Envelope, SerDes, SubscriptionOptions } from '../../types'
+import { Semaphore } from 'async-mutex'
 
 const {
   JETSTREAM_URL,
@@ -109,15 +110,27 @@ async function subscribe(
   const manualAck = ci.config.ack_policy == AckPolicy.Explicit || ci.config.ack_policy == AckPolicy.All
   const sc = StringCodec()
 
-  const messagesIterator = await consumer.consume({ max_messages: getMaxMessages(opts) });
+  const maxConcurrent = getMaxMessages(opts)
+  const messagesIterator = await consumer.consume({ max_messages: maxConcurrent })
+  const semaphore = new Semaphore(maxConcurrent);
 
   (async () => {
     for await (const m of messagesIterator) {
-      const envelope = serDes.deSerialize(sc.decode(m.data))
-      await handler(envelope)
-      if (manualAck) {
-        m.ack()
-      }
+      // Acquire a slot (waits if at max concurrency)
+      const [_, release] = await semaphore.acquire();
+
+      (async () => {
+        try {
+          const envelope = serDes.deSerialize(sc.decode(m.data))
+          await handler(envelope)
+          if (manualAck) {
+            m.ack()
+          }
+        }
+        finally {
+          release() // Release the slot
+        }
+      })()
     }
   })()
 
