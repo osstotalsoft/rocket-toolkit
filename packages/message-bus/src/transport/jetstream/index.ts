@@ -9,19 +9,20 @@ import {
 import { Mutex } from 'async-mutex'
 // import uuid from 'uuid'
 import { SubscriptionHandler, Transport } from '../types'
-import { EventEmitter } from 'stream'
+import { EventEmitter } from 'events'
 import { JetstreamConnection, JetstreamSubscription } from './types'
 import { Envelope, SerDes, SubscriptionOptions } from '../../types'
+import { Semaphore } from 'async-mutex'
 
 const {
   JETSTREAM_URL,
   JETSTREAM_CLIENT_ID,
   JETSTREAM_STREAM_PROCESSOR_MaxConcurrentMessages = '1',
-  JETSTREAM_STREAM_PROCESSOR_AckWaitTime = '5000000000', // 5 seconds
+  JETSTREAM_STREAM_PROCESSOR_AckWaitTime = '30000000000', // 30 seconds
   JETSTREAM_PUB_SUB_MaxConcurrentMessages = '100',
-  JETSTREAM_PUB_SUB_AckWaitTime = '5000000000', // 5 seconds
+  JETSTREAM_PUB_SUB_AckWaitTime = '30000000000', // 30 seconds
   JETSTREAM_RPC_MaxConcurrentMessages = '1',
-  JETSTREAM_RPC_AckWaitTime = '5000000000' // 5 seconds
+  JETSTREAM_RPC_AckWaitTime = '30000000000' // 30 seconds
 } = process.env
 
 //const clientID = `${JETSTREAM_CLIENT_ID}-${uuid.v4()}`
@@ -29,14 +30,14 @@ const natsConnectionMutex = new Mutex()
 let natsConnection: NatsConnection | null = null
 
 async function _connect() {
-  if (natsConnection) {
+  if (natsConnection && !natsConnection.isClosed()) {
     return natsConnection
   }
 
   const release = await natsConnectionMutex.acquire()
 
   try {
-    if (natsConnection) {
+    if (natsConnection && !natsConnection.isClosed()) {
       return natsConnection
     }
 
@@ -109,18 +110,31 @@ async function subscribe(
   const manualAck = ci.config.ack_policy == AckPolicy.Explicit || ci.config.ack_policy == AckPolicy.All
   const sc = StringCodec()
 
-  const messages = await consumer.consume({
-    callback: m => {
-      const envelope = serDes.deSerialize(sc.decode(m.data))
-      const r = handler(envelope)
-      if (manualAck) {
-        r.then(() => m.ack())
-      }
-    },
-    max_messages: getMaxMessages(opts)
-  })
+  const maxConcurrent = getMaxMessages(opts)
+  const messagesIterator = await consumer.consume({ max_messages: maxConcurrent })
+  const semaphore = new Semaphore(maxConcurrent);
 
-  return jetstreamSubscription(messages)
+  (async () => {
+    for await (const m of messagesIterator) {
+      // Acquire a slot (waits if at max concurrency)
+      const [_, release] = await semaphore.acquire();
+
+      (async () => {
+        try {
+          const envelope = serDes.deSerialize(sc.decode(m.data))
+          await handler(envelope)
+          if (manualAck) {
+            m.ack()
+          }
+        }
+        finally {
+          release() // Release the slot
+        }
+      })()
+    }
+  })()
+
+  return jetstreamSubscription(messagesIterator)
 }
 
 async function getStream(jsClient: JetStreamClient, subject: string): Promise<string> {
