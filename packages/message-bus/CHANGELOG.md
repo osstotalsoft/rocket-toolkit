@@ -1,5 +1,12 @@
 # @totalsoft/message-bus
 
+## 2.9.0
+
+### Minor Changes
+
+- e487c54: fix: update ack wait times to 30 seconds and refactor subscription handling
+- c9f6893: fix spacing between client id and topic name
+
 ## 2.8.0
 
 ### Minor Changes
