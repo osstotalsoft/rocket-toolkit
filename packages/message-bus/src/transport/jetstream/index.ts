@@ -178,6 +178,7 @@ async function getConsumer(
     case SubscriptionOptions.STREAM_PROCESSOR:
       consumerCfg.durable_name = (JETSTREAM_CLIENT_ID + '__' + subject).replaceAll('.', '_')
       consumerCfg.deliver_policy = DeliverPolicy.All
+      consumerCfg.inactive_threshold = 3_600_000_000_000 // 1 hour in nanoseconds
       consumerCfg.ack_wait = parseInt(JETSTREAM_STREAM_PROCESSOR_AckWaitTime, 10)
       consumerCfg.ack_policy = AckPolicy.Explicit
       break
