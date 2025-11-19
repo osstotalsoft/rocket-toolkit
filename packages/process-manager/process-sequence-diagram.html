@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process Event Sequence Diagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: rgba(15, 15, 30, 0.95);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            text-align: center;
+            color: #64ffda;
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 30px rgba(100, 255, 218, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+            }
+
+            to {
+                text-shadow: 0 0 40px rgba(100, 255, 218, 0.6);
+            }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #8892b0;
+            font-size: 1.4em;
+            margin-bottom: 50px;
+        }
+
+        .section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border-left: 5px solid #64ffda;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            color: #64ffda;
+            font-size: 2.2em;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #64ffda;
+            padding-bottom: 10px;
+        }
+
+        h2::before {
+            content: "▸";
+            margin-right: 15px;
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+
+        .sequence-diagram {
+            background: linear-gradient(135deg, #1e1e3f 0%, #2a2a4a 100%);
+            border: 3px solid #64ffda;
+            border-radius: 12px;
+            padding: 40px;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .actors {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .actor {
+            text-align: center;
+            position: relative;
+            flex: 1;
+        }
+
+        .actor-box {
+            background: linear-gradient(135deg, #2d1e3f 0%, #3d2e4f 100%);
+            border: 3px solid #64ffda;
+            border-radius: 10px;
+            padding: 15px 25px;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #64ffda;
+            display: inline-block;
+            box-shadow: 0 6px 20px rgba(100, 255, 218, 0.3);
+        }
+
+        .actor-line {
+            width: 3px;
+            background: linear-gradient(180deg, #64ffda 0%, rgba(100, 255, 218, 0.3) 100%);
+            margin: 20px auto 0;
+            min-height: 100px;
+            position: relative;
+        }
+
+        .timeline {
+            position: relative;
+            margin-top: 20px;
+        }
+
+        .sequence-step {
+            position: relative;
+            margin: 40px 0;
+            min-height: 80px;
+        }
+
+        .message {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .message-line {
+            flex: 1;
+            height: 3px;
+            background: linear-gradient(90deg, #ff79c6 0%, #bd93f9 100%);
+            position: relative;
+            box-shadow: 0 0 10px rgba(255, 121, 198, 0.5);
+        }
+
+        .message-line::after {
+            content: '▶';
+            position: absolute;
+            right: -10px;
+            top: -10px;
+            color: #bd93f9;
+            font-size: 1.5em;
+        }
+
+        .message-label {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff79c6 0%, #bd93f9 100%);
+            color: #0a0a15;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(255, 121, 198, 0.4);
+            font-size: 0.95em;
+        }
+
+        .activation-box {
+            background: linear-gradient(135deg, #3d2e4f 0%, #4d3e5f 100%);
+            border: 2px solid #bd93f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .activation-label {
+            color: #bd93f9;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .activation-content {
+            color: #e0e0e0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            line-height: 1.8;
+        }
+
+        .highlight-map {
+            background: linear-gradient(135deg, #1e3d3d 0%, #2e4d4d 100%);
+            border-left: 5px solid #50fa7b;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .highlight-bind {
+            background: linear-gradient(135deg, #3d2e1e 0%, #4d3e2e 100%);
+            border-left: 5px solid #ffd700;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .highlight-apply {
+            background: linear-gradient(135deg, #1e2d3d 0%, #2e3d4d 100%);
+            border-left: 5px solid #8be9fd;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .code-link {
+            color: #64ffda;
+            text-decoration: none;
+            border-bottom: 2px dotted #64ffda;
+            padding: 2px 5px;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .code-link:hover {
+            background: rgba(100, 255, 218, 0.2);
+            border-bottom-style: solid;
+            text-shadow: 0 0 10px rgba(100, 255, 218, 0.8);
+        }
+
+        .state-change {
+            background: rgba(80, 250, 123, 0.1);
+            border: 2px solid #50fa7b;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .state-label {
+            color: #50fa7b;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .state-value {
+            color: #f1fa8c;
+            margin-left: 10px;
+        }
+
+        .note {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 4px solid #ffd700;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #ffd700;
+            font-size: 0.95em;
+        }
+
+        .key-insight {
+            background: linear-gradient(135deg, #2d1b3d 0%, #3d2b5d 100%);
+            border: 3px solid #bd93f9;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            box-shadow: 0 8px 25px rgba(189, 147, 249, 0.3);
+        }
+
+        .key-insight h3 {
+            color: #bd93f9;
+            margin-bottom: 15px;
+        }
+
+        .code-block {
+            background: #0a0a15;
+            border: 2px solid #2d2d44;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .keyword {
+            color: #ff79c6;
+            font-weight: bold;
+        }
+
+        .function {
+            color: #50fa7b;
+        }
+
+        .type {
+            color: #8be9fd;
+            font-weight: bold;
+        }
+
+        .string {
+            color: #f1fa8c;
+        }
+
+        .comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        .number {
+            color: #bd93f9;
+        }
+
+        .property {
+            color: #ffd700;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            border: 2px solid;
+        }
+
+        .time-marker {
+            background: rgba(100, 255, 218, 0.1);
+            border: 2px solid #64ffda;
+            border-radius: 8px;
+            padding: 10px 20px;
+            margin: 30px 0 20px 0;
+            text-align: center;
+            font-weight: bold;
+            color: #64ffda;
+            font-size: 1.2em;
+        }
+
+        .parallel-branches {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .branch {
+            flex: 1;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2a2a3e 100%);
+            border: 2px solid #bd93f9;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .branch-title {
+            color: #bd93f9;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #bd93f9;
+            padding-bottom: 10px;
+        }
+
+        .return-message {
+            border-style: dashed !important;
+            background: linear-gradient(90deg, #50fa7b 0%, #8be9fd 100%) !important;
+        }
+
+        .return-message::after {
+            content: '◀' !important;
+            left: -10px !important;
+            right: auto !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📊 Process Event Sequence Diagrams</h1>
+        <div class="subtitle">Step-by-step event processing through map, bind, and apply</div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color"
+                    style="background: linear-gradient(135deg, #1e3d3d 0%, #2e4d4d 100%); border-color: #50fa7b;"></div>
+                <span>map - Transform Results</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color"
+                    style="background: linear-gradient(135deg, #3d2e1e 0%, #4d3e2e 100%); border-color: #ffd700;"></div>
+                <span>bind - Sequential Composition</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color"
+                    style="background: linear-gradient(135deg, #1e2d3d 0%, #2e3d4d 100%); border-color: #8be9fd;"></div>
+                <span>apply - Parallel Composition</span>
+            </div>
+        </div>
+
+        <!-- Sequence 1: map -->
+        <div class="section">
+            <h2>Sequence 1: ProcessState.map</h2>
+
+            <div class="code-block"><span class="keyword">const</span> proc = <span class="type">Process</span>.<span
+                    class="function">map</span>(
+                n => n * <span class="number">2</span>,
+                <span class="type">Process</span>.<span class="function">waitForEvent</span>(e => e.type === <span
+                    class="string">"Event1"</span> ? <span class="type">Result</span>.<span
+                    class="function">Ok</span>(e.value) : <span class="keyword">null</span>)
+                );
+            </div>
+
+            <div class="sequence-diagram">
+                <div class="actors">
+                    <div class="actor">
+                        <div class="actor-box">Runtime</div>
+                    </div>
+                    <div class="actor">
+                        <div class="actor-box">Process.map</div>
+                    </div>
+                    <div class="actor">
+                        <div class="actor-box">ProcessState.map</div>
+                    </div>
+                    <div class="actor">
+                        <div class="actor-box">waitForEvent</div>
+                    </div>
+                </div>
+
+                <div class="timeline">
+                    <div class="time-marker">⏰ T0: Initialization</div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">Runtime → Process.map</div>
+                        <div class="activation-content">
+                            Execute: map(n => n*2, waitForEvent(...))<br />
+                            <a class="code-link"
+                                href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:247">Line
+                                247-254</a>
+                        </div>
+                    </div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">Process.map → waitForEvent</div>
+                        <div class="activation-content">
+                            Execute inner process<br />
+                            Returns: [Effect.unit(), ProcessState.InProgress(...)]
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-map">
+                        <div class="activation-label">🟢 Process.map → ProcessState.map</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:252">Line
+                                    252</a>: ProcessState.map(f, state)</strong><br />
+                            Wraps InProgress state with transformation<br />
+                            f = n => n * 2
+                        </div>
+                    </div>
+
+                    <div class="state-change">
+                        <span class="state-label">State:</span>
+                        <span class="state-value">InProgress (waiting for events)</span>
+                    </div>
+
+                    <div class="time-marker">⏰ T1: Event Arrives → Event1(21)</div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">Runtime → ProcessState.map</div>
+                        <div class="activation-content">
+                            Calls wrapped next(event) handler<br />
+                            <a class="code-link"
+                                href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:50">Line
+                                50</a>: InProgress case
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-map">
+                        <div class="activation-label">🟢 ProcessState.map → Inner Handler</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:51">Line
+                                    51</a>: const next = state.next(event)</strong><br />
+                            Calls original waitForEvent handler<br />
+                            Returns: Succeeded(21)
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-map">
+                        <div class="activation-label">🟢 ProcessState.map (Recursive)</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:55">Line
+                                    55</a>: return [eff, map(f, nextState)]</strong><br />
+                            <strong>KEY RECURSION!</strong><br />
+                            map(f, Succeeded(21))
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-map">
+                        <div class="activation-label">🟢 ProcessState.map → Succeeded Case</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:46">Line
+                                    46</a>: ProcessState.pure(state, f(state.value))</strong><br />
+                            f(21) = 21 * 2 = 42<br />
+                            Returns: Succeeded(42)
+                        </div>
+                    </div>
+
+                    <div class="state-change">
+                        <span class="state-label">Final State:</span>
+                        <span class="state-value">Succeeded(value: 42) ✨</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="key-insight">
+                <h3>🎯 Key Insight: map Recursion</h3>
+                <p>The <code>map</code> function wraps the event handler at <a class="code-link"
+                        href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:50">line 50</a>. When
+                    an event arrives:</p>
+                <ol style="margin-left: 30px; margin-top: 10px;">
+                    <li><strong>Line 51:</strong> Calls inner handler → gets nextState</li>
+                    <li><strong>Line 55:</strong> Recursively applies <code>map(f, nextState)</code></li>
+                    <li><strong>Line 46:</strong> When Succeeded, transforms value with <code>f</code></li>
+                </ol>
+                <p style="margin-top: 15px;">This recursion ensures the transformation applies no matter how many events
+                    the process waits for!</p>
+            </div>
+        </div>
+
+        <!-- Sequence 2: bind -->
+        <div class="section">
+            <h2>Sequence 2: Process.bind (Sequential Composition)</h2>
+
+            <div class="code-block"><span class="keyword">const</span> proc = <span class="type">Process</span>.<span
+                    class="function">bind</span>(
+                <span class="type">Process</span>.<span class="function">waitForEvent</span>(e => e.type === <span
+                    class="string">"Event1"</span> ? <span class="type">Result</span>.<span
+                    class="function">Ok</span>(e.value) : <span class="keyword">null</span>),
+                (value1) => <span class="type">Process</span>.<span class="function">waitForEvent</span>(e => e.type ===
+                <span class="string">"Event2"</span> ? <span class="type">Result</span>.<span
+                    class="function">Ok</span>(e.value) : <span class="keyword">null</span>)
+                );
+            </div>
+
+            <div class="sequence-diagram">
+                <div class="actors">
+                    <div class="actor">
+                        <div class="actor-box">Runtime</div>
+                    </div>
+                    <div class="actor">
+                        <div class="actor-box">Process.bind</div>
+                    </div>
+                    <div class="actor">
+                        <div class="actor-box">First Process</div>
+                    </div>
+                    <div class="actor">
+                        <div class="actor-box">Second Process</div>
+                    </div>
+                </div>
+
+                <div class="timeline">
+                    <div class="time-marker">⏰ T0: Initialization</div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">Runtime → Process.bind</div>
+                        <div class="activation-content">
+                            Execute: bind(waitForEvent("Event1"), f)<br />
+                            <a class="code-link"
+                                href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:256">Line
+                                256-290</a>
+                        </div>
+                    </div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">Process.bind → First Process</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:262">Line
+                                    262</a>: const [effect, state] = proc(...)</strong><br />
+                            Execute first process<br />
+                            Returns: InProgress (waiting for Event1)
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-bind">
+                        <div class="activation-label">🟡 Process.bind → InProgress Case</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:277">Line
+                                    277</a>: case InProgress</strong><br />
+                            Wraps event handler to continue bind chain<br />
+                            Returns: InProgress with wrapped next()
+                        </div>
+                    </div>
+
+                    <div class="state-change">
+                        <span class="state-label">State:</span>
+                        <span class="state-value">InProgress (waiting for Event1)</span>
+                    </div>
+
+                    <div class="time-marker">⏰ T1: Event Arrives → Event1(10)</div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">Runtime → Process.bind</div>
+                        <div class="activation-content">
+                            Calls wrapped next(event) handler<br />
+                            <a class="code-link"
+                                href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:280">Line
+                                280</a>: (event) => {...}
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-bind">
+                        <div class="activation-label">🟡 Wrapped Handler → First Process</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:281">Line
+                                    281</a>: const result = state.next(event)</strong><br />
+                            Calls first process handler<br />
+                            Returns: Succeeded(10)
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-bind">
+                        <div class="activation-label">🟡 Process.bind (Recursive)</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:287">Line
+                                    287</a>: return bind((_, st) => result, f)(...)</strong><br />
+                            <strong>KEY RECURSION!</strong><br />
+                            Re-enters bind with Succeeded(10)
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-bind">
+                        <div class="activation-label">🟡 Process.bind → Succeeded Case</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:264">Line
+                                    264</a>: case Succeeded</strong><br />
+                            First process succeeded with value 10<br />
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:265">Line
+                                    265</a>: f(state.value)(...)</strong><br />
+                            Calls f(10) → returns second process
+                        </div>
+                    </div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">Process.bind → Second Process</div>
+                        <div class="activation-content">
+                            Execute second process: waitForEvent("Event2")<br />
+                            Returns: InProgress (waiting for Event2)
+                        </div>
+                    </div>
+
+                    <div class="state-change">
+                        <span class="state-label">State:</span>
+                        <span class="state-value">InProgress (waiting for Event2, captured value1=10)</span>
+                    </div>
+
+                    <div class="time-marker">⏰ T2: Event Arrives → Event2(32)</div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">Runtime → Second Process</div>
+                        <div class="activation-content">
+                            Calls event handler for Event2<br />
+                            Matches Event2 pattern<br />
+                            Returns: Succeeded(32)
+                        </div>
+                    </div>
+
+                    <div class="state-change">
+                        <span class="state-label">Final State:</span>
+                        <span class="state-value">Succeeded(value: 32) ✨</span>
+                    </div>
+
+                    <div class="note">
+                        <strong>Note:</strong> In a real scenario with value combination, there would be another bind
+                        wrapping both,
+                        but this shows the core sequential pattern where the second process starts only after the first
+                        succeeds.
+                    </div>
+                </div>
+            </div>
+
+            <div class="key-insight">
+                <h3>🎯 Key Insight: bind Sequential Chain</h3>
+                <p>The <code>bind</code> operation at <a class="code-link"
+                        href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:256">line 256</a>
+                    creates a sequential chain:</p>
+                <ol style="margin-left: 30px; margin-top: 10px;">
+                    <li><strong>Line 277:</strong> First process InProgress → wraps event handler</li>
+                    <li><strong>Line 281:</strong> Event arrives → calls first process handler</li>
+                    <li><strong>Line 287:</strong> Recursive bind continues the chain</li>
+                    <li><strong>Line 265:</strong> When first succeeds → calls <code>f(result)</code></li>
+                    <li><strong>Result:</strong> Second process starts with first's result</li>
+                </ol>
+                <p style="margin-top: 15px;">The recursion at line 287 is critical: it keeps checking if the process
+                    succeeded after each event!</p>
+            </div>
+        </div>
+
+        <!-- Sequence 3: apply (both) -->
+        <div class="section">
+            <h2>Sequence 3: ProcessState.apply (Parallel Composition)</h2>
+
+            <div class="code-block"><span class="keyword">const</span> proc = <span class="type">Process</span>.<span
+                    class="function">both</span>(
+                <span class="type">Process</span>.<span class="function">waitForEvent</span>(e => e.type === <span
+                    class="string">"Event1"</span> ? <span class="type">Result</span>.<span
+                    class="function">Ok</span>(e.value) : <span class="keyword">null</span>),
+                <span class="type">Process</span>.<span class="function">waitForEvent</span>(e => e.type === <span
+                    class="string">"Event2"</span> ? <span class="type">Result</span>.<span
+                    class="function">Ok</span>(e.value) : <span class="keyword">null</span>),
+                (left, right) => ({ left, right })
+                );
+            </div>
+
+            <div class="sequence-diagram">
+                <div class="actors">
+                    <div class="actor">
+                        <div class="actor-box">Runtime</div>
+                    </div>
+                    <div class="actor">
+                        <div class="actor-box">Process.both</div>
+                    </div>
+                    <div class="actor">
+                        <div class="actor-box">ProcessState.apply</div>
+                    </div>
+                    <div class="actor">
+                        <div class="actor-box">Left & Right</div>
+                    </div>
+                </div>
+
+                <div class="timeline">
+                    <div class="time-marker">⏰ T0: Initialization</div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">Runtime → Process.both</div>
+                        <div class="activation-content">
+                            Execute: both(proc1, proc2, merger)<br />
+                            <a class="code-link"
+                                href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:183">Line
+                                183-197</a>
+                        </div>
+                    </div>
+
+                    <div class="parallel-branches">
+                        <div class="branch">
+                            <div class="branch-title">Left Branch</div>
+                            <div class="activation-content">
+                                <strong><a class="code-link"
+                                        href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:184">Line
+                                        184</a>: proc1(instanceId, initialState)</strong><br />
+                                Returns: InProgress (waiting for Event1)
+                            </div>
+                        </div>
+                        <div class="branch">
+                            <div class="branch-title">Right Branch</div>
+                            <div class="activation-content">
+                                <strong><a class="code-link"
+                                        href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:185">Line
+                                        185</a>: proc2(instanceId, initialState)</strong><br />
+                                Returns: InProgress (waiting for Event2)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">Process.both → ProcessState.map</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:189">Line
+                                    189</a>: ProcessState.map(a => (b) => [a, b], state1)</strong><br />
+                            Wraps left result with tuple constructor function
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-apply">
+                        <div class="activation-label">🔵 Process.both → ProcessState.apply</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:191">Line
+                                    191</a>: ProcessState.apply(mappedState1, state2)</strong><br />
+                            Combines both InProgress states<br />
+                            <a class="code-link"
+                                href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:105">Line
+                                105</a>: InProgress + InProgress case
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-apply">
+                        <div class="activation-label">🔵 ProcessState.apply → Create Combined State</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:106">Line
+                                    106</a>: ProcessState.InProgress([f.state, state.state], ...)</strong><br />
+                            Creates tuple state: [leftState, rightState]<br />
+                            Wraps event handler to try both branches
+                        </div>
+                    </div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">Process.both → ProcessState.mapState</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:190">Line
+                                    190-193</a>: ProcessState.mapState(merger, ...)</strong><br />
+                            Wraps with state merger to flatten tuples
+                        </div>
+                    </div>
+
+                    <div class="state-change">
+                        <span class="state-label">State:</span>
+                        <span class="state-value">InProgress (tuple: [leftState, rightState], waiting for events)</span>
+                    </div>
+
+                    <div class="time-marker">⏰ T1: Event Arrives → Event1(100)</div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">Runtime → ProcessState.apply</div>
+                        <div class="activation-content">
+                            Calls wrapped event handler<br />
+                            <a class="code-link"
+                                href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:106">Line
+                                106</a>: (event) => {...}
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-apply">
+                        <div class="activation-label">🔵 Apply Handler → Try Both Branches</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:107">Line
+                                    107-108</a>:</strong><br />
+                            const fResult = f.next(event) → ✅ Returns Succeeded(100)<br />
+                            const stateResult = state.next(event) → ❌ Returns null
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-apply">
+                        <div class="activation-label">🔵 Apply → Only Left Accepts</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:114">Line
+                                    114-118</a>: if (fResult !== null && stateResult === null)</strong><br />
+                            <strong>Line 117: return [effF, ProcessState.apply(nextF, state)]</strong><br />
+                            <strong>KEY RECURSION!</strong> Left progressed, right unchanged
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-apply">
+                        <div class="activation-label">🔵 Recursive apply</div>
+                        <div class="activation-content">
+                            apply(Succeeded(100), InProgress)<br />
+                            <a class="code-link"
+                                href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:85">Line
+                                85-88</a>: Succeeded + any case<br />
+                            Creates new tuple state with updated left
+                        </div>
+                    </div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">ProcessState.mapState → Merge Tuple</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:74">Line
+                                    74</a>: return [effect, mapState(f, nextState)]</strong><br />
+                            <strong>RECURSIVE MERGE!</strong> Applies merger to new tuple
+                        </div>
+                    </div>
+
+                    <div class="state-change">
+                        <span class="state-label">State:</span>
+                        <span class="state-value">InProgress (left: Succeeded(100), right: waiting for Event2)</span>
+                    </div>
+
+                    <div class="time-marker">⏰ T2: Event Arrives → Event2("done")</div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">Runtime → ProcessState.apply</div>
+                        <div class="activation-content">
+                            Calls wrapped event handler again<br />
+                            Current state: apply(Succeeded(100), InProgress)
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-apply">
+                        <div class="activation-label">🔵 Apply Handler → Try Both Branches</div>
+                        <div class="activation-content">
+                            Left is Succeeded → doesn't handle events<br />
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:108">Line
+                                    108</a>:</strong> stateResult = state.next(event) → ✅ Returns Succeeded("done")
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-apply">
+                        <div class="activation-label">🔵 Apply → Only Right Accepts</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:120">Line
+                                    120-124</a>: if (fResult === null && stateResult !== null)</strong><br />
+                            <strong>Line 123: return [effState, ProcessState.apply(f, nextState)]</strong><br />
+                            Right progressed, left unchanged
+                        </div>
+                    </div>
+
+                    <div class="activation-box highlight-apply">
+                        <div class="activation-label">🔵 Recursive apply</div>
+                        <div class="activation-content">
+                            apply(Succeeded(100), Succeeded("done"))<br />
+                            <a class="code-link"
+                                href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:85">Line
+                                85-88</a>: Both Succeeded!<br />
+                            <strong>Line 87: map(f.value, state)</strong><br />
+                            Applies tuple constructor: [100, "done"]
+                        </div>
+                    </div>
+
+                    <div class="activation-box">
+                        <div class="activation-label">ProcessState.mapState → Final Merge</div>
+                        <div class="activation-content">
+                            <strong><a class="code-link"
+                                    href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:64">Line
+                                    64</a>: Succeeded case</strong><br />
+                            state: f(processState.state)<br />
+                            Applies merger to final tuple
+                        </div>
+                    </div>
+
+                    <div class="state-change">
+                        <span class="state-label">Final State:</span>
+                        <span class="state-value">Succeeded(value: [100, "done"], state: merged) ✨</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="key-insight">
+                <h3>🎯 Key Insight: apply Parallel Processing</h3>
+                <p>The <code>apply</code> operation at <a class="code-link"
+                        href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:82">line 82</a> enables
+                    parallel event handling:</p>
+                <ol style="margin-left: 30px; margin-top: 10px;">
+                    <li><strong>Line 106:</strong> Creates tuple state [left, right] and combined handler</li>
+                    <li><strong>Line 107-108:</strong> Tries both branches for each event</li>
+                    <li><strong>Line 117 or 123:</strong> Recursively applies when one branch progresses</li>
+                    <li><strong>Line 129:</strong> Recursively applies when both branches progress</li>
+                    <li><strong>Line 74:</strong> mapState recursion applies merger throughout</li>
+                    <li><strong>Result:</strong> Both branches' state changes are preserved in tuple</li>
+                </ol>
+                <p style="margin-top: 15px;">
+                    <strong>Critical:</strong> The recursive <code>apply</code> calls (lines 117, 123, 129) keep the
+                    tuple structure,
+                    while recursive <code>mapState</code> (line 74) automatically flattens with the merger!
+                </p>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="section">
+            <h2>Summary: Three Patterns</h2>
+
+            <div class="parallel-branches">
+                <div class="branch" style="border-color: #50fa7b;">
+                    <div class="branch-title" style="color: #50fa7b; border-color: #50fa7b;">
+                        🟢 map Pattern
+                    </div>
+                    <div class="note">
+                        <strong>Purpose:</strong> Transform result values
+                    </div>
+                    <div class="activation-content">
+                        <strong>Key Lines:</strong><br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:50">Line 50</a>:
+                        InProgress case wraps handler<br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:51">Line 51</a>:
+                        Calls inner handler<br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:55">Line 55</a>:
+                        <strong>Recursive map(f, nextState)</strong><br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:46">Line 46</a>:
+                        Applies transformation
+                    </div>
+                </div>
+
+                <div class="branch" style="border-color: #ffd700;">
+                    <div class="branch-title" style="color: #ffd700; border-color: #ffd700;">
+                        🟡 bind Pattern
+                    </div>
+                    <div class="note">
+                        <strong>Purpose:</strong> Sequential composition
+                    </div>
+                    <div class="activation-content">
+                        <strong>Key Lines:</strong><br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:277">Line 277</a>:
+                        InProgress case wraps handler<br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:281">Line 281</a>:
+                        Calls first process handler<br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:287">Line 287</a>:
+                        <strong>Recursive bind continues chain</strong><br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:265">Line 265</a>:
+                        Calls f(result) when succeeded
+                    </div>
+                </div>
+
+                <div class="branch" style="border-color: #8be9fd;">
+                    <div class="branch-title" style="color: #8be9fd; border-color: #8be9fd;">
+                        🔵 apply Pattern
+                    </div>
+                    <div class="note">
+                        <strong>Purpose:</strong> Parallel composition
+                    </div>
+                    <div class="activation-content">
+                        <strong>Key Lines:</strong><br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:106">Line 106</a>:
+                        Creates tuple state handler<br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:107-108">Lines
+                            107-108</a>: Tries both branches<br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:117">Line 117</a>:
+                        <strong>Recursive apply (left)</strong><br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:123">Line 123</a>:
+                        <strong>Recursive apply (right)</strong><br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:129">Line 129</a>:
+                        <strong>Recursive apply (both)</strong><br />
+                        • <a class="code-link"
+                            href="vscode://file/c:/tests/node-process-manager/src/process-algebra.ts:74">Line 74</a>:
+                        mapState recursion merges
+                    </div>
+                </div>
+            </div>
+
+            <div class="key-insight">
+                <h3>🎯 Universal Pattern: Event-Driven Recursion</h3>
+                <p style="font-size: 1.1em;">All three operations follow the same recursive pattern:</p>
+                <ol style="margin-left: 30px; margin-top: 15px; font-size: 1.05em;">
+                    <li><strong>Wrap the event handler</strong> with additional logic</li>
+                    <li><strong>When event arrives:</strong> Call inner handler(s) to process event</li>
+                    <li><strong>Recursively apply</strong> the same operation to the resulting state</li>
+                    <li><strong>Return transformed result</strong> with combined effects</li>
+                </ol>
+
+                <p style="margin-top: 20px; font-size: 1.1em;">
+                    This recursive wrapping creates a <strong>transformation pipeline</strong> where:
+                </p>
+                <ul style="margin-left: 30px; margin-top: 10px; font-size: 1.05em;">
+                    <li><code>map</code> transforms result values through the entire event chain</li>
+                    <li><code>bind</code> sequences processes by continuing the chain on success</li>
+                    <li><code>apply</code> processes events in parallel and merges states via tuple tracking</li>
+                </ul>
+
+                <p style="margin-top: 20px; font-size: 1.1em;">
+                    The magic is that <strong>one operation wraps the entire future computation</strong>,
+                    no matter how many events will arrive!
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

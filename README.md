@@ -18,7 +18,8 @@ A collection of plugins and other GraphQL utilities.
   - [pino-mssqlserver](./packages/pino-mssqlserver#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fpino-mssqlserver.svg)](https://badge.fury.io/js/@totalsoft%2Fpino-mssqlserver)
   - [pino-multitenancy](./packages/pino-multitenancy#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fpino-multitenancy.svg)](https://badge.fury.io/js/@totalsoft%2Fpino-multitenancy)
   - [pino-opentelemetry](./packages/pino-opentelemetry#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fpino-opentelemetry.svg)](https://badge.fury.io/js/@totalsoft%2Fpino-opentelemetry)
-  - [pino-opentracing](./packages/pino-opentracing#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fpino-opentracing.svg)](https://badge.fury.io/js/@totalsoft%2Fpino-opentracing)     
+  - [pino-opentracing](./packages/pino-opentracing#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fpino-opentracing.svg)](https://badge.fury.io/js/@totalsoft%2Fpino-opentracing)
+  - [process-manager](./packages/process-manager#readme) [![npm version](https://badge.fury.io/js/@totalsoft%2Fprocess-manager.svg)](https://badge.fury.io/js/@totalsoft%2Fprocess-manager)
 
 ## Contributing guide
 When using Visual Studio Code please follow these steps: [Editor Setup for VSCode](https://yarnpkg.com/getting-started/editor-sdks#vscode) (allows VSCode to read .zip yarn cache files and supports features like go-to-definition).
