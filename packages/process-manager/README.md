@@ -21,6 +21,7 @@ This library provides a functional approach to building complex event-driven wor
 
 ```typescript
 import { Process, Result } from './process-algebra';
+import { ProcessRuntime } from './process-runtime';
 
 // Define your event types
 type MyEvent = 
@@ -67,37 +68,24 @@ const myProcess = Process.Do<string, MyState, MyEvent, string>(function* () {
   return `User ${loginEvent} processed ${dataEvent} items`;
 });
 
-// Execute the process
+// Create a runtime to manage process execution
+const runtime = new ProcessRuntime<string, MyState, MyEvent>();
+
+// Start the process
 const instanceId = 'process-1';
 const initialState: MyState = { total: 0 };
 
-const [effects, processState] = myProcess(instanceId, initialState);
-
-// Process is now waiting for events
-console.log(processState.kind); // "InProgress"
+runtime.startProcess(instanceId, myProcess, initialState);
 
 // Send events to progress the process
-if (processState.kind === 'InProgress') {
-  const event1: MyEvent = { type: 'UserLoggedIn', userId: 'user123' };
-  const result1 = processState.next(event1);
-  
-  if (result1 !== null) {
-    const [_, nextState] = result1;
-    
-    if (nextState.kind === 'InProgress') {
-      const event2: MyEvent = { type: 'DataReceived', data: 42 };
-      const result2 = nextState.next(event2);
-      
-      if (result2 !== null) {
-        const [__, finalState] = result2;
-        
-        if (finalState.kind === 'Succeeded') {
-          console.log(finalState.value); // "User user123 processed 42 items"
-          console.log(finalState.state); // { userId: 'user123', total: 42 }
-        }
-      }
-    }
-  }
+runtime.sendEvent(instanceId, { type: 'UserLoggedIn', userId: 'user123' });
+runtime.sendEvent(instanceId, { type: 'DataReceived', data: 42 });
+
+// Check final state
+const finalState = runtime.getProcessState(instanceId);
+if (finalState?.kind === 'Succeeded') {
+  console.log(finalState.value); // "User user123 processed 42 items"
+  console.log(finalState.state); // { userId: 'user123', total: 42 }
 }
 ```
 
@@ -178,7 +166,6 @@ const mappedProcess = Process.map(
 The library includes visual documentation:
 
 - **[process-monad-explained.html](./process-monad-explained.html)** - Complete guide to the Process monad, map, bind, apply operations
-- **[process-sequence-diagram.html](./process-sequence-diagram.html)** - Sequence diagrams showing event flow through map, bind, and apply
 
 Open these files in your browser to explore interactive diagrams with code links.
 
