@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process Monad - Complete Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(15, 15, 30, 0.95);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            text-align: center;
+            color: #64ffda;
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 30px rgba(100, 255, 218, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+            }
+
+            to {
+                text-shadow: 0 0 40px rgba(100, 255, 218, 0.6);
+            }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #8892b0;
+            font-size: 1.4em;
+            margin-bottom: 50px;
+        }
+
+        .section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border-left: 5px solid #64ffda;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            color: #64ffda;
+            font-size: 2.2em;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #64ffda;
+            padding-bottom: 10px;
+        }
+
+        h2::before {
+            content: "▸";
+            margin-right: 15px;
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+
+        h3 {
+            color: #ffd700;
+            font-size: 1.6em;
+            margin: 30px 0 20px 0;
+            border-left: 4px solid #ffd700;
+            padding-left: 15px;
+        }
+
+        h4 {
+            color: #ff79c6;
+            font-size: 1.3em;
+            margin: 20px 0 15px 0;
+        }
+
+        .code-block {
+            background: #0a0a15;
+            border: 2px solid #2d2d44;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95em;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+            white-space: pre;
+        }
+
+        .code-block::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: linear-gradient(135deg, #64ffda 0%, #50fa7b 100%);
+            color: #0a0a15;
+            padding: 4px 15px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(100, 255, 218, 0.4);
+        }
+
+        .keyword {
+            color: #ff79c6;
+            font-weight: bold;
+        }
+
+        .function {
+            color: #50fa7b;
+        }
+
+        .type {
+            color: #8be9fd;
+            font-weight: bold;
+        }
+
+        .string {
+            color: #f1fa8c;
+        }
+
+        .comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        .number {
+            color: #bd93f9;
+        }
+
+        .property {
+            color: #ffd700;
+        }
+
+        .operator {
+            color: #ff6b6b;
+        }
+
+        .diagram-box {
+            background: linear-gradient(135deg, #1e1e3f 0%, #2a2a4a 100%);
+            border: 3px solid #64ffda;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(100, 255, 218, 0.2);
+        }
+
+        .diagram-title {
+            color: #64ffda;
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .flow-step {
+            background: linear-gradient(135deg, #2d1e3f 0%, #3d2e4f 100%);
+            border: 2px solid #bd93f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .flow-step::before {
+            content: attr(data-step);
+            position: absolute;
+            top: -15px;
+            left: 25px;
+            background: linear-gradient(135deg, #ff79c6 0%, #bd93f9 100%);
+            color: #0a0a15;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 4px 15px rgba(255, 121, 198, 0.4);
+        }
+
+        .state-box {
+            background: #0a0a15;
+            border: 2px solid #50fa7b;
+            border-radius: 8px;
+            padding: 18px;
+            margin: 15px 0;
+            font-family: monospace;
+            box-shadow: 0 4px 15px rgba(80, 250, 123, 0.2);
+        }
+
+        .state-label {
+            color: #8be9fd;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .state-value {
+            color: #f1fa8c;
+            margin-left: 25px;
+            line-height: 1.8;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 2.5em;
+            color: #64ffda;
+            margin: 15px 0;
+            animation: bounce 1.5s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .highlight {
+            background: rgba(100, 255, 218, 0.15);
+            border-left: 4px solid #64ffda;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+            box-shadow: 0 4px 15px rgba(100, 255, 218, 0.1);
+        }
+
+        .key-insight {
+            background: linear-gradient(135deg, #2d1b3d 0%, #3d2b5d 100%);
+            border: 3px solid #bd93f9;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            box-shadow: 0 8px 25px rgba(189, 147, 249, 0.3);
+        }
+
+        .key-insight h3 {
+            color: #bd93f9;
+            margin-top: 0;
+            border-left: 4px solid #bd93f9;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin: 25px 0;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2a2a3e 100%);
+            border: 2px solid #50fa7b;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 6px 20px rgba(80, 250, 123, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(80, 250, 123, 0.4);
+        }
+
+        .card-title {
+            color: #50fa7b;
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #50fa7b;
+            padding-bottom: 8px;
+        }
+
+        .example-box {
+            background: rgba(189, 147, 249, 0.1);
+            border: 2px solid #bd93f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .example-title {
+            color: #bd93f9;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        ul,
+        ol {
+            margin-left: 30px;
+            margin-top: 15px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            line-height: 1.8;
+        }
+
+        .visual-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .visual-node {
+            background: linear-gradient(135deg, #ff79c6 0%, #bd93f9 100%);
+            color: #0a0a15;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 6px 20px rgba(255, 121, 198, 0.4);
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .visual-arrow {
+            font-size: 2em;
+            color: #64ffda;
+            margin: 0 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #0a0a15;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #64ffda 0%, #50fa7b 100%);
+            color: #0a0a15;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #2d2d44;
+        }
+
+        tr:hover {
+            background: rgba(100, 255, 218, 0.05);
+        }
+
+        .note {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 4px solid #ffd700;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #ffd700;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>⚡ Process Monad Complete Guide</h1>
+        <div class="subtitle">Understanding bind, map, apply, and stateful event-driven processes</div>
+
+        <!-- Core Concepts -->
+        <div class="section">
+            <h2>Core Architecture</h2>
+
+            <h3>What is the Process Monad?</h3>
+            <p style="font-size: 1.1em; margin-bottom: 20px;">
+                The <strong>Process</strong> monad is a stateful, event-driven computation that can:
+            </p>
+            <ul>
+                <li>Carry state through sequential operations</li>
+                <li>Wait for and handle external events</li>
+                <li>Compose with other processes sequentially or in parallel</li>
+                <li>Fail gracefully and propagate errors</li>
+                <li>Execute side effects in a controlled manner</li>
+            </ul>
+
+            <div class="diagram-box">
+                <div class="diagram-title">Process Type Signature</div>
+                <div class="code-block" data-label="TypeScript Definition">
+                    <span class="keyword">type</span> <span class="type">Process</span>&lt;TInstanceId, TState, TEvent,
+                    TResult&gt; =
+                    (instanceId: TInstanceId, initialState: TState) => <span
+                        class="type">ProcessResult</span>&lt;TState, TEvent, TResult&gt;
+
+                    <span class="keyword">type</span> <span class="type">ProcessResult</span>&lt;TState, TEvent,
+                    TResult&gt; = [
+                    <span class="type">Effect</span>&lt;<span class="keyword">void</span>&gt;, <span class="comment">//
+                        Side effects to execute</span>
+                    <span class="type">ProcessState</span>&lt;TState, TEvent, TResult&gt; <span class="comment">//
+                        Current state of the process</span>
+                    ]
+                </div>
+
+                <div class="highlight">
+                    <strong>Key Point:</strong> A Process is a <em>function</em> that takes an instance ID and initial
+                    state,
+                    and returns side effects to execute along with the current state of the computation.
+                </div>
+            </div>
+
+            <h3>ProcessState: The Three States</h3>
+
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">✅ Succeeded</div>
+                    <div class="code-block" data-label="Structure">
+                        {
+                        <span class="property">kind</span>: <span class="string">"Succeeded"</span>,
+                        <span class="property">state</span>: TState,
+                        <span class="property">value</span>: TResult
+                        }
+                    </div>
+                    <p>The process completed successfully with a result value.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">⏳ InProgress</div>
+                    <div class="code-block" data-label="Structure">
+                        {
+                        <span class="property">kind</span>: <span class="string">"InProgress"</span>,
+                        <span class="property">state</span>: TState,
+                        <span class="property">next</span>: (event: TEvent) =>
+                        <span class="type">ProcessResult</span> | <span class="keyword">null</span>
+                        }
+                    </div>
+                    <p>The process is waiting for events. The <code>next</code> function handles incoming events.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">❌ Failed</div>
+                    <div class="code-block" data-label="Structure">
+                        {
+                        <span class="property">kind</span>: <span class="string">"Failed"</span>,
+                        <span class="property">state</span>: TState,
+                        <span class="property">error</span>: <span class="keyword">string</span>
+                        }
+                    </div>
+                    <p>The process failed with an error message.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ProcessState.map -->
+        <div class="section">
+            <h2>ProcessState.map - Transform Results</h2>
+
+            <div class="diagram-box">
+                <div class="diagram-title">Function Signature</div>
+                <div class="code-block" data-label="Line 43-57">
+                    <span class="keyword">export function</span> <span class="function">map</span>&lt;TState, TEvent,
+                    TResult1, TResult2&gt;(
+                    f: (a: TResult1) => TResult2,
+                    state: <span class="type">ProcessState</span>&lt;TState, TEvent, TResult1&gt;
+                    ): <span class="type">ProcessState</span>&lt;TState, TEvent, TResult2&gt;
+                </div>
+            </div>
+
+            <p style="font-size: 1.1em; margin: 20px 0;">
+                <strong>Purpose:</strong> Transforms the <em>result value</em> of a ProcessState without changing its
+                state.
+                It's like Array.map but for ProcessState.
+            </p>
+
+            <h3>How It Works</h3>
+
+            <div class="flow-step" data-step="Succeeded Case">
+                <div class="code-block" data-label="Line 46">
+                    <span class="keyword">case</span> <span class="type">ProcessStateKind</span>.Succeeded:
+                    <span class="keyword">return</span> <span class="type">ProcessState</span>.<span
+                        class="function">pure</span>(state.state, <span class="function">f</span>(state.value));
+                </div>
+                <p><strong>Action:</strong> Apply function <code>f</code> to the result value, keep state unchanged.</p>
+            </div>
+
+            <div class="flow-step" data-step="Failed Case">
+                <div class="code-block" data-label="Line 48">
+                    <span class="keyword">case</span> <span class="type">ProcessStateKind</span>.Failed:
+                    <span class="keyword">return</span> state; <span class="comment">// Propagate failure
+                        unchanged</span>
+                </div>
+                <p><strong>Action:</strong> Failed states pass through without transformation.</p>
+            </div>
+
+            <div class="flow-step" data-step="InProgress Case">
+                <div class="code-block" data-label="Line 49-56">
+                    <span class="keyword">case</span> <span class="type">ProcessStateKind</span>.InProgress:
+                    <span class="keyword">return</span> <span class="type">ProcessState</span>.<span
+                        class="function">InProgress</span>(state.state, (event) => {
+                    <span class="keyword">const</span> next = state.<span class="function">next</span>(event);
+                    <span class="keyword">if</span> (next === <span class="keyword">null</span>) <span
+                        class="keyword">return</span> <span class="keyword">null</span>;
+
+                    <span class="keyword">const</span> [eff, nextState] = next;
+                    <span class="keyword">return</span> [eff, <span class="function">map</span>(f, nextState)]; <span
+                        class="comment">// ← RECURSIVE!</span>
+                    });
+                </div>
+                <p><strong>Action:</strong> Create a new InProgress that wraps the event handler and recursively applies
+                    <code>map(f)</code> to future states.</p>
+                <div class="highlight">
+                    <strong>Key Insight:</strong> The recursion on line 55 ensures that <code>f</code> is applied to the
+                    final result,
+                    no matter how many events the process waits for!
+                </div>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">📝 Example: Doubling a Result</div>
+                <div class="code-block" data-label="Usage">
+                    <span class="keyword">const</span> state1 = <span class="type">ProcessState</span>.<span
+                        class="function">pure</span>({}, <span class="number">21</span>);
+                    <span class="keyword">const</span> state2 = <span class="type">ProcessState</span>.<span
+                        class="function">map</span>(n => n * <span class="number">2</span>, state1);
+                    <span class="comment">// state2 = { kind: "Succeeded", state: {}, value: 42 }</span>
+
+                    <span class="keyword">const</span> proc = <span class="type">Process</span>.<span
+                        class="function">map</span>(
+                    n => n * <span class="number">2</span>,
+                    <span class="type">Process</span>.<span class="function">waitForEvent</span>(e => e.type === <span
+                        class="string">"Event1"</span> ? <span class="type">Result</span>.<span
+                        class="function">Ok</span>(e.value) : <span class="keyword">null</span>)
+                    );
+                    <span class="comment">// When Event1(21) arrives, result will be 42</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ProcessState.mapState -->
+        <div class="section">
+            <h2>ProcessState.mapState - Transform State</h2>
+
+            <div class="diagram-box">
+                <div class="diagram-title">Function Signature</div>
+                <div class="code-block" data-label="Line 60-77">
+                    <span class="keyword">export function</span> <span class="function">mapState</span>&lt;TState1,
+                    TState2&gt;(
+                    f: (state: TState1) => TState2,
+                    processState: <span class="type">ProcessState</span>&lt;TState1, <span class="keyword">any</span>,
+                    <span class="keyword">any</span>&gt;
+                    ): <span class="type">ProcessState</span>&lt;TState2, <span class="keyword">any</span>, <span
+                        class="keyword">any</span>&gt;
+                </div>
+            </div>
+
+            <p style="font-size: 1.1em; margin: 20px 0;">
+                <strong>Purpose:</strong> Transforms the <em>state</em> of a ProcessState without changing its result.
+                This is crucial for composing processes with different state types.
+            </p>
+
+            <h3>How It Works</h3>
+
+            <div class="flow-step" data-step="Succeeded Case">
+                <div class="code-block" data-label="Line 64">
+                    <span class="keyword">case</span> <span class="type">ProcessStateKind</span>.Succeeded:
+                    <span class="keyword">return</span> { <span class="property">kind</span>: <span
+                        class="type">ProcessStateKind</span>.Succeeded, <span class="property">state</span>: <span
+                        class="function">f</span>(processState.state), <span class="property">value</span>:
+                    processState.value };
+                </div>
+                <p><strong>Action:</strong> Transform state with <code>f</code>, keep result unchanged.</p>
+            </div>
+
+            <div class="flow-step" data-step="InProgress Case (The Magic)">
+                <div class="code-block" data-label="Line 67-76">
+                    <span class="keyword">case</span> <span class="type">ProcessStateKind</span>.InProgress:
+                    <span class="keyword">return</span> <span class="type">ProcessState</span>.<span
+                        class="function">InProgress</span>(<span class="function">f</span>(processState.state), (event)
+                    => {
+                    <span class="keyword">const</span> result = processState.<span class="function">next</span>(event);
+                    <span class="keyword">if</span> (result === <span class="keyword">null</span>) <span
+                        class="keyword">return</span> <span class="keyword">null</span>;
+
+                    <span class="keyword">const</span> [effect, nextState] = result;
+                    <span class="keyword">return</span> [effect, <span class="function">mapState</span>(f, nextState)];
+                    <span class="comment">// ← RECURSIVE!</span>
+                    });
+                </div>
+            </div>
+
+            <div class="key-insight">
+                <h3>🎯 Critical Insight: Recursive State Transformation</h3>
+                <p>The recursion at line 74 is the <strong>secret sauce</strong> of the entire architecture!</p>
+                <ul>
+                    <li>When you wrap a ProcessState with <code>mapState(f, ...)</code>, the transformation
+                        <code>f</code> is applied to the <strong>current</strong> state</li>
+                    <li>But more importantly, <code>f</code> is also <strong>recursively applied to all future
+                            states</strong> after events are processed</li>
+                    <li>This means a single <code>mapState</code> call transforms the state through the <strong>entire
+                            event processing chain</strong></li>
+                </ul>
+
+                <div class="highlight" style="margin-top: 20px;">
+                    <strong>This is how Process.both works!</strong> The stateMerger function is applied once with
+                    mapState,
+                    and then it automatically applies to all states produced by future events.
+                </div>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">📝 Example: Converting State Structure</div>
+                <div class="code-block" data-label="Usage">
+                    <span class="comment">// Convert tuple state [left, right] to merged state</span>
+                    <span class="keyword">const</span> tupleState: <span class="type">ProcessState</span>&lt;[State,
+                    State], Event, number&gt; = ...;
+
+                    <span class="keyword">const</span> mergedState = <span class="type">ProcessState</span>.<span
+                        class="function">mapState</span>(
+                    ([left, right]) => ({ <span class="property">counter</span>: left.counter, <span
+                        class="property">flag</span>: right.flag }),
+                    tupleState
+                    );
+                    <span class="comment">// Now has type: ProcessState&lt;{ counter: number, flag: boolean }, Event,
+                        number&gt;</span>
+                    <span class="comment">// And this transformation applies to ALL future states after events!</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Process.bind -->
+        <div class="section">
+            <h2>Process.bind - Sequential Composition</h2>
+
+            <div class="diagram-box">
+                <div class="diagram-title">Function Signature</div>
+                <div class="code-block" data-label="Line 262-290">
+                    <span class="keyword">export function</span> <span class="function">bind</span>&lt;TInstanceId,
+                    TState, TEvent, TResult, TNextResult&gt;(
+                    proc: <span class="type">Process</span>&lt;TInstanceId, TState, TEvent, TResult&gt;,
+                    f: (result: TResult) => <span class="type">Process</span>&lt;TInstanceId, TState, TEvent,
+                    TNextResult&gt;
+                    ): <span class="type">Process</span>&lt;TInstanceId, TState, TEvent, TNextResult&gt;
+                </div>
+            </div>
+
+            <p style="font-size: 1.1em; margin: 20px 0;">
+                <strong>Purpose:</strong> Chains two processes sequentially. The second process receives the result of
+                the first.
+                This is the monadic bind operation (also called flatMap or >>=).
+            </p>
+
+            <h3>How It Works</h3>
+
+            <div class="visual-flow">
+                <div class="visual-node">Process A<br />→ Result A</div>
+                <div class="visual-arrow">⟹</div>
+                <div class="visual-node">f(Result A)<br />→ Process B</div>
+                <div class="visual-arrow">⟹</div>
+                <div class="visual-node">Result B</div>
+            </div>
+
+            <div class="flow-step" data-step="Case 1: First Process Succeeded">
+                <div class="code-block" data-label="Line 269-274">
+                    <span class="keyword">case</span> <span class="type">ProcessStateKind</span>.Succeeded: {
+                    <span class="keyword">const</span> [nextEffect, nextState] = <span
+                        class="function">f</span>(state.value)(instanceId, state.state);
+
+                    <span class="comment">// Sequence the effects: first effect, then next effect</span>
+                    <span class="keyword">const</span> combinedEffect = <span class="type">Effect</span>.<span
+                        class="function">bind</span>(effect, () => nextEffect);
+                    <span class="keyword">return</span> [combinedEffect, nextState];
+                    }
+                </div>
+                <p><strong>Action:</strong></p>
+                <ul>
+                    <li>Call <code>f</code> with the result value</li>
+                    <li>Execute the returned process with the updated state</li>
+                    <li>Sequence the side effects</li>
+                </ul>
+            </div>
+
+            <div class="flow-step" data-step="Case 2: First Process Failed">
+                <div class="code-block" data-label="Line 275-276">
+                    <span class="keyword">case</span> <span class="type">ProcessStateKind</span>.Failed:
+                    <span class="keyword">return</span> [effect, state]; <span class="comment">// Propagate failure,
+                        don't call f</span>
+                </div>
+                <p><strong>Action:</strong> Failed states short-circuit the bind - <code>f</code> is never called.</p>
+            </div>
+
+            <div class="flow-step" data-step="Case 3: First Process InProgress">
+                <div class="code-block" data-label="Line 277-289">
+                    <span class="keyword">case</span> <span class="type">ProcessStateKind</span>.InProgress:
+                    <span class="keyword">return</span> [
+                    effect,
+                    <span class="type">ProcessState</span>.<span class="function">InProgress</span>(state.state, (event)
+                    => {
+                    <span class="keyword">const</span> result = state.<span class="function">next</span>(event);
+                    <span class="keyword">if</span> (result === <span class="keyword">null</span>) <span
+                        class="keyword">return</span> <span class="keyword">null</span>;
+
+                    <span class="keyword">const</span> [_, resultState] = result;
+                    <span class="comment">// Recursively bind! Keep waiting for events until success or failure</span>
+                    <span class="keyword">return</span> <span class="function">bind</span>((_, st) => result,
+                    f)(instanceId, resultState.state);
+                    })
+                    ];
+                </div>
+                <p><strong>Action:</strong> Create a new InProgress that waits for events and recursively applies bind.
+                </p>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">📝 Example: Sequential Event Processing</div>
+                <div class="code-block" data-label="Usage">
+                    <span class="keyword">const</span> proc = <span class="type">Process</span>.<span
+                        class="function">bind</span>(
+                    <span class="type">Process</span>.<span class="function">waitForEvent</span>(e => e.type === <span
+                        class="string">"Event1"</span> ? <span class="type">Result</span>.<span
+                        class="function">Ok</span>(e.value) : <span class="keyword">null</span>),
+                    (value1) => <span class="type">Process</span>.<span class="function">bind</span>(
+                    <span class="type">Process</span>.<span class="function">waitForEvent</span>(e => e.type === <span
+                        class="string">"Event2"</span> ? <span class="type">Result</span>.<span
+                        class="function">Ok</span>(e.value) : <span class="keyword">null</span>),
+                    (value2) => <span class="type">Process</span>.<span class="function">pure</span>(value1 + value2)
+                    )
+                    );
+
+                    <span class="comment">// Or using Process.Do syntax:</span>
+                    <span class="keyword">const</span> proc = <span class="type">Process</span>.<span
+                        class="function">Do</span>(<span class="keyword">function*</span>() {
+                    <span class="keyword">const</span> value1 = <span class="keyword">yield</span> <span
+                        class="type">Process</span>.<span class="function">waitForEvent</span>(...);
+                    <span class="keyword">const</span> value2 = <span class="keyword">yield</span> <span
+                        class="type">Process</span>.<span class="function">waitForEvent</span>(...);
+                    <span class="keyword">return</span> value1 + value2;
+                    });
+                </div>
+            </div>
+        </div>
+
+        <!-- ProcessState.apply -->
+        <div class="section">
+            <h2>ProcessState.apply - Applicative Functor</h2>
+
+            <div class="diagram-box">
+                <div class="diagram-title">Function Signature</div>
+                <div class="code-block" data-label="Line 79-135">
+                    <span class="keyword">export function</span> <span class="function">apply</span>&lt;TState, TEvent,
+                    TResult1, TResult2&gt;(
+                    f: <span class="type">ProcessState</span>&lt;TState, TEvent, (a: TResult1) => TResult2&gt;,
+                    state: <span class="type">ProcessState</span>&lt;TState, TEvent, TResult1&gt;
+                    ): <span class="type">ProcessState</span>&lt;[TState, TState], TEvent, TResult2&gt;
+                </div>
+            </div>
+
+            <p style="font-size: 1.1em; margin: 20px 0;">
+                <strong>Purpose:</strong> Combines two ProcessStates in parallel. The first contains a function, the
+                second contains a value.
+                Returns a ProcessState with <strong>tuple state</strong> [leftState, rightState].
+            </p>
+
+            <div class="note">
+                <strong>⚠️ Important:</strong> The return type has tuple state <code>[TState, TState]</code> instead of
+                <code>TState</code>.
+                This is because both processes might modify state independently, so we need to track both states.
+            </div>
+
+            <h3>The Nine Cases</h3>
+
+            <table>
+                <tr>
+                    <th>f (Left)</th>
+                    <th>state (Right)</th>
+                    <th>Action</th>
+                </tr>
+                <tr>
+                    <td>Succeeded</td>
+                    <td>Any</td>
+                    <td>Apply f.value to state, wrap in tuple [f.state, s]</td>
+                </tr>
+                <tr>
+                    <td>Failed</td>
+                    <td>Failed</td>
+                    <td>Return state.error, tuple [f.state, state.state]</td>
+                </tr>
+                <tr>
+                    <td>Failed</td>
+                    <td>Other</td>
+                    <td>Return f.error, tuple [f.state, state.state]</td>
+                </tr>
+                <tr>
+                    <td>InProgress</td>
+                    <td>Succeeded</td>
+                    <td>Wait for f, apply to state.value when ready</td>
+                </tr>
+                <tr>
+                    <td>InProgress</td>
+                    <td>Failed</td>
+                    <td>Return state.error</td>
+                </tr>
+                <tr>
+                    <td>InProgress</td>
+                    <td>InProgress</td>
+                    <td>🔥 Both wait for events - see detailed breakdown below</td>
+                </tr>
+            </table>
+
+            <h3>The InProgress + InProgress Case (Most Important!)</h3>
+
+            <div class="flow-step" data-step="Initial Setup">
+                <div class="code-block" data-label="Line 106">
+                    <span class="keyword">return</span> <span class="type">ProcessState</span>.<span
+                        class="function">InProgress</span>([f.state, state.state], (event) => {
+                    <span class="keyword">const</span> fResult = f.<span class="function">next</span>(event);
+                    <span class="keyword">const</span> stateResult = state.<span class="function">next</span>(event);
+                    <span class="comment">// ...</span>
+                    });
+                </div>
+                <p>Create tuple state [f.state, state.state] and define event handler that tries both processes.</p>
+            </div>
+
+            <div class="flow-step" data-step="Sub-case 1: Both Ignore Event">
+                <div class="code-block" data-label="Line 111-112">
+                    <span class="keyword">if</span> (fResult === <span class="keyword">null</span> && stateResult ===
+                    <span class="keyword">null</span>)
+                    <span class="keyword">return</span> <span class="keyword">null</span>; <span class="comment">//
+                        Event not handled, stay in progress</span>
+                </div>
+            </div>
+
+            <div class="flow-step" data-step="Sub-case 2: Only Left (f) Accepts Event">
+                <div class="code-block" data-label="Line 114-118">
+                    <span class="keyword">if</span> (fResult !== <span class="keyword">null</span> && stateResult ===
+                    <span class="keyword">null</span>) {
+                    <span class="keyword">const</span> [effF, nextF] = fResult;
+                    <span class="comment">// Recursively apply nextF with unchanged state</span>
+                    <span class="keyword">return</span> [effF, <span class="type">ProcessState</span>.<span
+                        class="function">apply</span>(nextF, state)];
+                    }
+                </div>
+                <p><strong>Action:</strong> Left progresses, right stays same. Recursive apply creates new tuple.</p>
+            </div>
+
+            <div class="flow-step" data-step="Sub-case 3: Only Right (state) Accepts Event">
+                <div class="code-block" data-label="Line 120-124">
+                    <span class="keyword">if</span> (fResult === <span class="keyword">null</span> && stateResult !==
+                    <span class="keyword">null</span>) {
+                    <span class="keyword">const</span> [effState, nextState] = stateResult;
+                    <span class="comment">// Recursively apply unchanged f with nextState</span>
+                    <span class="keyword">return</span> [effState, <span class="type">ProcessState</span>.<span
+                        class="function">apply</span>(f, nextState)];
+                    }
+                </div>
+                <p><strong>Action:</strong> Right progresses, left stays same. Recursive apply creates new tuple.</p>
+            </div>
+
+            <div class="flow-step" data-step="Sub-case 4: Both Accept Event">
+                <div class="code-block" data-label="Line 126-131">
+                    <span class="comment">// Both accept the event</span>
+                    <span class="keyword">const</span> [effF, nextF] = fResult!;
+                    <span class="keyword">const</span> [effState, nextState] = stateResult!;
+                    <span class="keyword">const</span> combinedEffect = <span class="type">Effect</span>.<span
+                        class="function">bind</span>(effF, () => effState);
+                    <span class="keyword">return</span> [combinedEffect, <span class="type">ProcessState</span>.<span
+                        class="function">apply</span>(nextF, nextState)];
+                </div>
+                <p><strong>Action:</strong> Both progress. Recursive apply with both new states.</p>
+            </div>
+
+            <div class="key-insight">
+                <h3>🎯 Why Tuple State Matters</h3>
+                <p>The tuple state <code>[leftState, rightState]</code> tracks each branch's state independently:</p>
+                <ul>
+                    <li>When left progresses: tuple becomes <code>[newLeftState, oldRightState]</code></li>
+                    <li>When right progresses: tuple becomes <code>[oldLeftState, newRightState]</code></li>
+                    <li>When both progress: tuple becomes <code>[newLeftState, newRightState]</code></li>
+                </ul>
+                <p style="margin-top: 15px;">
+                    This preserves all state changes from both branches, even when they modify state independently!
+                </p>
+            </div>
+        </div>
+
+        <!-- Process.both -->
+        <div class="section">
+            <h2>Process.both - Parallel Composition</h2>
+
+            <div class="diagram-box">
+                <div class="diagram-title">Function Signature</div>
+                <div class="code-block" data-label="Line 177-199">
+                    <span class="keyword">export function</span> <span class="function">both</span>&lt;TInstanceId,
+                    TState, TEvent, TResult1, TResult2&gt;(
+                    proc1: <span class="type">Process</span>&lt;TInstanceId, TState, TEvent, TResult1&gt;,
+                    proc2: <span class="type">Process</span>&lt;TInstanceId, TState, TEvent, TResult2&gt;,
+                    stateMerger: (leftState: TState, rightState: TState) => TState
+                    ): <span class="type">Process</span>&lt;TInstanceId, TState, TEvent, [TResult1, TResult2]&gt;
+                </div>
+            </div>
+
+            <p style="font-size: 1.1em; margin: 20px 0;">
+                <strong>Purpose:</strong> Runs two processes in parallel, waiting for both to complete.
+                The stateMerger combines their states back into a single TState.
+            </p>
+
+            <h3>Step-by-Step Breakdown</h3>
+
+            <div class="flow-step" data-step="Step 1: Execute Both Processes">
+                <div class="code-block" data-label="Line 183-184">
+                    <span class="keyword">const</span> [eff1, state1] = <span class="function">proc1</span>(instanceId,
+                    initialState);
+                    <span class="keyword">const</span> [eff2, state2] = <span class="function">proc2</span>(instanceId,
+                    initialState);
+                </div>
+                <p>Both processes receive the same initial state and execute independently.</p>
+            </div>
+
+            <div class="flow-step" data-step="Step 2: Combine Effects">
+                <div class="code-block" data-label="Line 187">
+                    <span class="keyword">const</span> combinedEffect = <span class="type">Effect</span>.<span
+                        class="function">pipe</span>(eff1, () => eff2);
+                </div>
+                <p>Sequence side effects: execute eff1, then eff2.</p>
+            </div>
+
+            <div class="flow-step" data-step="Step 3: Create Tuple Function">
+                <div class="code-block" data-label="Line 189">
+                    <span class="keyword">const</span> mappedState1 = <span class="type">ProcessState</span>.<span
+                        class="function">map</span>(
+                    a => (b: TResult2): [TResult1, TResult2] => [a, b],
+                    state1
+                    );
+                </div>
+                <p>Transform state1 to hold a function that creates result tuples.</p>
+                <ul>
+                    <li>If state1 is Succeeded(5), becomes Succeeded(b => [5, b])</li>
+                    <li>If state1 is InProgress, becomes InProgress with function wrapped</li>
+                </ul>
+            </div>
+
+            <div class="flow-step" data-step="Step 4: Apply to Create Tuple State">
+                <div class="code-block" data-label="Line 191">
+                    <span class="type">ProcessState</span>.<span class="function">apply</span>(mappedState1, state2)
+                </div>
+                <p>Apply the function in mappedState1 to state2's value.</p>
+                <p><strong>Result type:</strong>
+                    <code>ProcessState&lt;[TState, TState], TEvent, [TResult1, TResult2]&gt;</code></p>
+                <ul>
+                    <li>State is now a tuple [state1.state, state2.state]</li>
+                    <li>Value is a tuple [result1, result2]</li>
+                </ul>
+            </div>
+
+            <div class="flow-step" data-step="Step 5: Merge Tuple State with mapState">
+                <div class="code-block" data-label="Line 190-194">
+                    <span class="keyword">const</span> combinedState = <span class="type">ProcessState</span>.<span
+                        class="function">mapState</span>(
+                    ([leftState, rightState]) => <span class="function">stateMerger</span>(leftState, rightState),
+                    <span class="type">ProcessState</span>.<span class="function">apply</span>(mappedState1, state2)
+                    );
+                </div>
+                <p>Transform tuple state [left, right] into single merged state.</p>
+                <div class="highlight">
+                    <strong>Critical:</strong> Because mapState is recursive (line 74), this transformation applies to:
+                    <ul style="margin-top: 10px;">
+                        <li>The current tuple state</li>
+                        <li>ALL future tuple states created by event processing</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="example-box">
+                <div class="example-title">📝 Complete Example</div>
+                <div class="code-block" data-label="Usage">
+                    <span class="keyword">const</span> proc = <span class="type">Process</span>.<span
+                        class="function">Do</span>(<span class="keyword">function*</span>() {
+                    <span class="comment">// Set initial state</span>
+                    <span class="keyword">yield</span> <span class="type">Process</span>.<span
+                        class="function">setState</span>(s => ({ ...s, <span class="property">counter</span>: <span
+                        class="number">10</span> }));
+
+                    <span class="keyword">const</span> [num, str] = <span class="keyword">yield</span> <span
+                        class="type">Process</span>.<span class="function">both</span>(
+                    <span class="comment">// Left: waits for Event1, adds 5 to counter</span>
+                    <span class="type">Process</span>.<span class="function">Do</span>(<span
+                        class="keyword">function*</span>() {
+                    <span class="keyword">const</span> evt = <span class="keyword">yield</span> <span
+                        class="type">Process</span>.<span class="function">waitForEvent</span>(...);
+                    <span class="keyword">yield</span> <span class="type">Process</span>.<span
+                        class="function">setState</span>(s => ({ ...s, <span class="property">counter</span>: s.counter
+                    + <span class="number">5</span> }));
+                    <span class="keyword">return</span> evt;
+                    }),
+
+                    <span class="comment">// Right: waits for Event2, sets flag to true</span>
+                    <span class="type">Process</span>.<span class="function">Do</span>(<span
+                        class="keyword">function*</span>() {
+                    <span class="keyword">const</span> evt = <span class="keyword">yield</span> <span
+                        class="type">Process</span>.<span class="function">waitForEvent</span>(...);
+                    <span class="keyword">yield</span> <span class="type">Process</span>.<span
+                        class="function">setState</span>(s => ({ ...s, <span class="property">flag</span>: <span
+                        class="keyword">true</span> }));
+                    <span class="keyword">return</span> evt;
+                    }),
+
+                    <span class="comment">// State merger: take counter from left, flag from right</span>
+                    (left, right) => ({ <span class="property">counter</span>: left.counter, <span
+                        class="property">flag</span>: right.flag })
+                    );
+
+                    <span class="keyword">return</span> [num, str];
+                    });
+                </div>
+
+                <h4>Execution Flow:</h4>
+                <div class="state-box">
+                    <div class="state-label">Initial State:</div>
+                    <div class="state-value">{ counter: 10, flag: false }</div>
+                </div>
+
+                <div class="arrow">⬇️</div>
+
+                <div class="state-box">
+                    <div class="state-label">After Process.both (Both InProgress):</div>
+                    <div class="state-value">Internal tuple: [{ counter: 10, flag: false }, { counter: 10, flag: false
+                        }]</div>
+                    <div class="state-value">Merged via stateMerger: { counter: 10, flag: false }</div>
+                </div>
+
+                <div class="arrow">⬇️ Event1(100)</div>
+
+                <div class="state-box">
+                    <div class="state-label">Left Branch Processes Event1:</div>
+                    <div class="state-value">Internal tuple: [{ counter: 15, flag: false }, { counter: 10, flag: false
+                        }]</div>
+                    <div class="state-value">Merged: { counter: 15, flag: false } ← left.counter = 15!</div>
+                </div>
+
+                <div class="arrow">⬇️ Event2("done")</div>
+
+                <div class="state-box">
+                    <div class="state-label">Right Branch Processes Event2:</div>
+                    <div class="state-value">Internal tuple: [{ counter: 15, flag: false }, { counter: 10, flag: true }]
+                    </div>
+                    <div class="state-value">Merged: { counter: 15, flag: true } ← Both changes preserved!</div>
+                </div>
+
+                <div class="arrow">⬇️</div>
+
+                <div class="state-box">
+                    <div class="state-label">Final Result:</div>
+                    <div class="state-value">Value: [100, "done"]</div>
+                    <div class="state-value">State: { counter: 15, flag: true }</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complete Flow Diagram -->
+        <div class="section">
+            <h2>Complete Flow: How It All Works Together</h2>
+
+            <div class="diagram-box">
+                <div class="diagram-title">The Recursive Magic</div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">map (Line 55)</div>
+                        <p>Recursively applies function transformation to all future result values through the event
+                            chain.</p>
+                        <div class="code-block" data-label="Recursion">
+                            <span class="keyword">return</span> [eff, <span class="function">map</span>(f, nextState)];
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">mapState (Line 74)</div>
+                        <p>Recursively applies state transformation to all future states through the event chain.</p>
+                        <div class="code-block" data-label="Recursion">
+                            <span class="keyword">return</span> [effect, <span class="function">mapState</span>(f,
+                            nextState)];
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">apply (Lines 116, 122, 129)</div>
+                        <p>Recursively applies applicative combination when one or both branches progress.</p>
+                        <div class="code-block" data-label="Recursion">
+                            <span class="keyword">return</span> [effF, <span class="type">ProcessState</span>.<span
+                                class="function">apply</span>(nextF, state)];
+                            <span class="keyword">return</span> [effState, <span class="type">ProcessState</span>.<span
+                                class="function">apply</span>(f, nextState)];
+                            <span class="keyword">return</span> [combinedEffect, <span
+                                class="type">ProcessState</span>.<span class="function">apply</span>(nextF, nextState)];
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">bind (Line 287)</div>
+                        <p>Recursively applies monadic bind until the first process succeeds or fails.</p>
+                        <div class="code-block" data-label="Recursion">
+                            <span class="keyword">return</span> <span class="function">bind</span>((_, st) => result,
+                            f)(...);
+                        </div>
+                    </div>
+                </div>
+
+                <div class="key-insight" style="margin-top: 30px;">
+                    <h3>🎯 The Big Picture</h3>
+                    <p style="font-size: 1.1em;">All these recursive functions create a <strong>transformation
+                            pipeline</strong> that:</p>
+                    <ol style="margin-top: 15px;">
+                        <li>Wraps event handlers with transformation logic</li>
+                        <li>Automatically applies transformations to future states after events</li>
+                        <li>Propagates through the entire event processing chain</li>
+                        <li>Preserves state changes from independent branches</li>
+                        <li>Combines parallel computations with tuple states</li>
+                        <li>Merges tuple states back to single states with stateMerger</li>
+                    </ol>
+
+                    <p style="margin-top: 20px; font-size: 1.1em;">
+                        This is why a single <code>mapState</code> call in <code>Process.both</code> (line 190)
+                        can transform ALL future states - the recursion does the heavy lifting!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="section">
+            <h2>Quick Reference</h2>
+
+            <table>
+                <tr>
+                    <th>Operation</th>
+                    <th>Purpose</th>
+                    <th>Key Feature</th>
+                </tr>
+                <tr>
+                    <td><strong>ProcessState.map</strong></td>
+                    <td>Transform result values</td>
+                    <td>Recursive - applies to all future results</td>
+                </tr>
+                <tr>
+                    <td><strong>ProcessState.mapState</strong></td>
+                    <td>Transform state values</td>
+                    <td>Recursive - applies to all future states</td>
+                </tr>
+                <tr>
+                    <td><strong>ProcessState.apply</strong></td>
+                    <td>Combine two ProcessStates</td>
+                    <td>Creates tuple state [left, right]</td>
+                </tr>
+                <tr>
+                    <td><strong>Process.bind</strong></td>
+                    <td>Sequential composition</td>
+                    <td>Second process receives first's result</td>
+                </tr>
+                <tr>
+                    <td><strong>Process.map</strong></td>
+                    <td>Transform process result</td>
+                    <td>Wraps ProcessState.map</td>
+                </tr>
+                <tr>
+                    <td><strong>Process.both</strong></td>
+                    <td>Parallel composition</td>
+                    <td>Uses apply + mapState to merge states</td>
+                </tr>
+                <tr>
+                    <td><strong>Process.Do</strong></td>
+                    <td>Generator syntax</td>
+                    <td>Converts generator to bind chain</td>
+                </tr>
+            </table>
+
+            <div class="highlight" style="margin-top: 30px;">
+                <h3 style="color: #64ffda; margin-bottom: 15px;">Key Takeaways</h3>
+                <ul style="font-size: 1.05em;">
+                    <li><strong>Recursion is the foundation:</strong> map, mapState, apply, and bind all use recursion
+                        to propagate transformations</li>
+                    <li><strong>Tuple states preserve independence:</strong> apply creates [left, right] to track both
+                        branches' state changes</li>
+                    <li><strong>mapState is the glue:</strong> It flattens tuple states back to single states throughout
+                        the event chain</li>
+                    <li><strong>Effects are separated:</strong> Side effects are returned separately and executed by the
+                        runtime</li>
+                    <li><strong>Type safety throughout:</strong> TypeScript ensures correct composition at every level
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
