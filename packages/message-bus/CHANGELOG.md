@@ -1,5 +1,11 @@
 # @totalsoft/message-bus
 
+## 2.10.0
+
+### Minor Changes
+
+- 0e2a4ba: set jetstream consumer inactive_threshold=1h
+
 ## 2.9.0
 
 ### Minor Changes
