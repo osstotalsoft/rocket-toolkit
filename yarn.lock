@@ -2502,6 +2502,7 @@ __metadata:
     pino: "npm:^9.5.0"
     ramda: "npm:^0.30.1"
     rimraf: "npm:^6.0.1"
+    ts-jest: "npm:^29.2.5"
     typescript: "npm:^5.7.2"
   languageName: unknown
   linkType: soft
