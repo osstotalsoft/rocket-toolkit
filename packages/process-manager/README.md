@@ -2,6 +2,14 @@
 
 A TypeScript library for building stateful, event-driven processes using monadic composition patterns.
 
+## Installation
+
+```bash
+npm install @totalsoft/process-manager
+# or
+yarn add @totalsoft/process-manager
+```
+
 ## Overview
 
 This library provides a functional approach to building complex event-driven workflows with:
@@ -88,6 +96,10 @@ await runtime.handleEvent(instanceId,
   stream, 
   myProcess
 ).execute();
+
+// The process completes and returns the result
+// Output: "User user123 processed 42 items"
+// Final state: { userId: 'user123', total: 42 }
 ```
 
 ## Process Composition
@@ -134,22 +146,6 @@ const parallelProcess = Process.both(
 // Result is a tuple: [userId, data]
 ```
 
-### Transform Results with `map`
-
-Transform the result value without changing process logic:
-
-```typescript
-const mappedProcess = Process.map(
-  (value: number) => value * 2,
-  Process.waitForEvent<MyEvent, number>(e => 
-    e.type === 'DataReceived' ? Result.Ok(e.data) : null
-  )
-);
-
-// If event arrives with data: 21
-// Process succeeds with result: 42
-```
-
 ## Key Operations
 
 | Operation | Purpose | Example |
@@ -161,6 +157,38 @@ const mappedProcess = Process.map(
 | `Process.waitForEvent` | Wait for specific event | `waitForEvent(e => e.type === 'X' ? Ok(e) : null)` |
 | `Process.setState` | Update process state | `setState(s => ({ ...s, count: s.count + 1 }))` |
 | `Process.pure` | Create completed process | `pure(42)` |
+
+## Effects
+
+Effects represent side effects that need to be executed. The library provides an `Effect` class for managing asynchronous operations:
+
+```typescript
+import { Effect } from '@totalsoft/process-manager';
+
+// Create an effect from an async operation
+const effect = Effect.fromAsync(async () => {
+  const response = await fetch('https://api.example.com/data');
+  return response.json();
+});
+
+// Execute the effect
+const result = await effect.execute();
+```
+
+### Custom Effects
+
+The library also provides custom effects for common scenarios:
+
+```typescript
+import { CustomEffects } from '@totalsoft/process-manager';
+
+// HTTP GET request with event handling
+const httpProcess = CustomEffects.httpGet(
+  'https://api.example.com/users',
+  (response) => ({ type: 'DataReceived', data: response }),
+  (event) => event.type === 'DataReceived' ? Result.Ok(event.data) : null
+);
+```
 
 ## Process Runtime
 
@@ -211,7 +239,7 @@ const inMemoryStore = createEventStore({ type: "in-memory" });
 const sqlStore = createEventStore({ type: "mssql" });
 
 // SQL Server with custom connection
-import { ConnectionManager } from '@totalsoft/process-manager';
+import { ConnectionManager } from '@totalsoft/process-manager/infra/db-connection';
 const connectionManager = new ConnectionManager({
   server: 'localhost',
   database: 'ProcessManager',
@@ -286,16 +314,3 @@ The library includes visual documentation:
 - **[process-monad-explained.html](./process-monad-explained.html)** - Complete guide to the Process monad, map, bind, apply operations
 
 > **Note:** Download the HTML file and open it in your browser to view the interactive visualizations.
-
-## Type Safety
-
-All processes are fully typed:
-
-```typescript
-Process<TInstanceId, TState, TEvent, TResult>
-```
-
-- `TInstanceId`: Type of process instance identifier
-- `TState`: Type of process state
-- `TEvent`: Type of events the process handles
-- `TResult`: Type of final result value
