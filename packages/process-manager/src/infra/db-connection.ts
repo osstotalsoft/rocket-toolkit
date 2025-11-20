@@ -1,11 +1,11 @@
 import sql from 'mssql';
 
 const defaultConfig: sql.config = {
-    server: process.env.DB_SERVER || 'simrusqlmi.public.3927760fc80b.database.windows.net',
-    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 3342,
-    database: process.env.DB_NAME || 'platform_orchestrator_anfp-dev_dev',
-    user: process.env.DB_USER || 'supera',
-    password: process.env.DB_PASSWORD || 'BucifalEDoarUnCal!1504AMIN',
+    server: process.env.DB_SERVER || 'localhost',
+    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 1433,
+    database: process.env.DB_NAME || '',
+    user: process.env.DB_USER || '',
+    password: process.env.DB_PASSWORD || '',
     options: {
         trustServerCertificate: true,
     }

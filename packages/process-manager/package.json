@@ -10,7 +10,26 @@
     "test": "tsx __tests__/process-algebra.test.ts",
     "test:all": "tsx __tests__/*.test.ts"
   },
-  "composite": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./effects": {
+      "import": "./dist/effects.js",
+      "types": "./dist/effects.d.ts"
+    },
+    "./event-store": {
+      "import": "./dist/event-store/index.js",
+      "types": "./dist/event-store/index.d.ts"
+    },
+    "./mediator": {
+      "import": "./dist/mediator.js",
+      "types": "./dist/mediator.d.ts"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },

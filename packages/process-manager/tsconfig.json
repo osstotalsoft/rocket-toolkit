@@ -37,7 +37,8 @@
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-    "skipLibCheck": true,
+    "skipLibCheck": true
+    // "composite": true
   },
   "exclude": [
     "node_modules",
