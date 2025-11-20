@@ -1,0 +1,54 @@
+{
+  "name": "@totalsoft/process-manager",
+  "version": "1.1.1",
+  "description": "Process Manager Library",
+  "packageManager": "yarn@4.5.3",
+  "scripts": {
+    "build": "run clean && tsc",
+    "lint": "eslint src/*.ts",
+    "clean": "rimraf dist",
+    "test": "tsx __tests__/process-algebra.test.ts",
+    "test:all": "tsx __tests__/*.test.ts"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./effects": {
+      "import": "./dist/effects.js",
+      "types": "./dist/effects.d.ts"
+    },
+    "./event-store": {
+      "import": "./dist/event-store/index.js",
+      "types": "./dist/event-store/index.d.ts"
+    },
+    "./mediator": {
+      "import": "./dist/mediator.js",
+      "types": "./dist/mediator.d.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/osstotalsoft/rocket-toolkit.git",
+    "directory": "packages/process-manager"
+  },
+  "type": "module",
+  "dependencies": {
+    "mssql": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/mssql": "^9.1.8",
+    "@types/node": "^24.10.0",
+    "@types/uuid": "^10.0.0",
+    "rimraf": "^3.0.2",
+    "supports-color": "^10.2.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
