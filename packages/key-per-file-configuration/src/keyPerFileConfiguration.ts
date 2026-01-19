@@ -25,7 +25,7 @@ export function load(options?: Options): ConfigWatcher {
   const watcher = chokidar
     .watch(configFolderPath, {
       awaitWriteFinish: true,
-      ignored: (filePath) => path.basename(filePath).startsWith('..') //ignore kubernetes folders
+      ignorePermissionErrors: true
       /*, usePolling: true*/
     })
     .on('unlink', _removeValue)
