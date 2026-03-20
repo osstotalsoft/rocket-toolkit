@@ -3,4 +3,4 @@
 "@totalsoft/multitenancy-core": patch
 ---
 
-FIX: correlation ID and Tenant are separated between concurent calls.
+Fix: Ensure correlation ID and tenant context are kept separate between concurrent calls.
