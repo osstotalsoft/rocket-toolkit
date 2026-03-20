@@ -1,5 +1,12 @@
 # @totalsoft/pino-mssqlserver
 
+## 2.0.2
+
+### Patch Changes
+
+- Updated dependencies [6c440f8]
+  - @totalsoft/correlation@3.0.1
+
 ## 2.0.1
 
 ### Patch Changes

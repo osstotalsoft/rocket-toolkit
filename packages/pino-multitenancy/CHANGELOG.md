@@ -1,5 +1,12 @@
 # @totalsoft/pino-multitenancy
 
+## 2.0.1
+
+### Patch Changes
+
+- Updated dependencies [6c440f8]
+  - @totalsoft/multitenancy-core@2.0.1
+
 ## 2.0.0
 
 ### Major Changes

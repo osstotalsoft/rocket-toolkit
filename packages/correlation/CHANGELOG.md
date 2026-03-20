@@ -1,5 +1,11 @@
 # @totalsoft/correlation
 
+## 3.0.1
+
+### Patch Changes
+
+- 6c440f8: Fix: Ensure correlation ID and tenant context are kept separate between concurrent calls.
+
 ## 3.0.0
 
 ### Major Changes

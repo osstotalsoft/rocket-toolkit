@@ -2376,7 +2376,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@totalsoft/correlation@npm:3.0.0, @totalsoft/correlation@workspace:packages/correlation":
+"@totalsoft/correlation@npm:3.0.1, @totalsoft/correlation@workspace:packages/correlation":
   version: 0.0.0-use.local
   resolution: "@totalsoft/correlation@workspace:packages/correlation"
   dependencies:
@@ -2507,7 +2507,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@totalsoft/multitenancy-core@npm:2.0.0, @totalsoft/multitenancy-core@workspace:packages/multitenancy-core":
+"@totalsoft/multitenancy-core@npm:2.0.1, @totalsoft/multitenancy-core@workspace:packages/multitenancy-core":
   version: 0.0.0-use.local
   resolution: "@totalsoft/multitenancy-core@workspace:packages/multitenancy-core"
   dependencies:
@@ -2579,7 +2579,7 @@ __metadata:
     "@apollo/server": "npm:^4.11.2"
     "@colors/colors": "npm:^1.6.0"
     "@jest/types": "npm:^29.6.3"
-    "@totalsoft/correlation": "npm:3.0.0"
+    "@totalsoft/correlation": "npm:3.0.1"
     "@types/jest": "npm:^29.5.14"
     "@types/node": "npm:^22.8.7"
     "@types/ramda": "npm:0.30.2"
@@ -2601,7 +2601,7 @@ __metadata:
   resolution: "@totalsoft/pino-correlation@workspace:packages/pino-correlation"
   dependencies:
     "@jest/types": "npm:^29.6.3"
-    "@totalsoft/correlation": "npm:3.0.0"
+    "@totalsoft/correlation": "npm:3.0.1"
     "@types/jest": "npm:^29.5.14"
     "@types/node": "npm:^22.8.7"
     "@types/uuid": "npm:^10.0.0"
@@ -2617,7 +2617,7 @@ __metadata:
   resolution: "@totalsoft/pino-mssqlserver@workspace:packages/pino-mssqlserver"
   dependencies:
     "@jest/types": "npm:^29.6.3"
-    "@totalsoft/correlation": "npm:3.0.0"
+    "@totalsoft/correlation": "npm:3.0.1"
     "@types/humps": "npm:^2.0.6"
     "@types/jest": "npm:^29.5.14"
     "@types/node": "npm:^22.8.7"
@@ -2639,7 +2639,7 @@ __metadata:
   resolution: "@totalsoft/pino-multitenancy@workspace:packages/pino-multitenancy"
   dependencies:
     "@jest/types": "npm:^29.6.3"
-    "@totalsoft/multitenancy-core": "npm:2.0.0"
+    "@totalsoft/multitenancy-core": "npm:2.0.1"
     "@types/jest": "npm:^29.5.14"
     "@types/node": "npm:^22.8.7"
     "@types/uuid": "npm:^10.0.0"

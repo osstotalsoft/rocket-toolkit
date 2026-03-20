@@ -1,5 +1,12 @@
 # @totalsoft/pino-apollo
 
+## 3.1.1
+
+### Patch Changes
+
+- Updated dependencies [6c440f8]
+  - @totalsoft/correlation@3.0.1
+
 ## 3.1.0
 
 ### Minor Changes
