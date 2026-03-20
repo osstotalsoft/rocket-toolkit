@@ -16,7 +16,6 @@ jobs:
         uses: actions/checkout@master
         with:
           fetch-depth: 0
-          token: ${{ secrets.PAT }}
       - name: Set Node.js 20.x
         uses: actions/setup-node@v3
         with:
