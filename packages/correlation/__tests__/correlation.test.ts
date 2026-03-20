@@ -46,4 +46,26 @@ describe('correlation tests:', () => {
     //assert
     expect(correlationId).toHaveLength(36)
   })
+
+  it('does not mix correlation ids between concurrent requests', async () => {
+    //arrange
+    let correlationId1: string | undefined
+    let correlationId2: string | undefined
+
+    //act
+    await Promise.all([
+      correlationManager.useCorrelationId('request-1', async () => {
+        await new Promise(resolve => setTimeout(resolve, 10))
+        correlationId1 = correlationManager.getCorrelationId()
+      }),
+      correlationManager.useCorrelationId('request-2', async () => {
+        await new Promise(resolve => setTimeout(resolve, 5))
+        correlationId2 = correlationManager.getCorrelationId()
+      })
+    ])
+
+    //assert
+    expect(correlationId1).toBe('request-1')
+    expect(correlationId2).toBe('request-2')
+  })
 })
