@@ -13,7 +13,7 @@ describe('tenant context accessor tests:', () => {
     }
 
     //act
-    tenantContextAccessor.useTenantContext({ tenant }, async () => {
+    await tenantContextAccessor.useTenantContext({ tenant }, async () => {
       await inner()
     })
 
