@@ -31,5 +31,5 @@ export interface TenantSection {
 }
 
 export interface TenantContext {
-  tenant: Tenant;
+  tenant?: Tenant
 }

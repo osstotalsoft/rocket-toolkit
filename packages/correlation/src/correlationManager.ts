@@ -4,18 +4,15 @@
 import { AsyncLocalStorage } from 'async_hooks'
 import { v4 } from 'uuid'
 
-const asyncLocalStorage = new AsyncLocalStorage<Map<string, string>>()
-const store = new Map<string, string>()
-const correlationIdKey = 'correlationId'
+const asyncLocalStorage = new AsyncLocalStorage<string>()
 
 const getCorrelationId = () => {
-  const correlationIdStore = asyncLocalStorage.getStore()
-  return correlationIdStore?.get(correlationIdKey)
+  return asyncLocalStorage.getStore()
 }
 
 async function useCorrelationId(correlationId: string | null, next: () => Promise<void>) {
-  return asyncLocalStorage.run(store, async () => {
-    store.set(correlationIdKey, correlationId || v4())
+  const correlationIdToUse = correlationId || v4()
+  return asyncLocalStorage.run(correlationIdToUse, async () => {
     return await next()
   })
 }

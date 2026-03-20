@@ -4,16 +4,15 @@
 import { AsyncLocalStorage } from 'async_hooks'
 import { TenantContext } from './types'
 
-const asyncLocalStorage = new AsyncLocalStorage<Map<string, TenantContext>>()
-const store = new Map<string, TenantContext>()
+const asyncLocalStorage = new AsyncLocalStorage<TenantContext>()
 
 /**
  * Access the current tenant context in scope
  * @returns - the tenant context
  */
 const getTenantContext = (): TenantContext => {
-  const tenantStore = asyncLocalStorage.getStore()
-  return tenantStore?.get('tenantContext') ?? <TenantContext>{}
+  const tenantContext = asyncLocalStorage.getStore()
+  return tenantContext ?? <TenantContext>{}
 }
 
 /**
@@ -23,8 +22,7 @@ const getTenantContext = (): TenantContext => {
  * @returns the result of the next function
  */
 async function useTenantContext(tenantContext: TenantContext, next: () => Promise<void>) {
-  return asyncLocalStorage.run(store, async () => {
-    store.set('tenantContext', tenantContext)
+  return asyncLocalStorage.run(tenantContext, async () => {
     return await next()
   })
 }
