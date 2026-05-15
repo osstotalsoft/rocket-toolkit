@@ -170,16 +170,7 @@ export async function subscribe(
     const ackRequest = { message_id: msg.id /* , error: null*/ }
     call.write?.call(call, { ack_request: ackRequest })
   })
-  call.on('end', function () {
-    // The server has finished sending
-    console.error(`Rusi subscription ended for subject ${subject}.`)
-  })
-  call.on('error', function (e) {
-    // An error has occurred and the stream has been closed.
-    console.error(`Rusi subscription error for subject ${subject}: ${e}`)
-  })
-
-  const sub = rusiSubscription(call)
+  const sub = rusiSubscription(call, subject)
   return sub
 }
 
@@ -241,16 +232,25 @@ function fromUTF8Array(data: number[]): string {
   return str
 }
 
-function rusiSubscription(call: grpc.ClientDuplexStream<any, any>): RusiSubscription {
+function rusiSubscription(call: grpc.ClientDuplexStream<any, any>, subject?: string): RusiSubscription {
   const sub = <RusiSubscription> new EventEmitter()
-  sub.on('removeListener', (event, listener) => {
-    call.removeListener(event, listener)
-  })
-  sub.on('newListener', (event, listener) => {
-    call.on(event, listener)
-  })
+
+  const onError = function (e: Error) {
+    console.error(`Rusi subscription error for subject ${subject}: ${e}`)
+    sub.emit('error', e)
+  }
+  const onEnd = function () {
+    const err = new Error(`Rusi subscription ended for subject ${subject}.`)
+    console.error(err.message)
+    sub.emit('error', err)
+  }
+
+  call.on('error', onError)
+  call.on('end', onEnd)
 
   sub.unsubscribe = function unsubscribe() {
+    call.removeListener('error', onError)
+    call.removeListener('end', onEnd)
     call.cancel?.call(call)
     return Promise.resolve()
   }
