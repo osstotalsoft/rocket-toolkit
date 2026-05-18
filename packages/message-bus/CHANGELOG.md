@@ -1,5 +1,12 @@
 # @totalsoft/message-bus
 
+## 2.10.1
+
+### Patch Changes
+
+- 17fd694: upgrage messahe-bus grpc deps
+- 34f640b: Msgbus Rusi transport emit subscription error
+
 ## 2.10.0
 
 ### Minor Changes
