@@ -41,7 +41,8 @@ describe('Testing rusi transport', () => {
         cancel: jest.fn(),
         end: jest.fn(),
         write: jest.fn(),
-        on: jest.fn()
+        on: jest.fn(),
+        removeListener: jest.fn()
       })),
       close: jest.fn()
     }
@@ -166,6 +167,83 @@ describe('Testing rusi transport', () => {
 
     // assert
     expect(sub._call?.cancel).toBeCalled()
+  })
+
+  test('subscribe registers error and end listeners on call', async () => {
+    // arrange
+    const subject = 'subject'
+
+    // act
+    const sub = <RusiSubscription>await rusi.subscribe(subject, jest.fn(), SubscriptionOptions.PUB_SUB, serDes)
+
+    // assert
+    expect(sub._call?.on).toHaveBeenCalledWith('error', expect.any(Function))
+    expect(sub._call?.on).toHaveBeenCalledWith('end', expect.any(Function))
+  })
+
+  test('unsubscribe removes error and end listeners before cancelling', async () => {
+    // arrange
+    const sub = <RusiSubscription>await rusi.subscribe('subject', jest.fn(), SubscriptionOptions.STREAM_PROCESSOR, serDes)
+
+    // act
+    await sub.unsubscribe?.call(sub)
+
+    // assert
+    expect(sub._call?.removeListener).toHaveBeenCalledWith('error', expect.any(Function))
+    expect(sub._call?.removeListener).toHaveBeenCalledWith('end', expect.any(Function))
+    expect(sub._call?.cancel).toBeCalled()
+  })
+
+  test('subscription emits error when call emits error', async () => {
+    // arrange — use a real EventEmitter for call so events propagate
+    const { EventEmitter } = require('events')
+    const realCall = Object.assign(new EventEmitter(), { cancel: jest.fn(), write: jest.fn() })
+    mockRusiClient.Subscribe.mockReturnValueOnce(realCall)
+
+    const sub = await rusi.subscribe('subject', jest.fn(), SubscriptionOptions.PUB_SUB, serDes)
+    const errorListener = jest.fn()
+    sub.on('error', errorListener)
+
+    // act
+    const testError = new Error('sidecar subscription error')
+    realCall.emit('error', testError)
+
+    // assert
+    expect(errorListener).toHaveBeenCalledWith(testError)
+  })
+
+  test('subscription emits error when call emits end', async () => {
+    // arrange
+    const { EventEmitter } = require('events')
+    const realCall = Object.assign(new EventEmitter(), { cancel: jest.fn(), write: jest.fn() })
+    mockRusiClient.Subscribe.mockReturnValueOnce(realCall)
+
+    const sub = await rusi.subscribe('subject', jest.fn(), SubscriptionOptions.PUB_SUB, serDes)
+    const errorListener = jest.fn()
+    sub.on('error', errorListener)
+
+    // act
+    realCall.emit('end')
+
+    // assert
+    expect(errorListener).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('subject') }))
+  })
+
+  test('subscription does not throw when call emits error or end without error listeners', async () => {
+    // arrange
+    const { EventEmitter } = require('events')
+    const realCall = Object.assign(new EventEmitter(), { cancel: jest.fn(), write: jest.fn() })
+    mockRusiClient.Subscribe.mockReturnValueOnce(realCall)
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+    await rusi.subscribe('subject', jest.fn(), SubscriptionOptions.PUB_SUB, serDes)
+
+    // act - assert
+    expect(() => realCall.emit('error', new Error('sidecar subscription error'))).not.toThrow()
+    expect(() => realCall.emit('end')).not.toThrow()
+    expect(errorSpy).toHaveBeenCalled()
+
+    errorSpy.mockRestore()
   })
 
   test('disconnect happens if the connection is open', async () => {
