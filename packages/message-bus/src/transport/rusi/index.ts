@@ -235,14 +235,20 @@ function fromUTF8Array(data: number[]): string {
 function rusiSubscription(call: grpc.ClientDuplexStream<any, any>, subject?: string): RusiSubscription {
   const sub = <RusiSubscription> new EventEmitter()
 
+  const emitError = function (error: Error) {
+    if (sub.listenerCount('error') > 0) {
+      sub.emit('error', error)
+    }
+  }
+
   const onError = function (e: Error) {
     console.error(`Rusi subscription error for subject ${subject}: ${e}`)
-    sub.emit('error', e)
+    emitError(e)
   }
   const onEnd = function () {
     const err = new Error(`Rusi subscription ended for subject ${subject}.`)
     console.error(err.message)
-    sub.emit('error', err)
+    emitError(err)
   }
 
   call.on('error', onError)

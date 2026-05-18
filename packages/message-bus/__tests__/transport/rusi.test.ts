@@ -229,6 +229,23 @@ describe('Testing rusi transport', () => {
     expect(errorListener).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining('subject') }))
   })
 
+  test('subscription does not throw when call emits error or end without error listeners', async () => {
+    // arrange
+    const { EventEmitter } = require('events')
+    const realCall = Object.assign(new EventEmitter(), { cancel: jest.fn(), write: jest.fn() })
+    mockRusiClient.Subscribe.mockReturnValueOnce(realCall)
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+    await rusi.subscribe('subject', jest.fn(), SubscriptionOptions.PUB_SUB, serDes)
+
+    // act - assert
+    expect(() => realCall.emit('error', new Error('sidecar subscription error'))).not.toThrow()
+    expect(() => realCall.emit('end')).not.toThrow()
+    expect(errorSpy).toHaveBeenCalled()
+
+    errorSpy.mockRestore()
+  })
+
   test('disconnect happens if the connection is open', async () => {
     // arrange
 
