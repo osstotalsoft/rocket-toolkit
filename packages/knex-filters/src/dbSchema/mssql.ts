@@ -34,7 +34,7 @@ const mssql: BuildTableHasColumnPredicate = async (column: Name, knex: Knex<any,
   const [defaultSchema, dbName] = await getDefaultSchemaAndDbName(knex)
   const tables = await getTablesWithColumn(column, knex)
 
-  const map = new Map<string, Set<any>>()
+  const map = new Map<string, Set<string>>()
   for (const row of tables) {
     if (!map.has(row.schema)) map.set(row.schema, new Set())
     map.get(row.schema)!.add(row.table)
@@ -46,7 +46,7 @@ const mssql: BuildTableHasColumnPredicate = async (column: Name, knex: Knex<any,
       return false
     }
     const schema = _schema ?? defaultSchema
-    return Boolean(map.has(schema) && map?.get(schema)?.has(table))
+    return Boolean(table != null && map.get(schema)?.has(table))
   }
 }
 

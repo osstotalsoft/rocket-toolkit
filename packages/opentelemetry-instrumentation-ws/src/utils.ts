@@ -33,11 +33,13 @@ export const getIncomingRequestAttributes = (
   options: { component: string; hookAttributes?: Attributes }
 ): Attributes => {
   const headers = request.headers
+  // TLS sockets expose `encrypted === true`; use it to distinguish `wss` (over https) from `ws` (over http).
+  const isEncrypted = (request.socket as { encrypted?: boolean } | undefined)?.encrypted === true
   const attributes: Attributes = {
     'http.method': (request.method || 'GET').toUpperCase(),
     'http.target': request.url || '/',
     'http.host': headers.host || 'localhost',
-    'http.scheme': 'ws',
+    'http.scheme': isEncrypted ? 'wss' : 'ws',
     'http.flavor': request.httpVersion,
     'net.transport': 'ip_tcp',
     component: options.component

@@ -40,7 +40,7 @@ const pg: BuildTableHasColumnPredicate = async (column: Name, knex: Knex<any, an
   const tablesWithColumn = await getTablesWithColumn(column, knex)
   if (!tablesWithColumn) return () => false
 
-  const map = new Map<string, Set<any>>()
+  const map = new Map<string, Set<string>>()
   for (const row of tablesWithColumn) {
     if (!map.has(row.schema)) map.set(row.schema, new Set())
     map.get(row.schema)!.add(row.table)
@@ -52,7 +52,7 @@ const pg: BuildTableHasColumnPredicate = async (column: Name, knex: Knex<any, an
       return false
     }
     const schema = _schema ?? defaultSchema
-    const tableHasColumn = map.has(schema) && map?.get(schema)?.has(table)
+    const tableHasColumn = table != null && map.get(schema)?.has(table)
     return Boolean(tableHasColumn)
   }
 }
