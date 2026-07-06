@@ -37,7 +37,6 @@ export default tseslint.config(
       ],
       '@typescript-eslint/no-use-before-define': 'off',
       '@typescript-eslint/no-namespace': 'off',
-      '@typescript-eslint/no-empty-interface': 'off',
       '@typescript-eslint/no-empty-function': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-var-requires': 'off',

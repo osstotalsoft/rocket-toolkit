@@ -33,13 +33,14 @@ export const getIncomingRequestAttributes = (
   options: { component: string; hookAttributes?: Attributes }
 ): Attributes => {
   const headers = request.headers
-  // TLS sockets expose `encrypted === true`; use it to distinguish `wss` (over https) from `ws` (over http).
+  // Per OTel semantic conventions `http.scheme` is the HTTP scheme (`http`/`https`), even for WebSocket
+  // upgrade requests. TLS sockets expose `encrypted === true`, which distinguishes `https` from `http`.
   const isEncrypted = (request.socket as { encrypted?: boolean } | undefined)?.encrypted === true
   const attributes: Attributes = {
     'http.method': (request.method || 'GET').toUpperCase(),
     'http.target': request.url || '/',
     'http.host': headers.host || 'localhost',
-    'http.scheme': isEncrypted ? 'wss' : 'ws',
+    'http.scheme': isEncrypted ? 'https' : 'http',
     'http.flavor': request.httpVersion,
     'net.transport': 'ip_tcp',
     component: options.component
