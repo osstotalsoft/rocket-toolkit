@@ -21,7 +21,7 @@ describe('pino-opentelemetry tests:', () => {
     logger.info('bau')
 
     //assert
-    expect(rootSpan.addEvent).toBeCalledWith('info', expect.objectContaining({ message: 'bau' }), expect.anything())
+    expect(rootSpan.addEvent).toHaveBeenCalledWith('info', expect.objectContaining({ message: 'bau' }), expect.anything())
   })
 
   it('records exception', async () => {
@@ -44,7 +44,7 @@ describe('pino-opentelemetry tests:', () => {
     logger.error(error, 'bau')
 
     //assert
-    expect(rootSpan.addEvent).toBeCalledWith(
+    expect(rootSpan.addEvent).toHaveBeenCalledWith(
       'error',
       expect.objectContaining({
         message: 'bau',

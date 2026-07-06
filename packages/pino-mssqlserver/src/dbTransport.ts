@@ -1,7 +1,6 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-/* eslint-env browser */
 import build from 'pino-abstract-transport'
 import knex from 'knex'
 import { Knex } from 'knex'

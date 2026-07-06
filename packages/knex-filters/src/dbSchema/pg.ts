@@ -1,7 +1,6 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import * as R from 'ramda'
 import type { BuildTableHasColumnPredicate, Name } from '../types'
 import { Knex } from 'knex'
 
@@ -40,14 +39,12 @@ const pg: BuildTableHasColumnPredicate = async (column: Name, knex: Knex<any, an
 
   const tablesWithColumn = await getTablesWithColumn(column, knex)
   if (!tablesWithColumn) return () => false
-  const propSchema: (obj: Record<'schema', any>) => string = R.prop('schema')
 
-  const entries = R.compose(
-    R.map(([k, v]): [string, Set<typeof v>] => [k, new Set(R.map(R.prop('table'), v))]),
-    R.toPairs,
-    R.groupBy(propSchema)
-  )(tablesWithColumn)
-  const map = new Map(entries)
+  const map = new Map<string, Set<any>>()
+  for (const row of tablesWithColumn) {
+    if (!map.has(row.schema)) map.set(row.schema, new Set())
+    map.get(row.schema)!.add(row.table)
+  }
 
   return function tableHasColumn(tableName) {
     const [db, _schema, table] = decompose(tableName)

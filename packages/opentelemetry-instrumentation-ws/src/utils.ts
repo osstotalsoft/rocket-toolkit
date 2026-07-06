@@ -1,8 +1,55 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import { Span, SpanStatusCode } from '@opentelemetry/api'
+import { Attributes, Span, SpanStatusCode } from '@opentelemetry/api'
+import type { IncomingMessage } from 'http'
 import isPromise from 'is-promise'
+
+/**
+ * Semantic attribute keys used by this instrumentation. Previously imported from
+ * `@opentelemetry/semantic-conventions`, these are inlined to keep the emitted span
+ * attribute keys stable across semantic-conventions major versions.
+ */
+export const SemanticAttributes = {
+  MESSAGING_SYSTEM: 'messaging.system',
+  MESSAGING_DESTINATION_KIND: 'messaging.destination_kind',
+  MESSAGING_OPERATION: 'messaging.operation',
+  MESSAGING_DESTINATION: 'messaging.destination',
+  MESSAGING_PROTOCOL: 'messaging.protocol',
+  NET_HOST_IP: 'net.host.ip',
+  NET_HOST_PORT: 'net.host.port',
+  NET_PEER_IP: 'net.peer.ip',
+  NET_PEER_PORT: 'net.peer.port',
+  HTTP_STATUS_CODE: 'http.status_code'
+} as const
+
+/**
+ * Builds span attributes for an incoming HTTP(S) upgrade request. Replaces the
+ * `getIncomingRequestAttributes` helper that `@opentelemetry/instrumentation-http`
+ * no longer exports as of the 0.2xx line.
+ */
+export const getIncomingRequestAttributes = (
+  request: IncomingMessage,
+  options: { component: string; hookAttributes?: Attributes }
+): Attributes => {
+  const headers = request.headers
+  const attributes: Attributes = {
+    'http.method': (request.method || 'GET').toUpperCase(),
+    'http.target': request.url || '/',
+    'http.host': headers.host || 'localhost',
+    'http.scheme': 'ws',
+    'http.flavor': request.httpVersion,
+    'net.transport': 'ip_tcp',
+    component: options.component
+  }
+
+  const userAgent = headers['user-agent']
+  if (userAgent !== undefined) {
+    attributes['http.user_agent'] = userAgent
+  }
+
+  return Object.assign(attributes, options.hookAttributes)
+}
 
 export const endSpan = (traced: () => any | Promise<any>, span: Span) => {
   try {

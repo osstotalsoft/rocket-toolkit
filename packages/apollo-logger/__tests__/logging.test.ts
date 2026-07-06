@@ -37,7 +37,7 @@ describe('logging plugin tests:', () => {
     logDebug('Test message', 'code')
 
     //assert
-    expect(global.console.log).toBeCalledTimes(1)
+    expect(global.console.log).toHaveBeenCalledTimes(1)
     expect(context.logs.length).toStrictEqual(1)
   })
 
@@ -51,7 +51,7 @@ describe('logging plugin tests:', () => {
     logInfo('Test message', 'code')
 
     //assert
-    expect(global.console.log).toBeCalledTimes(1)
+    expect(global.console.log).toHaveBeenCalledTimes(1)
     expect(context.logs.length).toStrictEqual(1)
   })
 
@@ -70,7 +70,7 @@ describe('logging plugin tests:', () => {
     const result = await logError('Test message', 'code', new Error('Error message'))
 
     //assert
-    expect(global.console.error).toBeCalledTimes(1)
+    expect(global.console.error).toHaveBeenCalledTimes(1)
     expect(context.logs.length).toStrictEqual(0)
     expect(result).toBeInstanceOf(GraphQLError)
     expect(result.message.includes('Error message')).toBeFalsy()
@@ -91,7 +91,7 @@ describe('logging plugin tests:', () => {
     const result = await logError('Test message', 'code', new Error('Error message'))
 
     //assert
-    expect(global.console.error).toBeCalledTimes(1)
+    expect(global.console.error).toHaveBeenCalledTimes(1)
     expect(context.logs.length).toStrictEqual(0)
     expect(result).toBeInstanceOf(GraphQLError)
     expect(result.message).toContain('Error message')
@@ -205,7 +205,7 @@ describe('logging plugin tests:', () => {
     await logEvent(context, message, code, LoggingLevel.INFO, persistLogsFn)
 
     //assert
-    expect(persistLogsFn).toBeCalledTimes(1)
+    expect(persistLogsFn).toHaveBeenCalledTimes(1)
     expect(context.logs).toStrictEqual([])
   })
 
@@ -224,7 +224,7 @@ describe('logging plugin tests:', () => {
 
     //assert
     expect(context.logs).toStrictEqual([] as Log[])
-    expect(console.error).toBeCalled()
+    expect(console.error).toHaveBeenCalled()
     expect(res).toBeInstanceOf(GraphQLError)
   })
 
@@ -243,8 +243,8 @@ describe('logging plugin tests:', () => {
     const res = await logError(message, code, new Error(errorMessage))
 
     //assert
-    expect(console.error).toBeCalled()
-    expect(persistLogsFn).toBeCalledTimes(1)
+    expect(console.error).toHaveBeenCalled()
+    expect(persistLogsFn).toHaveBeenCalledTimes(1)
     expect(res).toBeInstanceOf(GraphQLError)
     expect(res.message).toContain('For more details check Log Id:')
     expect(res.message.includes('Error message')).toBeFalsy()

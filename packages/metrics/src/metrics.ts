@@ -1,4 +1,4 @@
-import { MeterProvider, View, ExplicitBucketHistogramAggregation, InstrumentType } from '@opentelemetry/sdk-metrics'
+import { MeterProvider, AggregationType, InstrumentType } from '@opentelemetry/sdk-metrics'
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
 import { metrics, ValueType } from '@opentelemetry/api'
 import { Logger } from 'pino'
@@ -11,20 +11,22 @@ const exporter = new PrometheusExporter({ preventServerStart: true })
 const meterProvider = new MeterProvider({
   readers: [exporter],
   views: [
-    new View({
+    {
       instrumentType: InstrumentType.HISTOGRAM,
       instrumentUnit: 'seconds',
-      aggregation: new ExplicitBucketHistogramAggregation([
-        0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10
-      ])
-    }),
-    new View({
+      aggregation: {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+        options: { boundaries: [0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10] }
+      }
+    },
+    {
       instrumentType: InstrumentType.HISTOGRAM,
       instrumentUnit: 'milliseconds',
-      aggregation: new ExplicitBucketHistogramAggregation([
-        5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000
-      ])
-    })
+      aggregation: {
+        type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+        options: { boundaries: [5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000] }
+      }
+    }
   ]
 })
 metrics.setGlobalMeterProvider(meterProvider)

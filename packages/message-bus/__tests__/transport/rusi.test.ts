@@ -79,7 +79,7 @@ describe('Testing rusi transport', () => {
     await expect(rusi.connect()).rejects.toMatchObject({ message: 'Loading failed!' })
 
     // assert
-    expect(protoLoader.loadSync).toBeCalled()
+    expect(protoLoader.loadSync).toHaveBeenCalled()
     expect(grpcJs.loadPackageDefinition).not.toHaveBeenCalled()
   })
 
@@ -96,7 +96,7 @@ describe('Testing rusi transport', () => {
     expect(Object.is(c1._rusiClient, c3[0]._rusiClient)).toBeTruthy()
     expect(Object.is(c1._rusiClient, c3[1]._rusiClient)).toBeTruthy()
     expect(Object.is(c1._rusiClient, c3[2]._rusiClient)).toBeTruthy()
-    expect(mockRusiClient.waitForReady).toBeCalledTimes(1)
+    expect(mockRusiClient.waitForReady).toHaveBeenCalledTimes(1)
   })
 
   test('protoLoader creates the definition used for GRPC package definition', async () => {
@@ -108,7 +108,7 @@ describe('Testing rusi transport', () => {
     await rusi.connect()
 
     // assert
-    expect(grpcJs.loadPackageDefinition).toBeCalledWith(definition)
+    expect(grpcJs.loadPackageDefinition).toHaveBeenCalledWith(definition)
   })
 
   test('error thrown while watching connectivity state', async () => {
@@ -135,10 +135,10 @@ describe('Testing rusi transport', () => {
     await rusi.publish(subject, envelope, serDes)
 
     // assert
-    expect(protoLoader.loadSync).toBeCalled()
+    expect(protoLoader.loadSync).toHaveBeenCalled()
     expect(grpcJs.loadPackageDefinition).toHaveBeenCalled()
-    expect(mockRusiClient.waitForReady).toBeCalled()
-    expect(mockRusiClient.Publish).toBeCalled()
+    expect(mockRusiClient.waitForReady).toHaveBeenCalled()
+    expect(mockRusiClient.Publish).toHaveBeenCalled()
   })
 
   test('subscribe opens a connection before calling Subscribe', async () => {
@@ -150,10 +150,10 @@ describe('Testing rusi transport', () => {
     await rusi.subscribe(subject, handler, SubscriptionOptions.PUB_SUB, serDes)
 
     // assert
-    expect(protoLoader.loadSync).toBeCalled()
+    expect(protoLoader.loadSync).toHaveBeenCalled()
     expect(grpcJs.loadPackageDefinition).toHaveBeenCalled()
-    expect(mockRusiClient.waitForReady).toBeCalled()
-    expect(mockRusiClient.Subscribe).toBeCalled()
+    expect(mockRusiClient.waitForReady).toHaveBeenCalled()
+    expect(mockRusiClient.Subscribe).toHaveBeenCalled()
   })
 
   test('unsubscribe calls cancel on the connection', async () => {
@@ -166,7 +166,7 @@ describe('Testing rusi transport', () => {
     await sub.unsubscribe?.call(sub)
 
     // assert
-    expect(sub._call?.cancel).toBeCalled()
+    expect(sub._call?.cancel).toHaveBeenCalled()
   })
 
   test('subscribe registers error and end listeners on call', async () => {
@@ -191,7 +191,7 @@ describe('Testing rusi transport', () => {
     // assert
     expect(sub._call?.removeListener).toHaveBeenCalledWith('error', expect.any(Function))
     expect(sub._call?.removeListener).toHaveBeenCalledWith('end', expect.any(Function))
-    expect(sub._call?.cancel).toBeCalled()
+    expect(sub._call?.cancel).toHaveBeenCalled()
   })
 
   test('subscription emits error when call emits error', async () => {
@@ -266,6 +266,6 @@ describe('Testing rusi transport', () => {
     await rusi.disconnect()
 
     // assert
-    expect(mockRusiClient?.close).toBeCalledTimes(1)
+    expect(mockRusiClient?.close).toHaveBeenCalledTimes(1)
   })
 })

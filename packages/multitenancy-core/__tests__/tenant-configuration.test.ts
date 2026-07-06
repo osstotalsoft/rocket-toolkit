@@ -120,7 +120,7 @@ describe('logging plugin tests:', () => {
     const action = () => tenantConfiguration.getValue(tenantId, 'parent.tenantProp')
 
     ///Assert
-    expect(action).toThrowError('Configuration not found')
+    expect(action).toThrow('Configuration not found')
   })
 
   it('should read connection info:', () => {

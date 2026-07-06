@@ -60,7 +60,7 @@ describe('tenant service tests:', () => {
     const action = async () => await tenantService.getTenantFromId(tenantId)
 
     ///Assert
-    await expect(action).rejects.toThrowError('Configuration not found')
+    await expect(action).rejects.toThrow('Configuration not found')
   })
 
   it('should throw when tenant is disabled:', async () => {
@@ -77,7 +77,7 @@ describe('tenant service tests:', () => {
     const action = async () => await tenantService.getTenantFromId(tenantId)
 
     ///Assert
-    await expect(action).rejects.toThrowError('disabled')
+    await expect(action).rejects.toThrow('disabled')
   })
 
   it('should load tenants', async () => {
