@@ -30,7 +30,7 @@ describe('graceful shutdown tests:', () => {
     process.emit('SIGINT')
 
     //assert
-    expect(onShutdown).toBeCalled()
+    expect(onShutdown).toHaveBeenCalled()
   })
 
   it('handles custom shutdown signal', async () => {
@@ -47,7 +47,7 @@ describe('graceful shutdown tests:', () => {
     process.emit(<any>'BAU')
 
     //assert
-    expect(onShutdown).toBeCalled()
+    expect(onShutdown).toHaveBeenCalled()
   })
 
   it('handles default unrecoverable event', async () => {
@@ -63,7 +63,7 @@ describe('graceful shutdown tests:', () => {
     process.emit('uncaughtException', new Error())
 
     //assert
-    expect(onShutdown).toBeCalledWith(expect.stringContaining('uncaughtException'))
+    expect(onShutdown).toHaveBeenCalledWith(expect.stringContaining('uncaughtException'))
   })
 
   it('logs shutdown events', async () => {
@@ -81,7 +81,7 @@ describe('graceful shutdown tests:', () => {
     process.emit('SIGINT')
 
     //assert
-    expect(logger.info).toBeCalledWith(expect.stringContaining('Shutdown'))
+    expect(logger.info).toHaveBeenCalledWith(expect.stringContaining('Shutdown'))
   })
 
   it('logs unrecoverable events', async () => {
@@ -100,8 +100,8 @@ describe('graceful shutdown tests:', () => {
     process.emit('uncaughtException', new Error('MyException'))
 
     //assert
-    expect(logger.info).toBeCalledWith(expect.stringContaining('Shutdown'))
-    expect(logger.error).toBeCalledWith(error, expect.stringContaining('uncaughtException'))
+    expect(logger.info).toHaveBeenCalledWith(expect.stringContaining('Shutdown'))
+    expect(logger.error).toHaveBeenCalledWith(error, expect.stringContaining('uncaughtException'))
   })
 
   it('handles shutdown errors', async () => {
@@ -122,8 +122,8 @@ describe('graceful shutdown tests:', () => {
     process.emit('SIGINT')
 
     //assert
-    expect(logger.info).toBeCalledWith(expect.stringContaining('Shutdown'))
-    expect(logger.error).toBeCalledWith(error, expect.anything())
+    expect(logger.info).toHaveBeenCalledWith(expect.stringContaining('Shutdown'))
+    expect(logger.error).toHaveBeenCalledWith(error, expect.anything())
     expect(process.exit).toHaveBeenCalled()
   })
 
@@ -146,7 +146,7 @@ describe('graceful shutdown tests:', () => {
     await setTimeout(50)
 
     //assert
-    expect(logger.error).toBeCalledWith(expect.stringContaining('Timeout'))
+    expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('Timeout'))
     expect(process.exit).toHaveBeenCalled()
   })
 })

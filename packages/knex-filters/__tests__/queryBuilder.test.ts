@@ -26,7 +26,7 @@ describe('apply filter tests', () => {
     applyFilter(filter, queryBuilder)
 
     // assert
-    expect(filter).toBeCalledWith(null)
+    expect(filter).toHaveBeenCalledWith(null)
   })
 
   test('circuit break if `onUpdate` is not returned by filter', () => {
@@ -38,7 +38,7 @@ describe('apply filter tests', () => {
     applyFilter(filter, queryBuilder)
 
     // assert
-    expect(filter).toBeCalledWith(null)
+    expect(filter).toHaveBeenCalledWith(null)
   })
 
   test('circuit break if `onDelete` is not returned by filter', () => {
@@ -50,7 +50,7 @@ describe('apply filter tests', () => {
     applyFilter(filter, queryBuilder)
 
     // assert
-    expect(filter).toBeCalledWith(null)
+    expect(filter).toHaveBeenCalledWith(null)
   })
 
   test('circuit break if `onSelect` is not returned by filter', () => {
@@ -62,7 +62,7 @@ describe('apply filter tests', () => {
     applyFilter(filter, queryBuilder)
 
     // assert
-    expect(filter).toBeCalledWith(null)
+    expect(filter).toHaveBeenCalledWith(null)
   })
 
   test('filter is called with table name', () => {
@@ -93,8 +93,8 @@ describe('apply filter tests', () => {
     applyFilter(filter, queryBuilder)
 
     // assert
-    expect(filter).toBeCalled()
-    expect(onInsert).toBeCalledTimes(5)
+    expect(filter).toHaveBeenCalled()
+    expect(onInsert).toHaveBeenCalledTimes(5)
   })
 
   test('on update is called once', () => {
@@ -107,8 +107,8 @@ describe('apply filter tests', () => {
     applyFilter(filter, queryBuilder)
 
     // assert
-    expect(filter).toBeCalled()
-    expect(onUpdate).toBeCalledTimes(1)
+    expect(filter).toHaveBeenCalled()
+    expect(onUpdate).toHaveBeenCalledTimes(1)
   })
 
   test('on delete is called once', () => {
@@ -121,8 +121,8 @@ describe('apply filter tests', () => {
     applyFilter(filter, queryBuilder)
 
     // assert
-    expect(filter).toBeCalled()
-    expect(onDelete).toBeCalledTimes(1)
+    expect(filter).toHaveBeenCalled()
+    expect(onDelete).toHaveBeenCalledTimes(1)
   })
 
   test('on select is called for each clause', () => {
@@ -135,8 +135,8 @@ describe('apply filter tests', () => {
     applyFilter(filter, queryBuilder)
 
     // assert
-    expect(filter).toBeCalledTimes(6)
-    expect(onSelect).toBeCalledTimes(6)
+    expect(filter).toHaveBeenCalledTimes(6)
+    expect(onSelect).toHaveBeenCalledTimes(6)
   })
 
   test('on select is called for each type of clause', () => {
@@ -169,12 +169,12 @@ describe('apply filter tests', () => {
     applyFilter(filter, queryBuilder)
 
     // assert
-    expect(filter).toBeCalledTimes(9)
-    expect(onSelect.from).toBeCalledTimes(1)
-    expect(onSelect.innerJoin).toBeCalledTimes(1)
-    expect(onSelect.leftJoin).toBeCalledTimes(2)
-    expect(onSelect.rightJoin).toBeCalledTimes(2)
-    expect(onSelect.fullOuterJoin).toBeCalledTimes(2)
-    expect(onSelect.crossJoin).toBeCalledTimes(1)
+    expect(filter).toHaveBeenCalledTimes(9)
+    expect(onSelect.from).toHaveBeenCalledTimes(1)
+    expect(onSelect.innerJoin).toHaveBeenCalledTimes(1)
+    expect(onSelect.leftJoin).toHaveBeenCalledTimes(2)
+    expect(onSelect.rightJoin).toHaveBeenCalledTimes(2)
+    expect(onSelect.fullOuterJoin).toHaveBeenCalledTimes(2)
+    expect(onSelect.crossJoin).toHaveBeenCalledTimes(1)
   })
 })

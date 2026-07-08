@@ -420,8 +420,8 @@ describe('create filter tests', () => {
     createFilter(tablePredicate, hooks)(null)
 
     // assert
-    expect(tablePredicate).toBeCalledTimes(1)
-    expect(tablePredicate).toBeCalledWith(null)
+    expect(tablePredicate).toHaveBeenCalledTimes(1)
+    expect(tablePredicate).toHaveBeenCalledWith(null)
   })
 
   test('returns given hook if table predicate results in true', () => {

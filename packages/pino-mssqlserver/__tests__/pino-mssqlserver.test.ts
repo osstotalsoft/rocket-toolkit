@@ -30,8 +30,8 @@ describe('correlation tests:', () => {
     await setTimeout(20)
 
     //assert
-    expect(dbInstance).toBeCalledWith(tableName)
-    expect(queryBuilder.insert).toBeCalledWith([
+    expect(dbInstance).toHaveBeenCalledWith(tableName)
+    expect(queryBuilder.insert).toHaveBeenCalledWith([
       expect.objectContaining({ Level: 'info', Message: 'bau', ServiceName: serviceName })
     ])
   })
@@ -57,8 +57,8 @@ describe('correlation tests:', () => {
     await setTimeout(20)
 
     //assert
-    expect(dbInstance).toBeCalledWith(tableName)
-    expect(queryBuilder.insert).toBeCalledWith([
+    expect(dbInstance).toHaveBeenCalledWith(tableName)
+    expect(queryBuilder.insert).toHaveBeenCalledWith([
       expect.objectContaining({ Level: 'info', Message: 'bow', ServiceName: serviceName }),
       expect.objectContaining({ Level: 'info', Message: 'wow', ServiceName: serviceName })
     ])
@@ -86,11 +86,11 @@ describe('correlation tests:', () => {
     await setTimeout(20)
 
     //assert
-    expect(dbInstance).toBeCalledWith(tableName)
-    expect(queryBuilder.insert).nthCalledWith(1, [
+    expect(dbInstance).toHaveBeenCalledWith(tableName)
+    expect(queryBuilder.insert).toHaveBeenNthCalledWith(1, [
       expect.objectContaining({ Level: 'info', Message: 'bow', ServiceName: serviceName })
     ])
-    expect(queryBuilder.insert).nthCalledWith(2, [
+    expect(queryBuilder.insert).toHaveBeenNthCalledWith(2, [
       expect.objectContaining({ Level: 'info', Message: 'wow', ServiceName: serviceName })
     ])
   })
@@ -118,7 +118,7 @@ describe('correlation tests:', () => {
     await setTimeout(20)
 
     //assert
-    expect(consoleError).toBeCalledWith(expect.objectContaining({ message: 'insert error' }))
+    expect(consoleError).toHaveBeenCalledWith(expect.objectContaining({ message: 'insert error' }))
   })
 
   it('parses connection string', async () => {
@@ -133,7 +133,7 @@ describe('correlation tests:', () => {
     dest.end()
 
     //assert
-    expect(knex).lastCalledWith(
+    expect(knex).toHaveBeenLastCalledWith(
       expect.objectContaining({
         client: 'mssql',
         connection: expect.objectContaining({

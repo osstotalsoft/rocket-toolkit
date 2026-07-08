@@ -34,8 +34,8 @@ describe('Testing Jetstream transport', () => {
     await jetstream.publish(subject, envelope, serDes)
 
     // assert
-    expect(connect).toBeCalled()
-    expect(__jetStreamClientMock.publish).toBeCalled()
+    expect(connect).toHaveBeenCalled()
+    expect(__jetStreamClientMock.publish).toHaveBeenCalled()
   })
 
   test('subscribe to a channel', async () => {
@@ -47,7 +47,7 @@ describe('Testing Jetstream transport', () => {
     await jetstream.subscribe(subject, handler, SubscriptionOptions.PUB_SUB, serDes)
 
     // assert
-    expect(connect).toBeCalled()
-    expect(__natsConsumerMock.consume).toBeCalled()
+    expect(connect).toHaveBeenCalled()
+    expect(__natsConsumerMock.consume).toHaveBeenCalled()
   })
 })

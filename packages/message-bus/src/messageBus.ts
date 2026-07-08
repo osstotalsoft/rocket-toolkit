@@ -47,7 +47,7 @@ function _messageBus(transport: Transport, serDes: SerDes): MessageBus {
   ): Promise<Subscription> {
     const fullTopicName = topicRegistry.getFullTopicName(topic)
     function h(e: Envelope<any>) {
-      setImmediate(_ => {
+      setImmediate(() => {
         console.info(`✉   Received a message from ${fullTopicName}`)
       })
       return handler(e)

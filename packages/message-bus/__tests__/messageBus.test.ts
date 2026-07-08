@@ -39,7 +39,7 @@ describe('testing message bus', () => {
     await sut.publish('test topic', {})
 
     // assert
-    expect(mockTransport.publish).toBeCalled()
+    expect(mockTransport.publish).toHaveBeenCalled()
   })
 
   test('if transport fails an error is thrown', async () => {
@@ -65,7 +65,7 @@ describe('testing message bus', () => {
     await sut.subscribe('test topic', jest.fn())
 
     // assert
-    expect(mockTransport.subscribe).toBeCalled()
+    expect(mockTransport.subscribe).toHaveBeenCalled()
   })
 
   test('sendCommandAndReceiveEvent opens a subscription for each event', async () => {
@@ -79,7 +79,7 @@ describe('testing message bus', () => {
     ).rejects.toThrow()
 
     // assert
-    expect(mockTransport?.subscribe).toBeCalledTimes(3)
-    expect(mockTransport?.publish).toBeCalledTimes(1)
+    expect(mockTransport?.subscribe).toHaveBeenCalledTimes(3)
+    expect(mockTransport?.publish).toHaveBeenCalledTimes(1)
   })
 })

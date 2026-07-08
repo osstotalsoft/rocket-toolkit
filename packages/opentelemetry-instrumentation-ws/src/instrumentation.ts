@@ -9,16 +9,12 @@ import {
   isWrapped,
   safeExecuteInTheMiddle
 } from '@opentelemetry/instrumentation'
-import { getIncomingRequestAttributes } from '@opentelemetry/instrumentation-http'
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
-import type * as http from 'http'
-import type * as https from 'https'
 import { IncomingMessage } from 'http'
 import { Duplex } from 'stream'
 import WS, { ErrorEvent, Server, WebSocket } from 'ws'
 import { WSInstrumentationConfig } from './types'
 import { ExtendedWebsocket } from './internal-types'
-import { endSpan, limitLength } from './utils'
+import { endSpan, getIncomingRequestAttributes, limitLength, SemanticAttributes } from './utils'
 
 import { VERSION } from './version'
 
@@ -31,7 +27,7 @@ const DEFAULT_CONFIG: WSInstrumentationConfig = {
 const MESSAGE_ATTRIBUTE = 'message'
 
 /** Instrumentation for the `ws` library WebSocket class */
-export class WSInstrumentation extends InstrumentationBase<WS> {
+export class WSInstrumentation extends InstrumentationBase<WSInstrumentationConfig> {
   protected _requestSpans = new WeakMap<IncomingMessage, Span>()
 
   constructor(config: WSInstrumentationConfig = {}) {
@@ -50,7 +46,7 @@ export class WSInstrumentation extends InstrumentationBase<WS> {
     const self = this
 
     return [
-      new InstrumentationNodeModuleDefinition<WS>(
+      new InstrumentationNodeModuleDefinition(
         'ws',
         ['>=7'],
         (moduleExports, moduleVersion) => {
@@ -103,7 +99,7 @@ export class WSInstrumentation extends InstrumentationBase<WS> {
           return OriginalWebSocket
         }
       ),
-      new InstrumentationNodeModuleDefinition<typeof http>(
+      new InstrumentationNodeModuleDefinition(
         'http',
         ['*'],
         moduleExports => {
@@ -122,7 +118,7 @@ export class WSInstrumentation extends InstrumentationBase<WS> {
           this._unwrap(moduleExports.Server.prototype, 'emit')
         }
       ),
-      new InstrumentationNodeModuleDefinition<typeof https>(
+      new InstrumentationNodeModuleDefinition(
         'https',
         ['*'],
         moduleExports => {

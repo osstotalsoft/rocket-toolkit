@@ -1,7 +1,6 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-import * as R from 'ramda'
 import type { BuildTableHasColumnPredicate, Name } from '../types'
 import { Knex } from 'knex'
 
@@ -34,15 +33,12 @@ function decompose(tableName: Name): [Name, Name, Name] {
 const mssql: BuildTableHasColumnPredicate = async (column: Name, knex: Knex<any, any>) => {
   const [defaultSchema, dbName] = await getDefaultSchemaAndDbName(knex)
   const tables = await getTablesWithColumn(column, knex)
-  const propSchema: (obj: Record<'schema', any>) => string = R.prop('schema')
 
-  const entries = R.compose(
-    R.map(([k, v]): [string, Set<typeof v>] => [k, new Set(R.map(R.prop('table'), v))]),
-    R.toPairs,
-    R.groupBy(propSchema)
-  )(tables)
-
-  const map = new Map(entries)
+  const map = new Map<string, Set<string>>()
+  for (const row of tables) {
+    if (!map.has(row.schema)) map.set(row.schema, new Set())
+    map.get(row.schema)!.add(row.table)
+  }
 
   return function tableHasColumn(tableName) {
     const [db, _schema, table] = decompose(tableName)
@@ -50,7 +46,7 @@ const mssql: BuildTableHasColumnPredicate = async (column: Name, knex: Knex<any,
       return false
     }
     const schema = _schema ?? defaultSchema
-    return Boolean(map.has(schema) && map?.get(schema)?.has(table))
+    return Boolean(table != null && map.get(schema)?.has(table))
   }
 }
 

@@ -23,7 +23,7 @@ describe('logging plugin tests:', () => {
     await plugin.requestDidStart(<any>{ contextValue, request })
 
     //assert
-    expect(contextValue?.logger?.info).toBeCalledWith(expect.stringContaining('[REQUEST_STARTED]'))
+    expect(contextValue?.logger?.info).toHaveBeenCalledWith(expect.stringContaining('[REQUEST_STARTED]'))
   })
 
   it('skip introspection query', async () => {
@@ -37,7 +37,7 @@ describe('logging plugin tests:', () => {
     await plugin.requestDidStart(<any>{ contextValue, request })
 
     //assert
-    expect(contextValue?.logger?.info).toBeCalledTimes(0)
+    expect(contextValue?.logger?.info).toHaveBeenCalledTimes(0)
   })
 
   it('log validation successful', async () => {
@@ -52,7 +52,7 @@ describe('logging plugin tests:', () => {
     await obj.didResolveOperation?.(<any>{ contextValue, document: {} })
 
     //assert
-    expect(contextValue?.logger?.debug).toBeCalledWith(expect.stringContaining('[GraphQL_Validation]'))
+    expect(contextValue?.logger?.debug).toHaveBeenCalledWith(expect.stringContaining('[GraphQL_Validation]'))
   })
 
   it('log execution started', async () => {
@@ -67,7 +67,7 @@ describe('logging plugin tests:', () => {
     await obj.executionDidStart?.(<any>{ contextValue })
 
     //assert
-    expect(contextValue?.logger?.debug).toBeCalledWith(expect.stringContaining('[GraphQL_Execution]'))
+    expect(contextValue?.logger?.debug).toHaveBeenCalledWith(expect.stringContaining('[GraphQL_Execution]'))
   })
 
   it('log operation name resolution', async () => {
@@ -97,7 +97,7 @@ describe('logging plugin tests:', () => {
     await obj.didEncounterErrors?.(<any>{ request, errors, contextValue })
 
     //assert
-    expect(contextValue?.logger?.error).toBeCalledWith(errors[0], expect.stringContaining('[GraphQL_Execution][Error]'))
+    expect(contextValue?.logger?.error).toHaveBeenCalledWith(errors[0], expect.stringContaining('[GraphQL_Execution][Error]'))
     expect(errors[0].message).not.toContain('BAU')
   })
 
@@ -115,7 +115,7 @@ describe('logging plugin tests:', () => {
     await obj.didEncounterErrors?.(<any>{ request, errors, contextValue })
 
     //assert
-    expect(contextValue?.logger?.error).toBeCalledWith(errors[0], expect.stringContaining('[GraphQL_Execution][Error]'))
+    expect(contextValue?.logger?.error).toHaveBeenCalledWith(errors[0], expect.stringContaining('[GraphQL_Execution][Error]'))
     expect(errors[0].message).toContain('BAU')
   })
 
@@ -130,6 +130,6 @@ describe('logging plugin tests:', () => {
     await obj.willSendResponse?.(<any>{ contextValue })
 
     //assert
-    expect(contextValue?.logger?.debug).toBeCalledWith(expect.stringContaining('[GraphQL_Response]'))
+    expect(contextValue?.logger?.debug).toHaveBeenCalledWith(expect.stringContaining('[GraphQL_Response]'))
   })
 })

@@ -18,7 +18,7 @@ describe('pino-opentracing tests:', () => {
     })
 
     //assert
-    expect(rootSpan.log).toBeCalledWith(expect.objectContaining({ event: 'info', message: 'bau' }))
+    expect(rootSpan.log).toHaveBeenCalledWith(expect.objectContaining({ event: 'info', message: 'bau' }))
   })
 
   it('sets error tag', async () => {
@@ -36,7 +36,7 @@ describe('pino-opentracing tests:', () => {
     })
 
     //assert
-    expect(rootSpan.setTag).toBeCalledWith(Tags.ERROR, true)
+    expect(rootSpan.setTag).toHaveBeenCalledWith(Tags.ERROR, true)
   })
 
   it('log error details', async () => {
@@ -55,7 +55,7 @@ describe('pino-opentracing tests:', () => {
     })
 
     //assert
-    expect(rootSpan.log).toBeCalledWith(
+    expect(rootSpan.log).toHaveBeenCalledWith(
       expect.objectContaining({
         event: 'error',
         message: 'bau',

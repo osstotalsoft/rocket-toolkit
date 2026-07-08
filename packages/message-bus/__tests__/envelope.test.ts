@@ -44,7 +44,7 @@ describe('testing the envelope', () => {
     envelope('test', context, customizer)
 
     // assert
-    expect(customizer).toBeCalledWith(
+    expect(customizer).toHaveBeenCalledWith(
       expect.objectContaining({
         'nbb-correlationId': 'test correlation',
         'nbb-tenantId': 'test tenant',

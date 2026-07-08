@@ -66,7 +66,7 @@ describe('Testing nats transport', () => {
     await nats.connect()
 
     // assert
-    expect(nodeNatsStreaming.connect).toBeCalledTimes(1)
+    expect(nodeNatsStreaming.connect).toHaveBeenCalledTimes(1)
   })
 
   test('connections pass error along', async () => {
@@ -102,7 +102,7 @@ describe('Testing nats transport', () => {
     await nats.disconnect()
 
     // assert
-    expect(mockConnection?.close).toBeCalledTimes(1)
+    expect(mockConnection?.close).toHaveBeenCalledTimes(1)
   })
 
   test('publish opens a connection before publishing', async () => {
@@ -114,8 +114,8 @@ describe('Testing nats transport', () => {
     await nats.publish(subject, envelope, serDes)
 
     // assert
-    expect(nodeNatsStreaming.connect).toBeCalled()
-    expect(mockConnection?.publish).toBeCalled()
+    expect(nodeNatsStreaming.connect).toHaveBeenCalled()
+    expect(mockConnection?.publish).toHaveBeenCalled()
   })
 
   test('subscribe opens a connection before subscribing', async () => {
@@ -127,8 +127,8 @@ describe('Testing nats transport', () => {
     await nats.subscribe(subject, handler, SubscriptionOptions.PUB_SUB, serDes)
 
     // assert
-    expect(nodeNatsStreaming.connect).toBeCalled()
-    expect(mockConnection?.subscribe).toBeCalled()
+    expect(nodeNatsStreaming.connect).toHaveBeenCalled()
+    expect(mockConnection?.subscribe).toHaveBeenCalled()
   })
 
   test('unsubscribe calls connection close', async () => {
@@ -141,6 +141,6 @@ describe('Testing nats transport', () => {
     sub.unsubscribe?.call(sub)
 
     // assert
-    expect(sub._natsSubscription?.close).toBeCalled()
+    expect(sub._natsSubscription?.close).toHaveBeenCalled()
   })
 })
