@@ -1,5 +1,13 @@
 # @totalsoft/pino-multitenancy
 
+## 2.0.2
+
+### Patch Changes
+
+- c9bc584: Update dependencies and apply audit fixes.
+- Updated dependencies [c9bc584]
+  - @totalsoft/multitenancy-core@2.0.2
+
 ## 2.0.1
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @totalsoft/pino-apollo
 
+## 3.1.2
+
+### Patch Changes
+
+- c9bc584: Update dependencies and apply audit fixes.
+- Updated dependencies [c9bc584]
+  - @totalsoft/correlation@3.0.2
+
 ## 3.1.1
 
 ### Patch Changes

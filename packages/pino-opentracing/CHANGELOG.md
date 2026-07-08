@@ -1,5 +1,13 @@
 # @totalsoft/pino-opentracing
 
+## 1.1.2
+
+### Patch Changes
+
+- c9bc584: Update dependencies and apply audit fixes.
+- Updated dependencies [c9bc584]
+  - @totalsoft/opentracing@2.0.1
+
 ## 1.1.1
 
 ### Patch Changes

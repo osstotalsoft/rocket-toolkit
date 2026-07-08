@@ -1,5 +1,11 @@
 # @totalsoft/apollo-logger
 
+## 2.0.2
+
+### Patch Changes
+
+- c9bc584: Update dependencies and apply audit fixes.
+
 ## 2.0.1
 
 ### Patch Changes

@@ -2341,7 +2341,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@totalsoft/correlation@npm:3.0.1, @totalsoft/correlation@workspace:packages/correlation":
+"@totalsoft/correlation@npm:3.0.2, @totalsoft/correlation@workspace:packages/correlation":
   version: 0.0.0-use.local
   resolution: "@totalsoft/correlation@workspace:packages/correlation"
   dependencies:
@@ -2464,7 +2464,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@totalsoft/multitenancy-core@npm:2.0.1, @totalsoft/multitenancy-core@workspace:packages/multitenancy-core":
+"@totalsoft/multitenancy-core@npm:2.0.2, @totalsoft/multitenancy-core@workspace:packages/multitenancy-core":
   version: 0.0.0-use.local
   resolution: "@totalsoft/multitenancy-core@workspace:packages/multitenancy-core"
   dependencies:
@@ -2508,7 +2508,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@totalsoft/opentracing@npm:2.0.0, @totalsoft/opentracing@workspace:packages/opentracing":
+"@totalsoft/opentracing@npm:2.0.1, @totalsoft/opentracing@workspace:packages/opentracing":
   version: 0.0.0-use.local
   resolution: "@totalsoft/opentracing@workspace:packages/opentracing"
   dependencies:
@@ -2530,7 +2530,7 @@ __metadata:
     "@apollo/server": "npm:^5.5.1"
     "@colors/colors": "npm:^1.6.0"
     "@jest/types": "npm:^30.4.1"
-    "@totalsoft/correlation": "npm:3.0.1"
+    "@totalsoft/correlation": "npm:3.0.2"
     "@types/jest": "npm:^30.0.0"
     "@types/node": "npm:^26.1.0"
     "@types/ramda": "npm:^0.32.0"
@@ -2550,7 +2550,7 @@ __metadata:
   resolution: "@totalsoft/pino-correlation@workspace:packages/pino-correlation"
   dependencies:
     "@jest/types": "npm:^30.4.1"
-    "@totalsoft/correlation": "npm:3.0.1"
+    "@totalsoft/correlation": "npm:3.0.2"
     "@types/jest": "npm:^30.0.0"
     "@types/node": "npm:^26.1.0"
     jest: "npm:^30.4.2"
@@ -2565,7 +2565,7 @@ __metadata:
   resolution: "@totalsoft/pino-mssqlserver@workspace:packages/pino-mssqlserver"
   dependencies:
     "@jest/types": "npm:^30.4.1"
-    "@totalsoft/correlation": "npm:3.0.1"
+    "@totalsoft/correlation": "npm:3.0.2"
     "@types/humps": "npm:^2.0.6"
     "@types/jest": "npm:^30.0.0"
     "@types/node": "npm:^26.1.0"
@@ -2586,7 +2586,7 @@ __metadata:
   resolution: "@totalsoft/pino-multitenancy@workspace:packages/pino-multitenancy"
   dependencies:
     "@jest/types": "npm:^30.4.1"
-    "@totalsoft/multitenancy-core": "npm:2.0.1"
+    "@totalsoft/multitenancy-core": "npm:2.0.2"
     "@types/jest": "npm:^30.0.0"
     "@types/node": "npm:^26.1.0"
     jest: "npm:^30.4.2"
@@ -2622,7 +2622,7 @@ __metadata:
   resolution: "@totalsoft/pino-opentracing@workspace:packages/pino-opentracing"
   dependencies:
     "@jest/types": "npm:^30.4.1"
-    "@totalsoft/opentracing": "npm:2.0.0"
+    "@totalsoft/opentracing": "npm:2.0.1"
     "@types/jest": "npm:^30.0.0"
     "@types/node": "npm:^26.1.0"
     "@types/ramda": "npm:^0.32.0"

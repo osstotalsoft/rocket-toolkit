@@ -1,5 +1,13 @@
 # @totalsoft/pino-correlation
 
+## 2.0.3
+
+### Patch Changes
+
+- c9bc584: Update dependencies and apply audit fixes.
+- Updated dependencies [c9bc584]
+  - @totalsoft/correlation@3.0.2
+
 ## 2.0.2
 
 ### Patch Changes

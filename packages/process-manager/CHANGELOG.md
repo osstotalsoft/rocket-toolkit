@@ -1,5 +1,11 @@
 # @totalsoft/process-manager
 
+## 1.1.2
+
+### Patch Changes
+
+- c9bc584: Update dependencies and apply audit fixes.
+
 ## 1.1.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @totalsoft/knex-filters
 
+## 2.4.4
+
+### Patch Changes
+
+- c9bc584: Update dependencies and apply audit fixes.
+
 ## 2.4.3
 
 ### Patch Changes

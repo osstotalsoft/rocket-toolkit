@@ -1,5 +1,11 @@
 # @totalsoft/message-bus
 
+## 2.10.2
+
+### Patch Changes
+
+- c9bc584: Update dependencies and apply audit fixes.
+
 ## 2.10.1
 
 ### Patch Changes
