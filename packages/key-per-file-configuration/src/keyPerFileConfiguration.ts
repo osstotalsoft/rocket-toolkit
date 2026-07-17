@@ -23,7 +23,11 @@ export function load(options?: Options): ConfigWatcher {
 
   // Watch for file changes
   const watcher = chokidar
-    .watch(configFolderPath, { awaitWriteFinish: true /*, usePolling: true*/ })
+    .watch(configFolderPath, {
+      awaitWriteFinish: true,
+      ignorePermissionErrors: true
+      /*, usePolling: true*/
+    })
     .on('unlink', _removeValue)
     .on('add', loadValue)
     .on('change', loadValue)
@@ -43,13 +47,13 @@ function _getAbsolutePath(configPath = KEY_PER_FILE_CONFIG_PATH || defaultConfig
 
 function _getFilePaths(configPath: string) {
 
-    if (!fs.existsSync(configPath) || fs.lstatSync(configPath).isDirectory()) {
-      configPath = path.join(configPath, '**')
-    }
+  if (!fs.existsSync(configPath) || fs.lstatSync(configPath).isDirectory()) {
+    configPath = path.join(configPath, '**')
+  }
 
-    configPath = configPath.replace(/\\/g, '/')
+  configPath = configPath.replace(/\\/g, '/')
 
-    return glob.sync(configPath, { nodir: true })
+  return glob.sync(configPath, { nodir: true })
 }
 
 function _loadValue(logger: Logger) {
