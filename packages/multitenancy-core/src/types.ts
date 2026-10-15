@@ -11,10 +11,29 @@ export interface Tenant {
 export interface ConnectionInfo {
   server: string
   database: string
-  userName: string
-  password: string
+  userName?: string
+  password?: string
   otherParams?: string
+  authentication?: string
+  identityClientId?: string
 }
+
+export interface TediousDefaultAuthentication {
+  type: 'default'
+  options: {
+    userName?: string
+    password?: string
+  }
+}
+
+export interface TediousAzureActiveDirectoryDefaultAuthentication {
+  type: 'azure-active-directory-default'
+  options: {
+    clientId: string
+  }
+}
+
+export type TediousAuthentication = TediousDefaultAuthentication | TediousAzureActiveDirectoryDefaultAuthentication
 
 export interface TenantMapById {
   [tid: string]: TenantSection
