@@ -90,11 +90,52 @@ The returned `ConnectionInfo` object has the following structure:
 export interface ConnectionInfo {
     server: string, // Can include instance name and port
     database: string, 
-    userName: string, 
-    password: string, 
-    otherParams?: string
+    userName?: string, // SQL authentication
+    password?: string, // SQL authentication
+    otherParams?: string,
+    authentication?: string, // Optional authentication mode, see below
+    identityClientId?: string // Client id of the managed identity, for identity-based authentication
 }
 ```
+
+### Identity-based SQL authentication
+By default the connection uses SQL authentication with `userName` / `password`. A tenant can instead authenticate with an Azure identity (eg: AKS Workload Identity) by setting the `Authentication` and `IdentityClientId` keys of the connection string:
+
+```javascript
+// process.env = {
+//    IS_MULTITENANT: 'true',
+//    MultiTenancy__Defaults__ConnectionStrings__MyDatabase__Server: 'my-server.database.windows.net',
+//    MultiTenancy__Defaults__ConnectionStrings__MyDatabase__UserName: 'sharedUser',     // ignored for Tenant1
+//    MultiTenancy__Defaults__ConnectionStrings__MyDatabase__Password: 'sharedPassword', // ignored for Tenant1
+//    MultiTenancy__Tenants__Tenant1__TenantId: tenantId,
+//    MultiTenancy__Tenants__Tenant1__ConnectionStrings__MyDatabase__Database: db,
+//    MultiTenancy__Tenants__Tenant1__ConnectionStrings__MyDatabase__Authentication: 'Active Directory Workload Identity',
+//    MultiTenancy__Tenants__Tenant1__ConnectionStrings__MyDatabase__IdentityClientId: 'managed-identity-client-id',
+//}
+```
+
+The `getTediousAuthentication` helper builds the `authentication` block of a [tedious](https://github.com/tediousjs/tedious) / [mssql](https://github.com/tediousjs/node-mssql) config from a `ConnectionInfo`:
+- `authentication` empty or missing → `{ type: 'default', options: { userName, password } }` (SQL authentication)
+- `Active Directory Workload Identity`, `Active Directory Managed Identity`, `Active Directory MSI` or `Active Directory Default` (case-insensitive, spaces ignored) → `{ type: 'azure-active-directory-default', options: { clientId: identityClientId } }`. `userName` / `password` are ignored and an error is thrown if `identityClientId` is missing.
+- any other value → an "unsupported authentication" error is thrown
+
+```javascript
+const { tenantConfiguration, getTediousAuthentication } = require("@totalsoft/multitenancy-core")
+
+const connectionInfo = tenantConfiguration.getConnectionInfo(tenantId, "myDatabase")
+const [server, port] = connectionInfo.server.split(',')
+
+// tedious: new Connection(config) / mssql: new sql.ConnectionPool(config)
+const config = {
+  server,
+  port: port ? parseInt(port) : undefined,
+  database: connectionInfo.database,
+  authentication: getTediousAuthentication(connectionInfo),
+  options: { encrypt: true }
+}
+```
+
+The `azure-active-directory-default` authentication requires tedious ≥ 19, which uses `DefaultAzureCredential` from `@azure/identity` with `managedIdentityClientId` set to the identity client id. When `AZURE_FEDERATED_TOKEN_FILE` is set (eg: by the AKS Workload Identity webhook), the same client id is used for workload identity.
 
 ### tenantService
 The tenant service relies on the tenant configuration mechanism described above to read obtain tenant attributes.

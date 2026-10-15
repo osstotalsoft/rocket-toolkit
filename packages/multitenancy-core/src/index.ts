@@ -1,7 +1,14 @@
 // Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-export { Tenant, ConnectionInfo } from './types'
+export {
+  Tenant,
+  ConnectionInfo,
+  TediousAuthentication,
+  TediousDefaultAuthentication,
+  TediousAzureActiveDirectoryDefaultAuthentication
+} from './types'
+export { getTediousAuthentication } from './tediousAuthentication'
 export * as tenantService from './tenantService'
 import * as tenantConfiguration from './tenantConfiguration'
 import * as tenantConfigurationExtensions from './tenantConfigurationExtensions'

@@ -154,6 +154,42 @@ describe('logging plugin tests:', () => {
     expect(connectionInfo.otherParams).toBe(otherParams)
   })
 
+  it('should read identity connection info merged with defaults:', () => {
+    //Arrange
+    const tenantId = '3c841325-eccc-4670-a577-09546df7b1fc'
+    const server = 'server,3333'
+    const db = 'myDatabase'
+    const user = 'user'
+    const pass = 'pass'
+    const authentication = 'Active Directory Workload Identity'
+    const identityClientId = 'a1b2c3d4-0000-1111-2222-333344445555'
+
+    process.env = {
+      IS_MULTITENANT: 'true',
+      MultiTenancy__Tenants__Tenant1__TenantId: tenantId,
+      MultiTenancy__Defaults__ConnectionStrings__MyDatabase__Server: server,
+      MultiTenancy__Defaults__ConnectionStrings__MyDatabase__UserName: user,
+      MultiTenancy__Defaults__ConnectionStrings__MyDatabase__Password: pass,
+      MultiTenancy__Tenants__Tenant1__ConnectionStrings__MyDatabase__Database: db,
+      MultiTenancy__Tenants__Tenant1__ConnectionStrings__MyDatabase__Authentication: authentication,
+      MultiTenancy__Tenants__Tenant1__ConnectionStrings__MyDatabase__IdentityClientId: identityClientId
+    }
+    const { tenantConfiguration } = require('../src')
+
+    //Act
+    const connectionInfo = tenantConfiguration.getConnectionInfo(tenantId, 'myDatabase')
+
+    //Assert
+    expect(connectionInfo).toEqual({
+      server,
+      database: db,
+      userName: user,
+      password: pass,
+      authentication,
+      identityClientId
+    })
+  })
+
   it('should load all tenant configurations:', () => {
     // Arrange
     const tenants = [
