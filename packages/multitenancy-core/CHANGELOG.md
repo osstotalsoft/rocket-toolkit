@@ -1,5 +1,11 @@
 # @totalsoft/multitenancy-core
 
+## 2.1.0
+
+### Minor Changes
+
+- 14e0395: Add opt-in identity-based SQL authentication: `ConnectionInfo` gains `authentication` and `identityClientId`, and the new `getTediousAuthentication` helper builds the tedious / mssql `authentication` block (SQL authentication, or `azure-active-directory-default` for the Workload Identity / Managed Identity / MSI / Default modes).
+
 ## 2.0.2
 
 ### Patch Changes

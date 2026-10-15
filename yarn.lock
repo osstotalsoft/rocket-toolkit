@@ -2464,7 +2464,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@totalsoft/multitenancy-core@npm:2.0.2, @totalsoft/multitenancy-core@workspace:packages/multitenancy-core":
+"@totalsoft/multitenancy-core@npm:2.1.0, @totalsoft/multitenancy-core@workspace:packages/multitenancy-core":
   version: 0.0.0-use.local
   resolution: "@totalsoft/multitenancy-core@workspace:packages/multitenancy-core"
   dependencies:
@@ -2586,7 +2586,7 @@ __metadata:
   resolution: "@totalsoft/pino-multitenancy@workspace:packages/pino-multitenancy"
   dependencies:
     "@jest/types": "npm:^30.4.1"
-    "@totalsoft/multitenancy-core": "npm:2.0.2"
+    "@totalsoft/multitenancy-core": "npm:2.1.0"
     "@types/jest": "npm:^30.0.0"
     "@types/node": "npm:^26.1.0"
     jest: "npm:^30.4.2"
