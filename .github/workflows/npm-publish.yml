@@ -31,8 +31,15 @@ jobs:
       - name: Upgrade version based on Changeset
         run: yarn changeset version && yarn install
         env:
-          YARN_ENABLE_IMMUTABLE_INSTALLS: false        
-      - uses: stefanzweifel/git-auto-commit-action@v7
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
+      - name: Whoami
+        run: |
+          npm whoami
+          npm access list packages @totalsoft @totalsoft/message-bus
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Commit version bump
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: Increase packages version
       - name: Publish to npm
