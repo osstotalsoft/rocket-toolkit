@@ -2412,7 +2412,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@totalsoft/message-bus@npm:^2.10.3, @totalsoft/message-bus@workspace:packages/message-bus":
+"@totalsoft/message-bus@npm:2.10.3, @totalsoft/message-bus@workspace:packages/message-bus":
   version: 0.0.0-use.local
   resolution: "@totalsoft/message-bus@workspace:packages/message-bus"
   dependencies:
@@ -2445,7 +2445,7 @@ __metadata:
   resolution: "@totalsoft/messaging-host@workspace:packages/messaging-host"
   dependencies:
     "@jest/types": "npm:^30.4.1"
-    "@totalsoft/message-bus": "npm:^2.10.3"
+    "@totalsoft/message-bus": "npm:2.10.3"
     "@types/jest": "npm:^30.0.0"
     "@types/node": "npm:^26.1.0"
     jest: "npm:^30.4.2"
