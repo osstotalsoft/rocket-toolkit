@@ -1,0 +1,60 @@
+{
+  "name": "@totalsoft/messaging-host",
+  "description": "Infrastructure for event-driven stream processing microservices",
+  "version": "2.5.2",
+  "author": "TotalSoft",
+  "homepage": "https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/messaging-host",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "composite": true,
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "commonjs",
+  "engines": {
+    "node": ">=12.9.0"
+  },
+  "scripts": {
+    "build": "run clean && tsc --project tsconfig.build.json",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rimraf dist",
+    "test": "jest --collectCoverage --passWithNoTests --verbose --silent=false --runInBand",
+    "nats-sample": "tsx __samples__/nats-worker.ts",
+    "rusi-sample": "tsx __samples__/rusi-worker.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/osstotalsoft/rocket-toolkit.git",
+    "directory": "packages/messaging-host"
+  },
+  "keywords": [
+    "messaging",
+    "event-driven",
+    "message-bus"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@totalsoft/message-bus": "2.10.3",
+    "polly-js": "^1.8.3",
+    "uuid": "^11.1.1"
+  },
+  "devDependencies": {
+    "@jest/types": "^30.4.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^26.1.0",
+    "jest": "^30.4.2",
+    "rimraf": "^6.1.3",
+    "ts-jest": "^29.4.11",
+    "tsx": "^4.23.0",
+    "typescript": "^5.9.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "verbose": true,
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ]
+  }
+}
