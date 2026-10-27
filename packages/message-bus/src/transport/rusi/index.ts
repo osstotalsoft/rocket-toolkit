@@ -19,6 +19,8 @@ const {
   RUSI_PUB_SUB_AckWaitTime = '5000',
   RUSI_RPC_MaxConcurrentMessages = '1',
   RUSI_RPC_AckWaitTime = '5000',
+  RUSI_BROADCAST_MaxConcurrentMessages = '100',
+  RUSI_BROADCAST_AckWaitTime = '5000',
   RUSI_PUB_SUB_NAME
 } = process.env
 
@@ -150,6 +152,18 @@ export async function subscribe(
       }
       rusiSubOptions.ackWaitTime = {
         value: parseInt(RUSI_RPC_AckWaitTime, 10) || 5000
+      }
+      break
+
+    case SubscriptionOptions.BROADCAST:
+      rusiSubOptions.qGroup = { value: false }
+      rusiSubOptions.durable = { value: false }
+      rusiSubOptions.deliverNewMessagesOnly = { value: true }
+      rusiSubOptions.maxConcurrentMessages = {
+        value: parseInt(RUSI_BROADCAST_MaxConcurrentMessages, 10) || 100
+      }
+      rusiSubOptions.ackWaitTime = {
+        value: parseInt(RUSI_BROADCAST_AckWaitTime, 10) || 5000
       }
       break
   }

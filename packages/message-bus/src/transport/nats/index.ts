@@ -22,7 +22,9 @@ const {
   NATS_PUB_SUB_MaxInflight = '',
   NATS_PUB_SUB_AckWait,
   NATS_RPC_MaxInflight = '',
-  NATS_RPC_AckWait
+  NATS_RPC_AckWait,
+  NATS_BROADCAST_MaxInflight = '',
+  NATS_BROADCAST_AckWait
 } = process.env
 
 const clientID = `${NATS_CLIENT_ID}-${v4()}`
@@ -121,6 +123,14 @@ export async function subscribe(
       natsOpts.setMaxInFlight(parseInt(NATS_RPC_MaxInflight, 10) || 1)
       if (NATS_RPC_AckWait) {
         natsOpts.setAckWait(parseInt(NATS_RPC_AckWait, 10))
+      }
+      break
+    case SubscriptionOptions.BROADCAST:
+      useQGroup = false
+      natsOpts.setStartAt(nats.StartPosition.NEW_ONLY)
+      natsOpts.setMaxInFlight(parseInt(NATS_BROADCAST_MaxInflight, 10) || 100)
+      if (NATS_BROADCAST_AckWait) {
+        natsOpts.setAckWait(parseInt(NATS_BROADCAST_AckWait, 10))
       }
       break
     default:

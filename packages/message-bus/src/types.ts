@@ -44,7 +44,12 @@ export enum SubscriptionOptions {
    * RPC subscriptions: lite weight, non-durable, at-most-once, without queue group
    * @see https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/message-bus#subscription--options
    */
-  RPC
+  RPC,
+  /**
+   * Broadcast subscriptions: lite weight, non-durable, at-most-once, without queue group; every instance receives every message
+   * @see https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/message-bus#subscription--options
+   */
+  BROADCAST
 }
 
 export interface SerDesInfo {

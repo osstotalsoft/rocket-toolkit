@@ -268,4 +268,25 @@ describe('Testing rusi transport', () => {
     // assert
     expect(mockRusiClient?.close).toHaveBeenCalledTimes(1)
   })
+
+  test('broadcast subscribes without queue group, non-durable, new messages only', async () => {
+    // arrange
+
+    // act
+    const sub = <RusiSubscription>await rusi.subscribe('subject', jest.fn(), SubscriptionOptions.BROADCAST, serDes)
+
+    // assert
+    expect(sub._call?.write).toHaveBeenCalledWith({
+      subscription_request: expect.objectContaining({
+        topic: 'subject',
+        options: {
+          qGroup: { value: false },
+          durable: { value: false },
+          deliverNewMessagesOnly: { value: true },
+          maxConcurrentMessages: { value: 100 },
+          ackWaitTime: { value: 5000 }
+        }
+      })
+    })
+  })
 })

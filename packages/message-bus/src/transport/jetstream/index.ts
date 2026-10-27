@@ -22,7 +22,9 @@ const {
   JETSTREAM_PUB_SUB_MaxConcurrentMessages = '100',
   JETSTREAM_PUB_SUB_AckWaitTime = '30000000000', // 30 seconds
   JETSTREAM_RPC_MaxConcurrentMessages = '1',
-  JETSTREAM_RPC_AckWaitTime = '30000000000' // 30 seconds
+  JETSTREAM_RPC_AckWaitTime = '30000000000', // 30 seconds
+  JETSTREAM_BROADCAST_MaxConcurrentMessages = '100',
+  JETSTREAM_BROADCAST_AckWaitTime = '30000000000' // 30 seconds
 } = process.env
 
 //const clientID = `${JETSTREAM_CLIENT_ID}-${uuid.v4()}`
@@ -159,6 +161,9 @@ function getMaxMessages(opts: SubscriptionOptions): number {
     case SubscriptionOptions.RPC:
       return parseInt(JETSTREAM_RPC_MaxConcurrentMessages, 10)
 
+    case SubscriptionOptions.BROADCAST:
+      return parseInt(JETSTREAM_BROADCAST_MaxConcurrentMessages, 10)
+
     default:
       throw new Error(`Unsupported subscription option: ${opts}`)
   }
@@ -198,6 +203,13 @@ async function getConsumer(
       consumerCfg.name = consumerName + '__' + randomUUID().replaceAll('-', '')
       consumerCfg.deliver_policy = DeliverPolicy.New
       consumerCfg.ack_wait = parseInt(JETSTREAM_RPC_AckWaitTime, 10)
+      break
+
+    case SubscriptionOptions.BROADCAST:
+      // ephemeral consumer per subscriber (no queue group): every subscriber receives every message
+      consumerCfg.name = consumerName + '__' + randomUUID().replaceAll('-', '')
+      consumerCfg.deliver_policy = DeliverPolicy.New
+      consumerCfg.ack_wait = parseInt(JETSTREAM_BROADCAST_AckWaitTime, 10)
       break
 
     default:
