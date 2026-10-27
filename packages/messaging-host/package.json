@@ -1,7 +1,7 @@
 {
   "name": "@totalsoft/messaging-host",
   "description": "Infrastructure for event-driven stream processing microservices",
-  "version": "2.5.2",
+  "version": "2.6.0",
   "author": "TotalSoft",
   "homepage": "https://github.com/osstotalsoft/rocket-toolkit/tree/main/packages/messaging-host",
   "main": "dist/src/index.js",
