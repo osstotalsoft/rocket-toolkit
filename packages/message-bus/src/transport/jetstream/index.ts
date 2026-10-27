@@ -7,7 +7,7 @@ import {
   AckPolicy, DeliverPolicy, StringCodec
 } from 'nats'
 import { Mutex } from 'async-mutex'
-// import uuid from 'uuid'
+import { randomUUID } from 'crypto'
 import { SubscriptionHandler, Transport } from '../types'
 import { EventEmitter } from 'events'
 import { JetstreamConnection, JetstreamSubscription } from './types'
@@ -171,12 +171,13 @@ async function getConsumer(
   opts: SubscriptionOptions
 ): Promise<Consumer> {
   const jsm = await jsClient.jetstreamManager()
+  const consumerName = (JETSTREAM_CLIENT_ID + '__' + subject).replaceAll('.', '_')
   const consumerCfg: Partial<ConsumerConfig> = {
     filter_subject: subject
   }
   switch (opts) {
     case SubscriptionOptions.STREAM_PROCESSOR:
-      consumerCfg.durable_name = (JETSTREAM_CLIENT_ID + '__' + subject).replaceAll('.', '_')
+      consumerCfg.durable_name = consumerName
       consumerCfg.deliver_policy = DeliverPolicy.All
       consumerCfg.inactive_threshold = 3_600_000_000_000 // 1 hour in nanoseconds
       consumerCfg.ack_wait = parseInt(JETSTREAM_STREAM_PROCESSOR_AckWaitTime, 10)
@@ -184,12 +185,17 @@ async function getConsumer(
       break
 
     case SubscriptionOptions.PUB_SUB:
-      // ephemeral consumer
+      // ephemeral consumer shared by every subscriber with the same client id (queue group): subscribers compete
+      consumerCfg.name = consumerName
+      // the server default, set explicitly: otherwise the stored config differs from the requested one and the next subscriber gets "consumer already exists"
+      consumerCfg.inactive_threshold = 5_000_000_000 // 5 seconds in nanoseconds
       consumerCfg.deliver_policy = DeliverPolicy.New
       consumerCfg.ack_wait = parseInt(JETSTREAM_PUB_SUB_AckWaitTime, 10)
       break
 
     case SubscriptionOptions.RPC:
+      // ephemeral consumer per subscriber (no queue group): every subscriber receives every message
+      consumerCfg.name = consumerName + '__' + randomUUID().replaceAll('-', '')
       consumerCfg.deliver_policy = DeliverPolicy.New
       consumerCfg.ack_wait = parseInt(JETSTREAM_RPC_AckWaitTime, 10)
       break

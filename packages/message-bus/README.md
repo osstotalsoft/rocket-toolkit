@@ -67,6 +67,8 @@ When subscribing to a stream you ca opt in one of the following:
  - PUB_SUB: lite weight, non-durable, at-most-once, within a queue group
  - RPC: lite weight, non-durable, at-most-once, without queue group, used in send-command-and-wait-for-event scenarios
 
+With the JetStream transport, a queue group is a consumer shared by every subscriber with the same `JETSTREAM_CLIENT_ID`: STREAM_PROCESSOR uses the durable consumer `<clientId>__<subject>` and PUB_SUB the ephemeral consumer `<clientId>__<subject>`, so instances of a service compete for messages. RPC gives each subscriber its own ephemeral consumer, so every subscriber receives every message.
+
 
 ## request / response over messaging
 ```javascript
