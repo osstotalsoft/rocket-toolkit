@@ -2,8 +2,8 @@
 // This source code is licensed under the MIT license.
 
 import {
-  connect as natsConnect, NatsConnection, JetStreamClient, Consumer,
-  ConsumerConfig, ConsumerMessages,
+  connect as natsConnect, NatsConnection, NatsError, JetStreamClient, JetStreamManager, Consumer,
+  ConsumerConfig, ConsumerInfo, ConsumerMessages,
   AckPolicy, DeliverPolicy, StringCodec
 } from 'nats'
 import { Mutex } from 'async-mutex'
@@ -192,7 +192,7 @@ async function getConsumer(
     case SubscriptionOptions.PUB_SUB:
       // ephemeral consumer shared by every subscriber with the same client id (queue group): subscribers compete
       consumerCfg.name = consumerName
-      // the server default, set explicitly: otherwise the stored config differs from the requested one and the next subscriber gets "consumer already exists"
+      // deleted 5 seconds after the last subscriber stops pulling (the server default for ephemeral consumers, set explicitly)
       consumerCfg.inactive_threshold = 5_000_000_000 // 5 seconds in nanoseconds
       consumerCfg.deliver_policy = DeliverPolicy.New
       consumerCfg.ack_wait = parseInt(JETSTREAM_PUB_SUB_AckWaitTime, 10)
@@ -216,9 +216,29 @@ async function getConsumer(
       throw new Error(`Unsupported subscription option: ${opts}`)
   }
 
-  const ci = await jsm.consumers.add(stream, consumerCfg)
+  const ci = await createOrUpdateConsumer(jsm, stream, consumerCfg)
   const consumer = await jsClient.consumers.get(stream, ci.name)
   return consumer
+}
+
+// consumers.add only creates: a consumer that already exists with a different config is rejected
+const JS_CONSUMER_ALREADY_EXISTS = 10148
+
+async function createOrUpdateConsumer(
+  jsm: JetStreamManager,
+  stream: string,
+  consumerCfg: Partial<ConsumerConfig>
+): Promise<ConsumerInfo> {
+  try {
+    return await jsm.consumers.add(stream, consumerCfg)
+  } catch (err) {
+    // A consumer shared by every subscriber (PUB_SUB) is created by the first one; the others update it,
+    // so the latest subscriber's config wins, as with NATS.Net's CreateOrUpdate in NBB.
+    if (consumerCfg.name && err instanceof NatsError && err.api_error?.err_code === JS_CONSUMER_ALREADY_EXISTS) {
+      return await jsm.consumers.update(stream, consumerCfg.name, consumerCfg)
+    }
+    throw err
+  }
 }
 
 function jetstreamConnection(nc: NatsConnection): JetstreamConnection {
