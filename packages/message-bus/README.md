@@ -66,6 +66,9 @@ When subscribing to a stream you ca opt in one of the following:
  - STREAM_PROCESSOR: typical event driven subscriptions; durable, at-least-once, within a queue group
  - PUB_SUB: lite weight, non-durable, at-most-once, within a queue group
  - RPC: lite weight, non-durable, at-most-once, without queue group, used in send-command-and-wait-for-event scenarios
+ - BROADCAST: lite weight, non-durable, at-most-once, without queue group; every instance of a service receives every message, e.g. to refresh an in-memory cache or push to the clients connected to each instance
+
+With the JetStream transport, a queue group is a consumer shared by every subscriber with the same `JETSTREAM_CLIENT_ID`: STREAM_PROCESSOR uses the durable consumer `<clientId>__<subject>` and PUB_SUB the ephemeral consumer `<clientId>__<subject>`, so instances of a service compete for messages. RPC and BROADCAST give each subscriber its own ephemeral consumer (`<clientId>__<subject>__<uuid>`), so every subscriber receives every message. A subscriber that is not running misses what is published meanwhile.
 
 
 ## request / response over messaging
@@ -102,6 +105,8 @@ NATS_PUB_SUB_MaxInflight="100"
 NATS_PUB_SUB_AckWait="5000"
 NATS_RPC_MaxInflight="1"
 NATS_RPC_AckWait="5000"
+NATS_BROADCAST_MaxInflight="100"
+NATS_BROADCAST_AckWait="5000"
 
 RUSI_GRPC_ENDPOINT="localhost:50003"
 RUSI_GRPC_PORT="50003"
@@ -112,6 +117,8 @@ RUSI_PUB_SUB_MaxConcurrentMessages="100"
 RUSI_PUB_SUB_AckWaitTime="5000"
 RUSI_RPC_MaxConcurrentMessages="1"
 RUSI_RPC_AckWaitTime="5000"
+RUSI_BROADCAST_MaxConcurrentMessages="100"
+RUSI_BROADCAST_AckWaitTime="5000"
 
 JETSTREAM_URL,
 JETSTREAM_CLIENT_ID,
@@ -120,6 +127,8 @@ JETSTREAM_STREAM_PROCESSOR_AckWaitTime = '5000000000', // 5 seconds
 JETSTREAM_PUB_SUB_MaxConcurrentMessages = '100',
 JETSTREAM_PUB_SUB_AckWaitTime = '5000000000', // 5 seconds
 JETSTREAM_RPC_MaxConcurrentMessages = '1',
-JETSTREAM_RPC_AckWaitTime = '5000000000' // 5 seconds
+JETSTREAM_RPC_AckWaitTime = '5000000000', // 5 seconds
+JETSTREAM_BROADCAST_MaxConcurrentMessages = '100',
+JETSTREAM_BROADCAST_AckWaitTime = '5000000000' // 5 seconds
 
 

@@ -2,12 +2,12 @@
 // This source code is licensed under the MIT license.
 
 import {
-  connect as natsConnect, NatsConnection, JetStreamClient, Consumer,
-  ConsumerConfig, ConsumerMessages,
+  connect as natsConnect, NatsConnection, NatsError, JetStreamClient, JetStreamManager, Consumer,
+  ConsumerConfig, ConsumerInfo, ConsumerMessages,
   AckPolicy, DeliverPolicy, StringCodec
 } from 'nats'
 import { Mutex } from 'async-mutex'
-// import uuid from 'uuid'
+import { randomUUID } from 'crypto'
 import { SubscriptionHandler, Transport } from '../types'
 import { EventEmitter } from 'events'
 import { JetstreamConnection, JetstreamSubscription } from './types'
@@ -22,7 +22,9 @@ const {
   JETSTREAM_PUB_SUB_MaxConcurrentMessages = '100',
   JETSTREAM_PUB_SUB_AckWaitTime = '30000000000', // 30 seconds
   JETSTREAM_RPC_MaxConcurrentMessages = '1',
-  JETSTREAM_RPC_AckWaitTime = '30000000000' // 30 seconds
+  JETSTREAM_RPC_AckWaitTime = '30000000000', // 30 seconds
+  JETSTREAM_BROADCAST_MaxConcurrentMessages = '100',
+  JETSTREAM_BROADCAST_AckWaitTime = '30000000000' // 30 seconds
 } = process.env
 
 //const clientID = `${JETSTREAM_CLIENT_ID}-${uuid.v4()}`
@@ -159,6 +161,9 @@ function getMaxMessages(opts: SubscriptionOptions): number {
     case SubscriptionOptions.RPC:
       return parseInt(JETSTREAM_RPC_MaxConcurrentMessages, 10)
 
+    case SubscriptionOptions.BROADCAST:
+      return parseInt(JETSTREAM_BROADCAST_MaxConcurrentMessages, 10)
+
     default:
       throw new Error(`Unsupported subscription option: ${opts}`)
   }
@@ -171,12 +176,13 @@ async function getConsumer(
   opts: SubscriptionOptions
 ): Promise<Consumer> {
   const jsm = await jsClient.jetstreamManager()
+  const consumerName = (JETSTREAM_CLIENT_ID + '__' + subject).replaceAll('.', '_')
   const consumerCfg: Partial<ConsumerConfig> = {
     filter_subject: subject
   }
   switch (opts) {
     case SubscriptionOptions.STREAM_PROCESSOR:
-      consumerCfg.durable_name = (JETSTREAM_CLIENT_ID + '__' + subject).replaceAll('.', '_')
+      consumerCfg.durable_name = consumerName
       consumerCfg.deliver_policy = DeliverPolicy.All
       consumerCfg.inactive_threshold = 3_600_000_000_000 // 1 hour in nanoseconds
       consumerCfg.ack_wait = parseInt(JETSTREAM_STREAM_PROCESSOR_AckWaitTime, 10)
@@ -184,23 +190,55 @@ async function getConsumer(
       break
 
     case SubscriptionOptions.PUB_SUB:
-      // ephemeral consumer
+      // ephemeral consumer shared by every subscriber with the same client id (queue group): subscribers compete
+      consumerCfg.name = consumerName
+      // deleted 5 seconds after the last subscriber stops pulling (the server default for ephemeral consumers, set explicitly)
+      consumerCfg.inactive_threshold = 5_000_000_000 // 5 seconds in nanoseconds
       consumerCfg.deliver_policy = DeliverPolicy.New
       consumerCfg.ack_wait = parseInt(JETSTREAM_PUB_SUB_AckWaitTime, 10)
       break
 
     case SubscriptionOptions.RPC:
+      // ephemeral consumer per subscriber (no queue group): every subscriber receives every message
+      consumerCfg.name = consumerName + '__' + randomUUID().replaceAll('-', '')
       consumerCfg.deliver_policy = DeliverPolicy.New
       consumerCfg.ack_wait = parseInt(JETSTREAM_RPC_AckWaitTime, 10)
+      break
+
+    case SubscriptionOptions.BROADCAST:
+      // ephemeral consumer per subscriber (no queue group): every subscriber receives every message
+      consumerCfg.name = consumerName + '__' + randomUUID().replaceAll('-', '')
+      consumerCfg.deliver_policy = DeliverPolicy.New
+      consumerCfg.ack_wait = parseInt(JETSTREAM_BROADCAST_AckWaitTime, 10)
       break
 
     default:
       throw new Error(`Unsupported subscription option: ${opts}`)
   }
 
-  const ci = await jsm.consumers.add(stream, consumerCfg)
+  const ci = await createOrUpdateConsumer(jsm, stream, consumerCfg)
   const consumer = await jsClient.consumers.get(stream, ci.name)
   return consumer
+}
+
+// consumers.add only creates: a consumer that already exists with a different config is rejected
+const JS_CONSUMER_ALREADY_EXISTS = 10148
+
+async function createOrUpdateConsumer(
+  jsm: JetStreamManager,
+  stream: string,
+  consumerCfg: Partial<ConsumerConfig>
+): Promise<ConsumerInfo> {
+  try {
+    return await jsm.consumers.add(stream, consumerCfg)
+  } catch (err) {
+    // A consumer shared by every subscriber (PUB_SUB) is created by the first one; the others update it,
+    // so the latest subscriber's config wins, as with NATS.Net's CreateOrUpdate in NBB.
+    if (consumerCfg.name && err instanceof NatsError && err.api_error?.err_code === JS_CONSUMER_ALREADY_EXISTS) {
+      return await jsm.consumers.update(stream, consumerCfg.name, consumerCfg)
+    }
+    throw err
+  }
 }
 
 function jetstreamConnection(nc: NatsConnection): JetstreamConnection {
