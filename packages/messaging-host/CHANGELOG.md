@@ -1,5 +1,13 @@
 # @totalsoft/messaging-host
 
+## 2.6.1
+
+### Patch Changes
+
+- Updated dependencies [965e068]
+- Updated dependencies [965e068]
+  - @totalsoft/message-bus@2.11.0
+
 ## 2.6.0
 
 ### Minor Changes

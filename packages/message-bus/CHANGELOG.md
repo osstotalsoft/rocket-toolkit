@@ -1,5 +1,12 @@
 # @totalsoft/message-bus
 
+## 2.11.0
+
+### Minor Changes
+
+- 965e068: New `SubscriptionOptions.BROADCAST` mode: non-durable, at-most-once, without a queue group, so every instance of a service receives every message (for example to refresh an in-memory cache or push to the clients connected to each instance). It is supported by the NATS Streaming, JetStream and Rusi transports and configured with its own environment variables (`NATS_BROADCAST_MaxInflight` / `NATS_BROADCAST_AckWait`, `JETSTREAM_BROADCAST_MaxConcurrentMessages` / `JETSTREAM_BROADCAST_AckWaitTime`, `RUSI_BROADCAST_MaxConcurrentMessages` / `RUSI_BROADCAST_AckWaitTime`), with a default concurrency of 100. It matches `SubscriptionTransportOptions.Broadcast` in NBB. RPC is unchanged.
+- 965e068: JetStream transport: PUB_SUB subscriptions now share one ephemeral consumer per client id and subject (`<clientId>__<subject>`), so instances of a service compete for messages, as they do with the NATS Streaming and Rusi transports. Previously every PUB_SUB subscriber got its own consumer and received every message. RPC subscriptions keep fan-out and now get a named ephemeral consumer (`<clientId>__<subject>__<uuid>`). If you relied on PUB_SUB fanning out on JetStream, use the new BROADCAST mode.
+
 ## 2.10.3
 
 ### Patch Changes
