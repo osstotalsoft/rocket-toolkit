@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@jest/types": "^30.4.1",
+    "@opentelemetry/api": "^1.9.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.1.0",
     "@types/ramda": "^0.32.0",
@@ -37,7 +38,6 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/semantic-conventions": "^1.41.1",
     "pino": "^10.3.1",
     "ramda": "^0.32.0",
@@ -48,5 +48,8 @@
     "testEnvironment": "node",
     "verbose": true
   },
-  "license": "MIT"
+  "license": "MIT",
+  "peerDependencies": {
+    "@opentelemetry/api": "^1.9.0"
+  }
 }
