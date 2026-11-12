@@ -246,6 +246,25 @@ describe('Testing rusi transport', () => {
     errorSpy.mockRestore()
   })
 
+  test('unsubscribe does not throw when grpc emits the CANCELLED error after cancel', async () => {
+    // arrange — grpc-js emits 'error' (code 1 CANCELLED) on the stream after call.cancel()
+    const { EventEmitter } = require('events')
+    const realCall = Object.assign(new EventEmitter(), { write: jest.fn() })
+    realCall.cancel = jest.fn(() => {
+      realCall.emit('error', Object.assign(new Error('1 CANCELLED: Cancelled on client'), { code: 1 }))
+    })
+    mockRusiClient.Subscribe.mockReturnValueOnce(realCall)
+
+    const sub = await rusi.subscribe('subject', jest.fn(), SubscriptionOptions.RPC, serDes)
+    const errorListener = jest.fn()
+    sub.on('error', errorListener)
+
+    // act - assert
+    await expect(sub.unsubscribe?.call(sub)).resolves.toBeUndefined()
+    expect(realCall.cancel).toHaveBeenCalled()
+    expect(errorListener).not.toHaveBeenCalled()
+  })
+
   test('disconnect happens if the connection is open', async () => {
     // arrange
 
