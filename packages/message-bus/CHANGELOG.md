@@ -1,5 +1,11 @@
 # @totalsoft/message-bus
 
+## 2.11.1
+
+### Patch Changes
+
+- c4b183c: fix(message-bus): don't crash when a Rusi subscription is unsubscribed. grpc-js emits a `1 CANCELLED` error on the stream after `cancel()`, and because `unsubscribe` removed the `'error'` listener first, it became an uncaught exception (seen after every `sendCommandAndReceiveEvent`).
+
 ## 2.11.0
 
 ### Minor Changes
