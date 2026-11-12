@@ -246,6 +246,8 @@ function fromUTF8Array(data: number[]): string {
   return str
 }
 
+const noop = () => {}
+
 function rusiSubscription(call: grpc.ClientDuplexStream<any, any>, subject?: string): RusiSubscription {
   const sub = <RusiSubscription> new EventEmitter()
 
@@ -271,6 +273,9 @@ function rusiSubscription(call: grpc.ClientDuplexStream<any, any>, subject?: str
   sub.unsubscribe = function unsubscribe() {
     call.removeListener('error', onError)
     call.removeListener('end', onEnd)
+    // grpc-js reports a client-side cancel by emitting 'error' (1 CANCELLED) on the stream.
+    // An 'error' event with no listener throws (uncaughtException), so swallow it here.
+    call.on('error', noop)
     call.cancel?.call(call)
     return Promise.resolve()
   }
