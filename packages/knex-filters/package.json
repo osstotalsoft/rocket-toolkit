@@ -41,7 +41,7 @@
     "lodash": "^4.18.1",
     "mock-knex": "^0.4.13",
     "mssql": "^12.7.0",
-    "rimraf": "^6.1.3",
+    "rimraf": "^6.1.4",
     "ts-jest": "^29.4.11",
     "typescript": "^5.9.3"
   },
