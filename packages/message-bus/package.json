@@ -20,7 +20,7 @@
     "lint": "eslint src/*.ts",
     "clean": "rimraf dist",
     "test": "jest --collectCoverage --passWithNoTests --verbose --silent=false --runInBand",
-    "copy-files": "copyfiles -u 1 src/**/*.proto dist/src/",
+    "copy-files": "node -e \"const fs = require('fs'); fs.cpSync('src', 'dist/src', { recursive: true, filter: s => fs.statSync(s).isDirectory() || s.endsWith('.proto') })\"",
     "docker-run-jestream": "docker run -p 4222:4222 -it --rm nats -js",
     "docker-run-nats-streaming": "docker run -p 4222:4222 -p 8222:8222 -it --rm nats-streaming:alpine"
   },
@@ -43,14 +43,12 @@
   "devDependencies": {
     "@jest/types": "^30.4.1",
     "@types/bluebird": "^3.5.42",
-    "@types/copyfiles": "^2.4.4",
     "@types/humps": "^2.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.1.0",
-    "copyfiles": "^2.4.1",
     "dotenv": "^17.4.2",
     "jest": "^30.4.2",
-    "rimraf": "^6.1.3",
+    "rimraf": "^6.1.4",
     "ts-jest": "^29.4.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
